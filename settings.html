@@ -18,9 +18,45 @@
                 <input id="tensei-system-inject-state" type="checkbox" />
                 <span>Include current state in role-play prompts</span>
             </label>
+            <div class="tensei-settings-grid">
+                <label class="tensei-settings-field" for="tensei-system-language">
+                    <span>Interface & action language / ภาษา</span>
+                    <select id="tensei-system-language">
+                        <option value="en">English</option>
+                        <option value="th">ไทย</option>
+                    </select>
+                </label>
+                <label class="tensei-settings-field" for="tensei-system-interaction-mode">
+                    <span>Action delivery / รูปแบบข้อความ</span>
+                    <select id="tensei-system-interaction-mode">
+                        <option value="hidden">Hidden — no user bubble</option>
+                        <option value="visible">Visible — send immediately</option>
+                        <option value="draft">Draft only — review first</option>
+                    </select>
+                </label>
+                <label class="tensei-settings-field" for="tensei-system-accent">
+                    <span>Interface accent / สีหลัก</span>
+                    <input id="tensei-system-accent" type="color" value="#b78648" />
+                </label>
+                <label class="tensei-settings-field" for="tensei-system-density">
+                    <span>Information density / ความหนาแน่น</span>
+                    <select id="tensei-system-density">
+                        <option value="compact">Compact</option>
+                        <option value="comfortable">Comfortable</option>
+                    </select>
+                </label>
+                <label class="tensei-settings-field" for="tensei-system-glass">
+                    <span>Glass opacity</span>
+                    <input id="tensei-system-glass" type="range" min="55" max="98" value="86" />
+                </label>
+                <label class="tensei-settings-field" for="tensei-system-glow">
+                    <span>Magic glow</span>
+                    <input id="tensei-system-glow" type="range" min="0" max="100" value="38" />
+                </label>
+            </div>
             <div class="tensei-system-settings-note">
                 <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-                <span>Uses SillyTavern's active API and model. This extension does not read, copy, or store API keys.</span>
+                <span>Hidden actions use a temporary one-turn prompt and create no user chat bubble. The extension uses SillyTavern's active API/model and never reads, copies, or stores API keys.</span>
             </div>
             <div class="tensei-system-settings-actions">
                 <button id="tensei-system-open-from-settings" class="menu_button">

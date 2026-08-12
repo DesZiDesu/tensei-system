@@ -4,6 +4,7 @@ const EXTENSION_FOLDER = 'third-party/tensei-system';
 const SETTINGS_KEY = 'tensei_system';
 const METADATA_KEY = 'tensei_system_state';
 const PROMPT_KEY = 'tensei_system_roleplay_state';
+const ACTION_PROMPT_KEY = 'tensei_system_hidden_action';
 const RANKS = ['F', 'E', 'D', 'C', 'B', 'A', 'S'];
 const MASTERY = ['None', 'Beginner', 'Intermediate', 'Advanced', 'Saint', 'King', 'Emperor', 'God'];
 const DAY_PHASES = ['Morning', 'Afternoon', 'Evening', 'Night'];
@@ -44,7 +45,52 @@ const LOCATION_REGIONS = {
     Millishion: 'Holy Country of Millis', 'West Port': 'Holy Country of Millis', Rapan: 'Begaritt Continent',
     'Teleport Labyrinth': 'Begaritt Continent',
 };
-const DEFAULT_SETTINGS = Object.freeze({ showWandLauncher: true, autoTrack: true, injectState: true });
+const DEFAULT_SETTINGS = Object.freeze({
+    showWandLauncher: true,
+    autoTrack: true,
+    injectState: true,
+    language: 'en',
+    interactionMode: 'hidden',
+    accentColor: '#b78648',
+    glassOpacity: 86,
+    glowStrength: 38,
+    density: 'compact',
+});
+
+const TRANSLATIONS = {
+    th: {
+        'Mushoku Tensei Role-play': 'ระบบโรลเพลย์ Mushoku Tensei',
+        'Magic interface': 'อินเทอร์เฟซเวทมนตร์',
+        'Synchronizing world state': 'กำลังเชื่อมข้อมูลโลก',
+        'Connecting to the active role-play...': 'กำลังเชื่อมต่อกับโรลเพลย์ปัจจุบัน...',
+        Ready: 'พร้อม', Status: 'สถานะ', Inventory: 'คลังสิ่งของ', Skills: 'ทักษะ', Quests: 'ภารกิจ', Rank: 'อันดับ', 'World Map': 'แผนที่โลก',
+        'Waiting for chat': 'กำลังรอแชต', 'Sync latest turn': 'ซิงก์เหตุการณ์ล่าสุด', 'System interface': 'ข้อมูลระบบ',
+        'Current persona': 'ตัวตนปัจจุบัน', 'Guild rank': 'อันดับกิลด์', 'Vital status': 'สถานะพลังชีวิต', Identity: 'ข้อมูลส่วนตัว',
+        Health: 'พลังชีวิต', Mana: 'มานา', Stamina: 'พละกำลัง', Race: 'เผ่าพันธุ์', Age: 'อายุ', Guild: 'กิลด์', Party: 'ปาร์ตี้',
+        'Current region': 'ภูมิภาคปัจจุบัน', 'Exact place': 'สถานที่ปัจจุบัน', 'Edit status': 'แก้ไขสถานะ', Name: 'ชื่อ', Title: 'ฉายา',
+        Condition: 'สภาพร่างกาย', Level: 'เลเวล', 'Day phase': 'ช่วงเวลา', 'World time': 'เวลาโลก', 'World day': 'วันที่', 'Zone type': 'ประเภทเขต',
+        'HP max': 'HP สูงสุด', 'MP max': 'MP สูงสุด', 'Stamina max': 'พละกำลังสูงสุด', 'Save status': 'บันทึกสถานะ',
+        'Add inventory item': 'เพิ่มสิ่งของ', 'Item name': 'ชื่อสิ่งของ', Quantity: 'จำนวน', Category: 'หมวดหมู่', Description: 'รายละเอียด', 'Add item': 'เพิ่มสิ่งของ',
+        'Skills & Magic': 'ทักษะและเวทมนตร์', 'Add skill': 'เพิ่มทักษะ', 'Skill name': 'ชื่อทักษะ', Type: 'ประเภท',
+        'Quest Log': 'บันทึกภารกิจ', 'Add quest': 'เพิ่มภารกิจ', 'Quest name': 'ชื่อภารกิจ', Objective: 'เป้าหมาย', Reward: 'รางวัล',
+        'Ranks & Progression': 'อันดับและความก้าวหน้า', 'Guild and mastery record': 'บันทึกอันดับกิลด์และความชำนาญ', 'Adventurer Rank': 'อันดับนักผจญภัย',
+        'Recognized guild classification': 'ระดับที่กิลด์รับรอง', 'Magic mastery': 'ความชำนาญเวทมนตร์', 'Sword mastery': 'ความชำนาญดาบ', Experience: 'ค่าประสบการณ์', Reputation: 'ชื่อเสียง',
+        Gold: 'เหรียญทอง', Silver: 'เหรียญเงิน', Copper: 'เหรียญทองแดง', 'Edit progression': 'แก้ไขความก้าวหน้า', 'Adventurer rank': 'อันดับนักผจญภัย',
+        'Magic rank': 'ระดับเวทมนตร์', 'Sword rank': 'ระดับดาบ', 'EXP to next level': 'EXP สำหรับเลเวลถัดไป', 'Save progression': 'บันทึกความก้าวหน้า',
+        'Six-Faced World Atlas': 'แผนที่โลกหกด้าน', 'Selected location': 'สถานที่ที่เลือก', Region: 'ภูมิภาค', Discovery: 'การค้นพบ', Marker: 'หมุด',
+        Recorded: 'บันทึกแล้ว', Unexplored: 'ยังไม่สำรวจ', Pinned: 'ปักหมุดแล้ว', None: 'ไม่มี', Destination: 'จุดหมาย', 'Exact place / scene': 'สถานที่หรือฉากโดยละเอียด',
+        'Location detail': 'รายละเอียดสถานที่', 'Travel and notify chat': 'เดินทางและแจ้งในโรลเพลย์', 'Marker label': 'ชื่อหมุด', 'Marker note': 'บันทึกหมุด', 'Mark location': 'ปักหมุดสถานที่',
+        Current: 'ปัจจุบัน', Discovered: 'ค้นพบแล้ว', Marked: 'ปักหมุด', 'Drag to pan · Pinch or scroll to zoom': 'ลากเพื่อเลื่อน · จีบนิ้วหรือเลื่อนเพื่อซูม',
+        Morning: 'เช้า', Afternoon: 'บ่าย', Evening: 'เย็น', Night: 'กลางคืน', 'Safe Zone': 'เขตปลอดภัย', 'Neutral Zone': 'เขตเป็นกลาง', 'Danger Zone': 'เขตอันตราย', 'Unknown Zone': 'เขตไม่ทราบข้อมูล',
+        Active: 'กำลังดำเนินการ', Completed: 'สำเร็จ', Failed: 'ล้มเหลว', 'On Hold': 'พักไว้', Beginner: 'เริ่มต้น', Intermediate: 'กลาง', Advanced: 'ขั้นสูง', Saint: 'เซนต์', King: 'คิง', Emperor: 'จักรพรรดิ', God: 'เทพ',
+        'No description': 'ไม่มีรายละเอียด', 'No objective recorded': 'ยังไม่ได้บันทึกเป้าหมาย', 'Your inventory is empty.': 'คลังสิ่งของยังว่างอยู่',
+        'Skills learned during role-play will appear here.': 'ทักษะที่เรียนรู้ระหว่างโรลเพลย์จะแสดงที่นี่', 'No quests have been recorded yet.': 'ยังไม่มีภารกิจที่ถูกบันทึก',
+        'Open a chat to activate this system': 'เปิดแชตเพื่อใช้งานระบบ', 'Reading latest turn': 'กำลังอ่านเหตุการณ์ล่าสุด', 'AI synchronized': 'ซิงก์กับ AI แล้ว', 'Sync unavailable': 'ไม่สามารถซิงก์ได้',
+        Appearance: 'รูปแบบหน้าจอ', Accent: 'สีหลัก', Glass: 'ความโปร่งใส', Glow: 'แสงเรือง', Density: 'ความหนาแน่น', Language: 'ภาษา', 'Action delivery': 'รูปแบบการส่งคำสั่ง',
+        Compact: 'กระชับ', Comfortable: 'สบายตา', Hidden: 'ซ่อนข้อความ', Visible: 'แสดงข้อความ', 'Draft only': 'ร่างเท่านั้น',
+        'Choose profile picture': 'เลือกรูปโปรไฟล์', 'Use in role-play': 'ใช้ในโรลเพลย์', Remove: 'ลบ', 'Pursue in role-play': 'ดำเนินภารกิจในโรลเพลย์',
+    },
+};
 
 let initialized = false;
 let previousFocusedElement = null;
@@ -65,6 +111,30 @@ const number = (value, fallback = 0, min = 0, max = 999999999) => {
 };
 const html = value => String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+
+function tr(value) {
+    const language = getSettings().language;
+    return TRANSLATIONS[language]?.[value] || value;
+}
+
+function hexToRgb(hex) {
+    const value = /^#[0-9a-f]{6}$/i.test(hex) ? hex.slice(1) : DEFAULT_SETTINGS.accentColor.slice(1);
+    return `${parseInt(value.slice(0, 2), 16)}, ${parseInt(value.slice(2, 4), 16)}, ${parseInt(value.slice(4, 6), 16)}`;
+}
+
+function applyAppearance() {
+    const settings = getSettings();
+    const root = document.documentElement;
+    root.style.setProperty('--tensei-accent', settings.accentColor);
+    root.style.setProperty('--tensei-accent-rgb', hexToRgb(settings.accentColor));
+    root.style.setProperty('--tensei-glass-opacity', String(settings.glassOpacity / 100));
+    root.style.setProperty('--tensei-glow-strength', String(settings.glowStrength / 100));
+    const overlay = document.getElementById('tensei-system-overlay');
+    if (overlay) {
+        overlay.dataset.density = settings.density;
+        overlay.dataset.language = settings.language;
+    }
+}
 
 function defaultState() {
     return {
@@ -94,7 +164,14 @@ function getSettings() {
     for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
         if (!Object.hasOwn(extensionSettings[SETTINGS_KEY], key)) extensionSettings[SETTINGS_KEY][key] = value;
     }
-    return extensionSettings[SETTINGS_KEY];
+    const settings = extensionSettings[SETTINGS_KEY];
+    if (!['en', 'th'].includes(settings.language)) settings.language = DEFAULT_SETTINGS.language;
+    if (!['hidden', 'visible', 'draft'].includes(settings.interactionMode)) settings.interactionMode = DEFAULT_SETTINGS.interactionMode;
+    if (!['compact', 'comfortable'].includes(settings.density)) settings.density = DEFAULT_SETTINGS.density;
+    if (!/^#[0-9a-f]{6}$/i.test(settings.accentColor)) settings.accentColor = DEFAULT_SETTINGS.accentColor;
+    settings.glassOpacity = number(settings.glassOpacity, DEFAULT_SETTINGS.glassOpacity, 55, 98);
+    settings.glowStrength = number(settings.glowStrength, DEFAULT_SETTINGS.glowStrength, 0, 100);
+    return settings;
 }
 
 function meter(value, fallback) {
@@ -270,7 +347,29 @@ function mapLocation(id) {
 
 const tabButton = (id, icon, label, active = false) => `
     <button class="tensei-tab-button${active ? ' is-active' : ''}" type="button" role="tab"
-        data-tab="${id}" aria-selected="${active}"><i class="${icon}"></i><span>${label}</span></button>`;
+        data-tab="${id}" aria-selected="${active}"><i class="${icon}"></i><span>${html(tr(label))}</span></button>`;
+
+function appearanceMenu() {
+    const settings = getSettings();
+    return `<details class="tensei-appearance-menu">
+        <summary aria-label="${html(tr('Appearance'))}" title="${html(tr('Appearance'))}"><i class="fa-solid fa-sliders"></i></summary>
+        <div class="tensei-appearance-popover">
+            <div class="tensei-popover-heading"><span>${html(tr('Appearance'))}</span><small>UI 0.4</small></div>
+            <label class="tensei-setting-row"><span>${html(tr('Accent'))}</span><input type="color" data-ui-setting="accentColor" value="${settings.accentColor}"></label>
+            <label class="tensei-setting-row"><span>${html(tr('Glass'))}</span><input type="range" data-ui-setting="glassOpacity" min="55" max="98" value="${settings.glassOpacity}"></label>
+            <label class="tensei-setting-row"><span>${html(tr('Glow'))}</span><input type="range" data-ui-setting="glowStrength" min="0" max="100" value="${settings.glowStrength}"></label>
+            <label class="tensei-setting-row"><span>${html(tr('Density'))}</span><select data-ui-setting="density">
+                <option value="compact"${settings.density === 'compact' ? ' selected' : ''}>${html(tr('Compact'))}</option>
+                <option value="comfortable"${settings.density === 'comfortable' ? ' selected' : ''}>${html(tr('Comfortable'))}</option></select></label>
+            <label class="tensei-setting-row"><span>${html(tr('Language'))}</span><select data-ui-setting="language">
+                <option value="en"${settings.language === 'en' ? ' selected' : ''}>English</option>
+                <option value="th"${settings.language === 'th' ? ' selected' : ''}>ไทย</option></select></label>
+            <label class="tensei-setting-row"><span>${html(tr('Action delivery'))}</span><select data-ui-setting="interactionMode">
+                <option value="hidden"${settings.interactionMode === 'hidden' ? ' selected' : ''}>${html(tr('Hidden'))}</option>
+                <option value="visible"${settings.interactionMode === 'visible' ? ' selected' : ''}>${html(tr('Visible'))}</option>
+                <option value="draft"${settings.interactionMode === 'draft' ? ' selected' : ''}>${html(tr('Draft only'))}</option></select></label>
+        </div></details>`;
+}
 
 function buildInterface() {
     if (document.getElementById('tensei-system-overlay')) return;
@@ -284,18 +383,19 @@ function buildInterface() {
             aria-labelledby="tensei-system-title" tabindex="-1">
             <div class="tensei-boot" aria-live="polite">
                 <div class="tensei-boot-rune"><i class="fa-solid fa-wand-sparkles"></i></div>
-                <span class="tensei-boot-kicker">Magic interface</span>
-                <strong>Synchronizing world state</strong>
+                <span class="tensei-boot-kicker">${html(tr('Magic interface'))}</span>
+                <strong>${html(tr('Synchronizing world state'))}</strong>
                 <div class="tensei-boot-track"><span></span></div>
-                <small>Connecting to the active role-play...</small>
+                <small>${html(tr('Connecting to the active role-play...'))}</small>
             </div>
             <div class="tensei-app-shell">
                 <header class="tensei-system-panel-header">
                     <div class="tensei-system-brand-mark"><i class="fa-solid fa-book-open"></i></div>
-                    <div class="tensei-system-panel-heading"><span class="tensei-system-kicker">Mushoku Tensei Role-play</span>
+                    <div class="tensei-system-panel-heading"><span class="tensei-system-kicker">${html(tr('Mushoku Tensei Role-play'))}</span>
                         <h2 id="tensei-system-title">Tensei System</h2></div>
                     <div id="tensei-system-sync-state" class="tensei-sync-state" data-mode="ready">
-                        <i class="fa-solid fa-circle"></i><span>Ready</span></div>
+                        <i class="fa-solid fa-circle"></i><span>${html(tr('Ready'))}</span></div>
+                    ${appearanceMenu()}
                     <button id="tensei-system-close" class="menu_button menu_button_icon" type="button" aria-label="Close">
                         <i class="fa-solid fa-xmark"></i></button>
                 </header>
@@ -315,9 +415,9 @@ function buildInterface() {
                     </main>
                 </div>
                 <footer class="tensei-system-panel-footer">
-                    <span id="tensei-context-label"><i class="fa-solid fa-link"></i> Waiting for chat</span>
+                    <span id="tensei-context-label"><i class="fa-solid fa-link"></i> ${html(tr('Waiting for chat'))}</span>
                     <button id="tensei-sync-now" class="tensei-text-button" type="button">
-                        <i class="fa-solid fa-rotate"></i> Sync latest turn</button>
+                        <i class="fa-solid fa-rotate"></i> ${html(tr('Sync latest turn'))}</button>
                 </footer>
             </div>
         </section>`;
@@ -330,6 +430,33 @@ function buildInterface() {
     body?.addEventListener('submit', onSubmit);
     body?.addEventListener('click', onPanelClick);
     body?.addEventListener('change', onPanelChange);
+    overlay.addEventListener('input', onInterfaceSettingChange);
+    overlay.addEventListener('change', onInterfaceSettingChange);
+    applyAppearance();
+}
+
+function rebuildInterface() {
+    const previous = document.getElementById('tensei-system-overlay');
+    const wasOpen = previous?.classList.contains('is-open');
+    previous?.remove();
+    buildInterface();
+    renderAll();
+    if (wasOpen) {
+        const overlay = document.getElementById('tensei-system-overlay');
+        overlay?.classList.add('is-open', 'is-ready');
+        overlay?.setAttribute('aria-hidden', 'false');
+    }
+}
+
+function onInterfaceSettingChange(event) {
+    const control = event.target.closest('[data-ui-setting]');
+    if (!(control instanceof HTMLInputElement || control instanceof HTMLSelectElement)) return;
+    const key = control.dataset.uiSetting;
+    const settings = getSettings();
+    settings[key] = control.type === 'range' ? Number(control.value) : control.value;
+    SillyTavern.getContext().saveSettingsDebounced();
+    if (key === 'language' && event.type === 'change') rebuildInterface();
+    else applyAppearance();
 }
 
 function activateTab(id) {
@@ -363,23 +490,22 @@ function activateTab(id) {
 }
 
 const input = (label, name, value, type = 'text', extra = '') =>
-    `<label class="tensei-field"><span>${label}</span><input name="${name}" type="${type}" value="${html(value)}" ${extra}></label>`;
+    `<label class="tensei-field"><span>${html(tr(label))}</span><input name="${name}" type="${type}" value="${html(value)}" ${extra}></label>`;
 const select = (label, name, options, selected) =>
-    `<label class="tensei-field"><span>${label}</span><select name="${name}">${options.map(value =>
-        `<option value="${html(value)}"${value === selected ? ' selected' : ''}>${html(value)}</option>`).join('')}</select></label>`;
+    `<label class="tensei-field"><span>${html(tr(label))}</span><select name="${name}">${options.map(value =>
+        `<option value="${html(value)}"${value === selected ? ' selected' : ''}>${html(tr(value))}</option>`).join('')}</select></label>`;
 const heading = (title, subtitle, icon) =>
-    `<div class="tensei-section-heading"><div><span class="tensei-eyebrow">System interface</span>
-        <h3>${html(title)}</h3><p>${html(subtitle)}</p></div><i class="${icon} tensei-heading-icon"></i></div>`;
-const empty = message => `<div class="tensei-empty-state"><i class="fa-regular fa-compass"></i><p>${html(message)}</p></div>`;
+    `<div class="tensei-section-heading"><div><span class="tensei-eyebrow">${html(tr('System interface'))}</span>
+        <h3>${html(tr(title))}</h3><p>${html(tr(subtitle))}</p></div><i class="${icon} tensei-heading-icon"></i></div>`;
+const empty = message => `<div class="tensei-empty-state"><i class="fa-regular fa-compass"></i><p>${html(tr(message))}</p></div>`;
 
 function meterView(label, value, icon, tone) {
     const percent = Math.round(value.current / Math.max(1, value.max) * 100);
-    const offset = 176 - (176 * Math.min(100, percent) / 100);
-    return `<article class="tensei-vital tensei-vital-${tone}"><div class="tensei-vital-orbit">
-        <svg viewBox="0 0 68 68" aria-hidden="true"><circle class="tensei-vital-base" cx="34" cy="34" r="28"></circle>
-        <circle class="tensei-vital-value" cx="34" cy="34" r="28" style="stroke-dashoffset:${offset}"></circle></svg>
-        <span><i class="${icon}"></i><b>${percent}%</b></span></div><div class="tensei-vital-copy">
-        <small>${label}</small><strong>${value.current}<em>/ ${value.max}</em></strong></div></article>`;
+    return `<article class="tensei-vital tensei-vital-${tone}">
+        <div class="tensei-vital-line"><span><i class="${icon}"></i>${html(tr(label))}</span><strong>${value.current} <em>/ ${value.max}</em></strong></div>
+        <div class="tensei-vital-track" role="meter" aria-valuenow="${value.current}" aria-valuemax="${value.max}" aria-label="${html(tr(label))}">
+            <span style="width:${Math.min(100, percent)}%"></span><i style="left:${Math.min(100, percent)}%"></i>
+        </div><small>${percent}%</small></article>`;
 }
 
 function renderAll(state = getState()) {
@@ -394,7 +520,7 @@ function renderAll(state = getState()) {
     const label = overlay.querySelector('#tensei-context-label');
     if (label) label.innerHTML = SillyTavern.getContext().getCurrentChatId?.()
         ? `<i class="fa-solid fa-location-dot"></i> ${html(state.location.region)} · ${html(state.location.place)}`
-        : '<i class="fa-solid fa-triangle-exclamation"></i> Open a chat to activate this system';
+        : `<i class="fa-solid fa-triangle-exclamation"></i> ${html(tr('Open a chat to activate this system'))}`;
 }
 
 function renderStatus(panel, state) {
@@ -404,38 +530,38 @@ function renderStatus(panel, state) {
     const expPercent = Math.min(100, Math.round(state.progression.experience / Math.max(1, state.progression.experienceMax) * 100));
     const initial = html((persona || '?').charAt(0).toUpperCase());
     panel.innerHTML = `
-        <section class="tensei-character-hero"><button class="tensei-avatar" type="button" data-action="choose-portrait" aria-label="Choose profile picture">
+        <section class="tensei-character-hero"><button class="tensei-avatar" type="button" data-action="choose-portrait" aria-label="${html(tr('Choose profile picture'))}">
             <span class="tensei-magic-ring ring-one"></span><span class="tensei-magic-ring ring-two"></span>
             ${state.player.portrait ? `<img src="${html(state.player.portrait)}" alt="${html(persona)} portrait">` : `<span class="tensei-avatar-initial">${initial}</span>`}
             <span class="tensei-avatar-edit"><i class="fa-solid fa-camera"></i></span></button>
             <input id="tensei-avatar-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
-            <div class="tensei-character-copy"><span class="tensei-eyebrow">Current persona</span><h3>${html(persona)}</h3>
+            <div class="tensei-character-copy"><span class="tensei-eyebrow">${html(tr('Current persona'))}</span><h3>${html(persona)}</h3>
                 <p class="tensei-character-title">${html(state.player.title)}</p><div class="tensei-identity-chips">
                 <span><i class="fa-solid fa-dna"></i>${html(state.player.race)}</span><span><i class="fa-solid fa-shield-halved"></i>${html(state.player.guild)}</span>
                 <span><i class="fa-solid fa-people-group"></i>${html(state.player.party)}</span></div></div>
-            <span class="tensei-rank-seal"><small>Guild rank</small>${html(state.progression.adventurerRank)}</span></section>
+            <span class="tensei-rank-seal"><small>${html(tr('Guild rank'))}</small>${html(state.progression.adventurerRank)}</span></section>
         <section class="tensei-progress-deck"><div class="tensei-day-cycle" style="--phase:${phaseIndex}">
             <div class="tensei-cycle-line"><span></span></div>${DAY_PHASES.map((phase, index) => `<div class="tensei-cycle-stop${index === phaseIndex ? ' is-current' : ''}">
-                <i class="${['fa-solid fa-sun','fa-regular fa-sun','fa-solid fa-cloud-sun','fa-solid fa-moon'][index]}"></i><span>${phase}</span></div>`).join('')}
-            <div class="tensei-clock-label"><b>Day ${state.worldClock.day}</b><span>${html(state.worldClock.time)}</span></div></div>
+                <i class="${['fa-solid fa-sun','fa-regular fa-sun','fa-solid fa-cloud-sun','fa-solid fa-moon'][index]}"></i><span>${html(tr(phase))}</span></div>`).join('')}
+            <div class="tensei-clock-label"><b>${getSettings().language === 'th' ? `วันที่ ${state.worldClock.day}` : `Day ${state.worldClock.day}`}</b><span>${html(state.worldClock.time)}</span></div></div>
             <div class="tensei-exp-line"><div class="tensei-exp-track"><span style="width:${expPercent}%"></span><i style="left:${expPercent}%"></i></div>
-            <p><strong>${state.progression.experience} / ${state.progression.experienceMax} EXP</strong><span>Lv. ${state.player.level} · ${html(state.location.zoneType)} · ${html(state.location.place === 'Unknown' ? state.location.region : state.location.place)}</span></p></div></section>
+            <p><strong>${state.progression.experience} / ${state.progression.experienceMax} EXP</strong><span>Lv. ${state.player.level} · ${html(tr(state.location.zoneType))} · ${html(state.location.place === 'Unknown' ? state.location.region : state.location.place)}</span></p></div></section>
         <div class="tensei-dashboard-grid">
-            <article class="tensei-card tensei-vitals-card"><div class="tensei-card-title"><span>Vital resonance</span>
+            <article class="tensei-card tensei-vitals-card"><div class="tensei-card-title"><span>${html(tr('Vital status'))}</span>
                 <em><i class="fa-solid fa-wave-square"></i> ${html(state.player.condition)}</em></div><div class="tensei-vitals-grid">
                 ${meterView('Health', state.player.hp, 'fa-solid fa-heart', 'health')}
                 ${meterView('Mana', state.player.mp, 'fa-solid fa-droplet', 'mana')}
                 ${meterView('Stamina', state.player.stamina, 'fa-solid fa-bolt', 'stamina')}</div></article>
-            <article class="tensei-card"><div class="tensei-card-title"><span>Identity</span>
+            <article class="tensei-card"><div class="tensei-card-title"><span>${html(tr('Identity'))}</span>
                 <i class="fa-solid fa-feather"></i></div><dl class="tensei-fact-list">
-                <div><dt>Race</dt><dd>${html(state.player.race)}</dd></div>
-                <div><dt>Age</dt><dd>${html(state.player.age || 'Unknown')}</dd></div>
-                <div><dt>Guild</dt><dd>${html(state.player.guild)}</dd></div>
-                <div><dt>Party</dt><dd>${html(state.player.party)}</dd></div>
-                <div><dt>Current region</dt><dd>${html(state.location.region)}</dd></div>
-                <div><dt>Exact place</dt><dd>${html(state.location.place)}</dd></div></dl></article>
+                <div><dt>${html(tr('Race'))}</dt><dd>${html(state.player.race)}</dd></div>
+                <div><dt>${html(tr('Age'))}</dt><dd>${html(state.player.age || 'Unknown')}</dd></div>
+                <div><dt>${html(tr('Guild'))}</dt><dd>${html(state.player.guild)}</dd></div>
+                <div><dt>${html(tr('Party'))}</dt><dd>${html(state.player.party)}</dd></div>
+                <div><dt>${html(tr('Current region'))}</dt><dd>${html(state.location.region)}</dd></div>
+                <div><dt>${html(tr('Exact place'))}</dt><dd>${html(state.location.place)}</dd></div></dl></article>
         </div>
-        <details class="tensei-editor"><summary><i class="fa-solid fa-pen"></i> Edit status</summary>
+        <details class="tensei-editor"><summary><i class="fa-solid fa-pen"></i> ${html(tr('Edit status'))}</summary>
             <form data-form="status" class="tensei-form-grid">
                 ${input('Name', 'name', state.player.name)}${input('Title', 'title', state.player.title)}
                 ${input('Race', 'race', state.player.race)}${input('Age', 'age', state.player.age)}
@@ -446,7 +572,7 @@ function renderStatus(panel, state) {
                 ${input('HP', 'hpCurrent', state.player.hp.current, 'number', 'min="0"')}${input('HP max', 'hpMax', state.player.hp.max, 'number', 'min="1"')}
                 ${input('MP', 'mpCurrent', state.player.mp.current, 'number', 'min="0"')}${input('MP max', 'mpMax', state.player.mp.max, 'number', 'min="1"')}
                 ${input('Stamina', 'staminaCurrent', state.player.stamina.current, 'number', 'min="0"')}${input('Stamina max', 'staminaMax', state.player.stamina.max, 'number', 'min="1"')}
-                <button class="tensei-primary-button tensei-form-submit" type="submit">Save status</button>
+                <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Save status'))}</button>
             </form></details>`;
 }
 
@@ -456,13 +582,13 @@ function renderInventory(panel, state) {
         <div class="tensei-item-grid">${state.inventory.length ? state.inventory.map(entry => `
             <article class="tensei-list-card"><div class="tensei-item-icon"><i class="fa-solid fa-cube"></i></div>
                 <div class="tensei-item-copy"><strong>${html(entry.name)}</strong><span>${html(entry.category)} · ×${entry.quantity}</span>
-                <p>${html(entry.description || 'No description')}</p></div><div class="tensei-card-actions">
-                <button type="button" data-action="use-item" data-id="${html(entry.id)}" title="Use in chat"><i class="fa-solid fa-comment-dots"></i></button>
-                <button type="button" data-action="delete-item" data-id="${html(entry.id)}" title="Remove"><i class="fa-solid fa-trash"></i></button></div></article>`).join('') : empty('Your inventory is empty.')}</div>
-        <details class="tensei-editor"><summary><i class="fa-solid fa-plus"></i> Add inventory item</summary>
+                <p>${html(entry.description || tr('No description'))}</p></div><div class="tensei-card-actions">
+                <button type="button" data-action="use-item" data-id="${html(entry.id)}" title="${html(tr('Use in role-play'))}"><i class="fa-solid fa-comment-dots"></i></button>
+                <button type="button" data-action="delete-item" data-id="${html(entry.id)}" title="${html(tr('Remove'))}"><i class="fa-solid fa-trash"></i></button></div></article>`).join('') : empty('Your inventory is empty.')}</div>
+        <details class="tensei-editor"><summary><i class="fa-solid fa-plus"></i> ${html(tr('Add inventory item'))}</summary>
             <form data-form="inventory" class="tensei-form-grid">${input('Item name', 'name', '')}
                 ${input('Quantity', 'quantity', 1, 'number', 'min="0"')}${input('Category', 'category', 'Other')}
-                ${input('Description', 'description', '')}<button class="tensei-primary-button tensei-form-submit" type="submit">Add item</button>
+                ${input('Description', 'description', '')}<button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add item'))}</button>
             </form></details>`;
 }
 
@@ -472,12 +598,12 @@ function renderSkills(panel, state) {
         <div class="tensei-item-grid">${state.skills.length ? state.skills.map(entry => `
             <article class="tensei-list-card"><div class="tensei-item-icon"><i class="fa-solid fa-sparkles"></i></div>
                 <div class="tensei-item-copy"><strong>${html(entry.name)}</strong><span>${html(entry.type)} · ${html(entry.rank)}</span>
-                <p>${html(entry.description || 'No description')}</p></div><div class="tensei-card-actions">
-                <button type="button" data-action="delete-skill" data-id="${html(entry.id)}" title="Remove"><i class="fa-solid fa-trash"></i></button></div></article>`).join('') : empty('Skills learned during role-play will appear here.')}</div>
-        <details class="tensei-editor"><summary><i class="fa-solid fa-plus"></i> Add skill</summary>
+                <p>${html(entry.description || tr('No description'))}</p></div><div class="tensei-card-actions">
+                <button type="button" data-action="delete-skill" data-id="${html(entry.id)}" title="${html(tr('Remove'))}"><i class="fa-solid fa-trash"></i></button></div></article>`).join('') : empty('Skills learned during role-play will appear here.')}</div>
+        <details class="tensei-editor"><summary><i class="fa-solid fa-plus"></i> ${html(tr('Add skill'))}</summary>
             <form data-form="skill" class="tensei-form-grid">${input('Skill name', 'name', '')}${select('Rank', 'rank', MASTERY, 'Beginner')}
                 ${input('Type', 'type', 'Magic')}${input('Description', 'description', '')}
-                <button class="tensei-primary-button tensei-form-submit" type="submit">Add skill</button></form></details>`;
+                <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add skill'))}</button></form></details>`;
 }
 
 function renderQuests(panel, state) {
@@ -486,37 +612,37 @@ function renderQuests(panel, state) {
         <div class="tensei-quest-list">${state.quests.length ? state.quests.map(entry => `
             <article class="tensei-quest-card" data-status="${html(entry.status.toLowerCase())}"><div>
                 <span class="tensei-quest-status">${html(entry.status)}</span><h4>${html(entry.name)}</h4>
-                <p>${html(entry.objective || 'No objective recorded')}</p>${entry.reward ? `<small>Reward: ${html(entry.reward)}</small>` : ''}</div>
-                <div class="tensei-card-actions"><button type="button" data-action="pursue-quest" data-id="${html(entry.id)}" title="Pursue in chat"><i class="fa-solid fa-comment-dots"></i></button>
+                <p>${html(entry.objective || tr('No objective recorded'))}</p>${entry.reward ? `<small>${html(tr('Reward'))}: ${html(entry.reward)}</small>` : ''}</div>
+                <div class="tensei-card-actions"><button type="button" data-action="pursue-quest" data-id="${html(entry.id)}" title="${html(tr('Pursue in role-play'))}"><i class="fa-solid fa-comment-dots"></i></button>
                 <button type="button" data-action="delete-quest" data-id="${html(entry.id)}"><i class="fa-solid fa-trash"></i></button></div></article>`).join('') : empty('No quests have been recorded yet.')}</div>
-        <details class="tensei-editor"><summary><i class="fa-solid fa-plus"></i> Add quest</summary>
+        <details class="tensei-editor"><summary><i class="fa-solid fa-plus"></i> ${html(tr('Add quest'))}</summary>
             <form data-form="quest" class="tensei-form-grid">${input('Quest name', 'name', '')}
                 ${select('Status', 'status', ['Active', 'Completed', 'Failed', 'On Hold'], 'Active')}
                 ${input('Objective', 'objective', '')}${input('Reward', 'reward', '')}
-                <button class="tensei-primary-button tensei-form-submit" type="submit">Add quest</button></form></details>`;
+                <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add quest'))}</button></form></details>`;
 }
 
-const rankRow = (label, value, icon) => `<article class="tensei-rank-row"><i class="${icon}"></i><span>${label}</span><strong>${html(value)}</strong></article>`;
+const rankRow = (label, value, icon) => `<article class="tensei-rank-row"><i class="${icon}"></i><span>${html(tr(label))}</span><strong>${html(tr(String(value)))}</strong></article>`;
 
 function renderRank(panel, state) {
     if (!panel) return;
     const p = state.progression;
     panel.innerHTML = `${heading('Ranks & Progression', 'Guild and mastery record', 'fa-solid fa-medal')}
-        <div class="tensei-rank-layout"><article class="tensei-rank-hero"><span>Adventurer Rank</span>
-            <strong>${html(p.adventurerRank)}</strong><small>Recognized guild classification</small></article>
+        <div class="tensei-rank-layout"><article class="tensei-rank-hero"><span>${html(tr('Adventurer Rank'))}</span>
+            <strong>${html(p.adventurerRank)}</strong><small>${html(tr('Recognized guild classification'))}</small></article>
             <div class="tensei-rank-stack">${rankRow('Magic mastery', p.magicRank, 'fa-solid fa-hat-wizard')}
                 ${rankRow('Sword mastery', p.swordRank, 'fa-solid fa-khanda')}${rankRow('Experience', `${p.experience} / ${p.experienceMax}`, 'fa-solid fa-star')}
                 ${rankRow('Reputation', p.reputation, 'fa-solid fa-people-group')}</div></div>
-        <article class="tensei-card tensei-wallet"><div><span>Gold</span><strong>${p.currency.gold}</strong></div>
-            <div><span>Silver</span><strong>${p.currency.silver}</strong></div><div><span>Copper</span><strong>${p.currency.copper}</strong></div></article>
-        <details class="tensei-editor"><summary><i class="fa-solid fa-pen"></i> Edit progression</summary>
+        <article class="tensei-card tensei-wallet"><div><span>${html(tr('Gold'))}</span><strong>${p.currency.gold}</strong></div>
+            <div><span>${html(tr('Silver'))}</span><strong>${p.currency.silver}</strong></div><div><span>${html(tr('Copper'))}</span><strong>${p.currency.copper}</strong></div></article>
+        <details class="tensei-editor"><summary><i class="fa-solid fa-pen"></i> ${html(tr('Edit progression'))}</summary>
             <form data-form="rank" class="tensei-form-grid">${select('Adventurer rank', 'adventurerRank', RANKS, p.adventurerRank)}
                 ${select('Magic rank', 'magicRank', MASTERY, p.magicRank)}${select('Sword rank', 'swordRank', MASTERY, p.swordRank)}
                 ${input('Experience', 'experience', p.experience, 'number', 'min="0"')}${input('EXP to next level', 'experienceMax', p.experienceMax, 'number', 'min="1"')}
                 ${input('Reputation', 'reputation', p.reputation, 'number')}
                 ${input('Gold', 'gold', p.currency.gold, 'number', 'min="0"')}${input('Silver', 'silver', p.currency.silver, 'number', 'min="0"')}
                 ${input('Copper', 'copper', p.currency.copper, 'number', 'min="0"')}
-                <button class="tensei-primary-button tensei-form-submit" type="submit">Save progression</button></form></details>`;
+                <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Save progression'))}</button></form></details>`;
 }
 
 function renderMap(panel, state) {
@@ -564,19 +690,19 @@ function renderMap(panel, state) {
                     <path class="tensei-route" d="M164 307Q254 286 277 228T315 117M553 495Q610 512 666 500T775 492M846 345Q855 325 854 307"/>
                     <g class="tensei-map-markers">${mapMarkers}</g>
                 </g></svg>
-            <div class="tensei-map-legend"><span><i class="current"></i>Current</span><span><i class="known"></i>Discovered</span><span><i class="marked"></i>Marked</span><small>Drag to pan · Pinch or scroll to zoom</small></div></div>
-            <aside class="tensei-map-sidebar"><article class="tensei-location-dossier"><span class="tensei-eyebrow">Selected location</span><h4>${html(selected.name)}</h4>
-                <p>${html(selected.continent)}</p><div class="tensei-zone-badge" data-zone="${html(selected.zone)}"><i class="fa-solid fa-shield"></i>${html(selected.zone)}</div>
-                <dl><div><dt>Region</dt><dd>${html(LOCATION_REGIONS[selected.name] || selected.name)}</dd></div>
-                <div><dt>Discovery</dt><dd>${discovered.has(selected.name) ? 'Recorded' : 'Unexplored'}</dd></div>
-                <div><dt>Marker</dt><dd>${pinIds.has(selected.id) ? 'Pinned' : 'None'}</dd></div></dl></article>
-                <form data-form="travel" class="tensei-travel-form"><label class="tensei-field"><span>Destination</span><select name="destination">
+            <div class="tensei-map-legend"><span><i class="current"></i>${html(tr('Current'))}</span><span><i class="known"></i>${html(tr('Discovered'))}</span><span><i class="marked"></i>${html(tr('Marked'))}</span><small>${html(tr('Drag to pan · Pinch or scroll to zoom'))}</small></div></div>
+            <aside class="tensei-map-sidebar"><article class="tensei-location-dossier"><span class="tensei-eyebrow">${html(tr('Selected location'))}</span><h4>${html(selected.name)}</h4>
+                <p>${html(selected.continent)}</p><div class="tensei-zone-badge" data-zone="${html(selected.zone)}"><i class="fa-solid fa-shield"></i>${html(tr(selected.zone))}</div>
+                <dl><div><dt>${html(tr('Region'))}</dt><dd>${html(LOCATION_REGIONS[selected.name] || selected.name)}</dd></div>
+                <div><dt>${html(tr('Discovery'))}</dt><dd>${html(tr(discovered.has(selected.name) ? 'Recorded' : 'Unexplored'))}</dd></div>
+                <div><dt>${html(tr('Marker'))}</dt><dd>${html(tr(pinIds.has(selected.id) ? 'Pinned' : 'None'))}</dd></div></dl></article>
+                <form data-form="travel" class="tensei-travel-form"><label class="tensei-field"><span>${html(tr('Destination'))}</span><select name="destination">
                     ${Object.entries(WORLD).map(([continent]) => `<optgroup label="${html(continent)}">${WORLD_LOCATIONS.filter(location => location.continent === continent).map(location =>
                         `<option value="${location.id}"${location.id === selected.id ? ' selected' : ''}>${html(location.name)}</option>`).join('')}</optgroup>`).join('')}</select></label>
                     ${input('Exact place / scene', 'place', selected.name)}${input('Location detail', 'detail', state.location.detail)}
-                    <button class="tensei-primary-button" type="submit"><i class="fa-solid fa-route"></i> Travel and notify chat</button></form>
+                    <button class="tensei-primary-button" type="submit"><i class="fa-solid fa-route"></i> ${html(tr('Travel and notify chat'))}</button></form>
                 <form data-form="map-pin" class="tensei-pin-form">${input('Marker label', 'label', selected.name)}${input('Marker note', 'note', '')}
-                    <input type="hidden" name="locationId" value="${selected.id}"><button class="tensei-secondary-button" type="submit"><i class="fa-solid fa-map-pin"></i> Mark location</button></form>
+                    <input type="hidden" name="locationId" value="${selected.id}"><button class="tensei-secondary-button" type="submit"><i class="fa-solid fa-map-pin"></i> ${html(tr('Mark location'))}</button></form>
                 ${state.location.pins.length ? `<div class="tensei-pin-list">${state.location.pins.map(pin => `<button type="button" data-action="select-pin" data-location-id="${html(pin.locationId)}">
                     <i class="fa-solid fa-map-pin"></i><span>${html(pin.label)}<small>${html(pin.note || mapLocation(pin.locationId)?.name || '')}</small></span></button>`).join('')}</div>` : ''}</aside></div>`;
     setupMapInteractions(panel);
@@ -646,8 +772,10 @@ async function onSubmit(event) {
             };
             state.journal.push({ id: uid(), text: `Traveled from ${previous} to ${destination.name}.`, at: new Date().toISOString() });
             if (await persistState(state, 'travel')) {
-                const exact = values.place && values.place !== destination.name ? `, heading for ${values.place}` : '';
-                sendChatAction(`*I travel to ${destination.name}${exact}. The scene is now in ${destination.continent}.*`);
+                const exact = values.place && values.place !== destination.name ? values.place : '';
+                await sendChatAction(getSettings().language === 'th'
+                    ? `*ตัวผมเดินทางไปยัง ${destination.name}${exact ? ` โดยมุ่งหน้าไปที่ ${exact}` : ''} ตอนนี้ฉากอยู่ใน ${destination.continent}*`
+                    : `*I travel to ${destination.name}${exact ? `, heading for ${exact}` : ''}. The scene is now in ${destination.continent}.*`);
             }
             break;
         }
@@ -736,12 +864,16 @@ async function onPanelClick(event) {
             break;
         case 'use-item': {
             const entry = state.inventory.find(value => value.id === id);
-            if (entry) sendChatAction(`*I use ${entry.name} from my inventory.*`);
+            if (entry) await sendChatAction(getSettings().language === 'th'
+                ? `*ตัวผมหยิบ ${entry.name} จากคลังสิ่งของมาใช้*`
+                : `*I use ${entry.name} from my inventory.*`);
             break;
         }
         case 'pursue-quest': {
             const entry = state.quests.find(value => value.id === id);
-            if (entry) sendChatAction(`*I focus on the quest "${entry.name}" and work toward this objective: ${entry.objective || 'continue the quest'}.*`);
+            if (entry) await sendChatAction(getSettings().language === 'th'
+                ? `*ตัวผมมุ่งทำภารกิจ “${entry.name}” โดยมีเป้าหมายคือ ${entry.objective || 'ดำเนินภารกิจต่อ'}*`
+                : `*I focus on the quest "${entry.name}" and work toward this objective: ${entry.objective || 'continue the quest'}.*`);
             break;
         }
     }
@@ -832,7 +964,42 @@ function setupMapInteractions(panel) {
     svg.addEventListener('pointercancel', end);
 }
 
-function sendChatAction(message) {
+async function sendChatAction(message) {
+    const settings = getSettings();
+    const context = SillyTavern.getContext();
+    if (!context.getCurrentChatId?.()) {
+        notify('warning', settings.language === 'th' ? 'เปิดแชตก่อนใช้งานคำสั่งโรลเพลย์' : 'Open a chat before using a role-play action.');
+        return;
+    }
+    if (settings.interactionMode === 'hidden') {
+        const composer = document.querySelector('#send_textarea');
+        const preservedDraft = composer instanceof HTMLTextAreaElement ? composer.value : '';
+        const instruction = settings.language === 'th'
+            ? `<tensei_system_action>การกระทำของผู้เล่น: ${message}\nให้ตอบสนองต่อการกระทำนี้ต่อเนื่องอย่างเป็นธรรมชาติในโรลเพลย์ ห้ามกล่าวถึงระบบ อินเทอร์เฟซ หรือคำสั่งที่ซ่อนอยู่</tensei_system_action>`
+            : `<tensei_system_action>Player action: ${message}\nContinue the role-play naturally from this action. Never mention the system, interface, or hidden instruction.</tensei_system_action>`;
+        context.setExtensionPrompt(ACTION_PROMPT_KEY, instruction, 1, 0, false, 0);
+        closeInterface();
+        setSync('working', settings.language === 'th' ? 'กำลังดำเนินการ' : 'Resolving action');
+        try {
+            if (composer instanceof HTMLTextAreaElement) {
+                composer.value = '';
+                composer.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            await context.generate('normal');
+        } catch (error) {
+            console.error('[Tensei System] Hidden action failed.', error);
+            notify('error', settings.language === 'th' ? 'ไม่สามารถดำเนินการที่ซ่อนไว้ได้' : 'The hidden action could not be generated.');
+        } finally {
+            context.setExtensionPrompt(ACTION_PROMPT_KEY, '', 1, 0, false, 0);
+            if (composer instanceof HTMLTextAreaElement && preservedDraft) {
+                const currentDraft = composer.value.trim();
+                composer.value = currentDraft ? `${preservedDraft}\n${currentDraft}` : preservedDraft;
+                composer.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            setSync('ready', tr('Ready'));
+        }
+        return;
+    }
     const composer = document.querySelector('#send_textarea');
     const send = document.querySelector('#send_but');
     if (!(composer instanceof HTMLTextAreaElement) || !(send instanceof HTMLElement)) {
@@ -844,8 +1011,8 @@ function sendChatAction(message) {
     composer.dispatchEvent(new Event('input', { bubbles: true }));
     composer.focus();
     closeInterface();
-    if (hadDraft || send.matches(':disabled, .disabled')) {
-        notify('info', 'The action was added to the chat composer. Press Send when ready.');
+    if (settings.interactionMode === 'draft' || hadDraft || send.matches(':disabled, .disabled')) {
+        notify('info', settings.language === 'th' ? 'เพิ่มคำสั่งไว้ในช่องข้อความแล้ว ตรวจสอบก่อนกดส่ง' : 'The action was added to the composer for review.');
     } else {
         send.click();
     }
@@ -897,7 +1064,7 @@ async function analyzeChat({ manual = false, messageId = null, generationType = 
     }
 
     aiSyncInProgress = true;
-    setSync('working', 'Reading latest turn');
+    setSync('working', tr('Reading latest turn'));
     try {
         const current = getState();
         const response = await context.generateQuietPrompt({
@@ -911,12 +1078,12 @@ async function analyzeChat({ manual = false, messageId = null, generationType = 
         const summary = text(parsed.summary, 'Role-play state synchronized.', 300);
         next.journal = [...current.journal, { id: uid(), text: summary, at: new Date().toISOString() }].slice(-30);
         await persistState(next, 'ai');
-        setSync('ready', 'AI synchronized');
+        setSync('ready', tr('AI synchronized'));
         if (manual) notify('success', summary);
         console.info('[Tensei System] State synchronized.', messageId);
     } catch (error) {
         console.error('[Tensei System] AI synchronization failed.', error);
-        setSync('error', 'Sync unavailable');
+        setSync('error', tr('Sync unavailable'));
         if (manual) notify('error', `Could not synchronize: ${error.message}`);
     } finally {
         aiSyncInProgress = false;
@@ -1011,6 +1178,18 @@ function bindCheckbox(id, key, settings, callback) {
     });
 }
 
+function bindSettingControl(id, key, settings, callback) {
+    const control = document.getElementById(id);
+    if (!(control instanceof HTMLInputElement || control instanceof HTMLSelectElement)) return;
+    control.value = String(settings[key]);
+    const update = () => {
+        settings[key] = control.type === 'range' ? Number(control.value) : control.value;
+        SillyTavern.getContext().saveSettingsDebounced();
+        callback?.();
+    };
+    control.addEventListener(control.type === 'range' || control.type === 'color' ? 'input' : 'change', update);
+}
+
 async function addSettingsDrawer() {
     if (document.getElementById('tensei-system-settings')) return;
     const context = SillyTavern.getContext();
@@ -1021,6 +1200,12 @@ async function addSettingsDrawer() {
     bindCheckbox('tensei-system-show-launcher', 'showWandLauncher', settings, syncLauncherVisibility);
     bindCheckbox('tensei-system-auto-track', 'autoTrack', settings);
     bindCheckbox('tensei-system-inject-state', 'injectState', settings, updatePrompt);
+    bindSettingControl('tensei-system-language', 'language', settings, rebuildInterface);
+    bindSettingControl('tensei-system-interaction-mode', 'interactionMode', settings);
+    bindSettingControl('tensei-system-accent', 'accentColor', settings, applyAppearance);
+    bindSettingControl('tensei-system-density', 'density', settings, applyAppearance);
+    bindSettingControl('tensei-system-glass', 'glassOpacity', settings, applyAppearance);
+    bindSettingControl('tensei-system-glow', 'glowStrength', settings, applyAppearance);
     document.getElementById('tensei-system-open-from-settings')?.addEventListener('click', openInterface);
     document.getElementById('tensei-system-sync-from-settings')?.addEventListener('click', () => analyzeChat({ manual: true }));
 }
@@ -1030,7 +1215,7 @@ function bindChatEvents() {
     eventSource.on(eventTypes.CHAT_CHANGED, () => {
         updatePrompt();
         renderAll();
-        setSync('ready', 'Ready');
+        setSync('ready', tr('Ready'));
     });
     if (eventTypes.PERSONA_CHANGED) eventSource.on(eventTypes.PERSONA_CHANGED, () => renderAll());
     eventSource.on(eventTypes.MESSAGE_RECEIVED, (messageId, generationType) => {
@@ -1049,6 +1234,7 @@ async function initialize() {
     initialized = true;
     try {
         getSettings();
+        applyAppearance();
         buildInterface();
         await addSettingsDrawer();
         observeWandMenu();
@@ -1057,7 +1243,7 @@ async function initialize() {
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape') closeInterface();
         });
-        console.info('[Tensei System] Role-play interface v0.3.0 loaded.');
+        console.info('[Tensei System] Role-play interface v0.4.0 loaded.');
     } catch (error) {
         initialized = false;
         console.error('[Tensei System] Failed to initialize.', error);
