@@ -86,16 +86,18 @@ const TRANSLATIONS = {
         'Magic interface': 'อินเทอร์เฟซเวทมนตร์',
         'Synchronizing world state': 'กำลังเชื่อมข้อมูลโลก',
         'Connecting to the active role-play...': 'กำลังเชื่อมต่อกับโรลเพลย์ปัจจุบัน...',
-        Ready: 'พร้อม', Status: 'สถานะ', Inventory: 'คลังสิ่งของ', Skills: 'ทักษะ', Quests: 'ภารกิจ', Rank: 'อันดับ', 'World Map': 'แผนที่โลก',
-        Music: 'เพลง', Mailbox: 'กล่องจดหมาย', Contacts: 'รายชื่อ', Letters: 'จดหมาย', NPCs: 'ตัวละคร NPC', 'NPC Codex': 'สารบบ NPC', 'Magic & Technique': 'เวทมนตร์และวิชา',
+        Ready: 'พร้อม', Status: 'สถานะ', Scene: 'ฉาก', Inventory: 'คลังสิ่งของ', Skills: 'ทักษะ', Quests: 'ภารกิจ', Rank: 'อันดับ', 'World Map': 'แผนที่โลก',
+        Music: 'เพลง', Mailbox: 'กล่องจดหมาย', Contacts: 'รายชื่อ', Letters: 'จดหมาย', NPCs: 'ตัวละคร NPC', 'NPC Codex': 'สารบบ NPC', Techniques: 'วิชา',
         'Waiting for chat': 'กำลังรอแชต', 'Sync latest turn': 'ซิงก์เหตุการณ์ล่าสุด', 'System interface': 'ข้อมูลระบบ',
         'Current persona': 'ตัวตนปัจจุบัน', 'Guild rank': 'อันดับกิลด์', 'Vital status': 'สถานะพลังชีวิต', Identity: 'ข้อมูลส่วนตัว',
         Health: 'พลังชีวิต', Mana: 'มานา', Stamina: 'พละกำลัง', Race: 'เผ่าพันธุ์', Age: 'อายุ', Guild: 'กิลด์', Party: 'ปาร์ตี้',
         'Current region': 'ภูมิภาคปัจจุบัน', 'Exact place': 'สถานที่ปัจจุบัน', 'Edit status': 'แก้ไขสถานะ', Name: 'ชื่อ', Title: 'ฉายา',
         Condition: 'สภาพร่างกาย', Level: 'เลเวล', 'Day phase': 'ช่วงเวลา', 'World time': 'เวลาโลก', 'World day': 'วันที่', 'Zone type': 'ประเภทเขต',
+        'Scene Tracker': 'ระบบติดตามฉาก', 'Live environment and position': 'สภาพแวดล้อมและตำแหน่งปัจจุบัน', 'Day name': 'ชื่อวัน', 'Day counter': 'จำนวนวันที่ผ่านไป',
+        'Current place': 'สถานที่ปัจจุบัน', 'Current location detail': 'จุดที่อยู่โดยละเอียด', 'Scene position': 'ตำแหน่งในฉาก', Weather: 'สภาพอากาศ', Temperature: 'อุณหภูมิ', 'Save scene': 'บันทึกฉาก',
         'HP max': 'HP สูงสุด', 'MP max': 'MP สูงสุด', 'Stamina max': 'พละกำลังสูงสุด', 'Save status': 'บันทึกสถานะ',
         'Add inventory item': 'เพิ่มสิ่งของ', 'Item name': 'ชื่อสิ่งของ', Quantity: 'จำนวน', Category: 'หมวดหมู่', Description: 'รายละเอียด', 'Add item': 'เพิ่มสิ่งของ',
-        'Skills & Magic': 'ทักษะและเวทมนตร์', 'Add skill': 'เพิ่มทักษะ', 'Skill name': 'ชื่อทักษะ', Type: 'ประเภท',
+        'Skill Storage': 'คลังทักษะ', 'All acquired user skills': 'ทักษะทั้งหมดของผู้เล่น', 'Add skill': 'เพิ่มทักษะ', 'Skill name': 'ชื่อทักษะ', Type: 'ประเภท',
         'Quest Log': 'บันทึกภารกิจ', 'Add quest': 'เพิ่มภารกิจ', 'Quest name': 'ชื่อภารกิจ', Objective: 'เป้าหมาย', Reward: 'รางวัล',
         'Ranks & Progression': 'อันดับและความก้าวหน้า', 'Guild and mastery record': 'บันทึกอันดับกิลด์และความชำนาญ', 'Adventurer Rank': 'อันดับนักผจญภัย',
         'Recognized guild classification': 'ระดับที่กิลด์รับรอง', 'Magic mastery': 'ความชำนาญเวทมนตร์', 'Sword mastery': 'ความชำนาญดาบ', Experience: 'ค่าประสบการณ์', Reputation: 'ชื่อเสียง',
@@ -119,7 +121,7 @@ const TRANSLATIONS = {
         'Choose profile picture': 'เลือกรูปโปรไฟล์', 'Use in role-play': 'ใช้ในโรลเพลย์', Remove: 'ลบ', 'Pursue in role-play': 'ดำเนินภารกิจในโรลเพลย์',
         'Adjust portrait': 'จัดตำแหน่งรูป', 'Desktop framing': 'กรอบภาพ PC', 'Phone framing': 'กรอบภาพมือถือ',
         Horizontal: 'แนวนอน', Vertical: 'แนวตั้ง', Zoom: 'ซูม', 'Save framing': 'บันทึกกรอบภาพ',
-        'Magic disciplines': 'สาขาเวทมนตร์', 'Sword schools': 'สามสำนักดาบ', Techniques: 'วิชาและทักษะ', Proficiency: 'ความชำนาญ',
+        'Magic disciplines': 'สาขาเวทมนตร์', 'Sword schools': 'สามสำนักดาบ', Proficiency: 'ความชำนาญ', 'Proficiency rank': 'ระดับความชำนาญ',
         'Add technique': 'เพิ่มวิชา', 'Technique name': 'ชื่อวิชา', Category: 'หมวดหมู่', 'Save proficiency': 'บันทึกความชำนาญ',
         Playlist: 'เพลย์ลิสต์', 'Add audio files': 'เพิ่มไฟล์เสียง', 'No tracks in this chat.': 'ยังไม่มีเพลงในแชทนี้',
         'Stored locally on this device': 'เก็บไว้ในอุปกรณ์นี้เท่านั้น', 'Now playing': 'กำลังเล่น',
@@ -163,6 +165,11 @@ const number = (value, fallback = 0, min = 0, max = 999999999) => {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? Math.min(max, Math.max(min, parsed)) : fallback;
 };
+const optionalNumber = (value, fallback = null, min = -999999999, max = 999999999) => {
+    if (value === '' || value === null || value === undefined) return fallback;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? Math.min(max, Math.max(min, parsed)) : fallback;
+};
 const html = value => String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 
@@ -194,7 +201,7 @@ function defaultState() {
     const magic = Object.fromEntries(MAGIC_DISCIPLINES.map(entry => [entry.id, 0]));
     const sword = Object.fromEntries(SWORD_STYLES.map(entry => [entry.id, 0]));
     return {
-        version: 7,
+        version: 9,
         player: {
             name: 'Adventurer', portrait: '', race: 'Human', age: '', title: 'Newcomer', guild: 'Unaffiliated', party: 'Solo', condition: 'Stable', level: 1,
             portraitView: { desktop: { x: 50, y: 50, zoom: 1 }, mobile: { x: 50, y: 50, zoom: 1 } },
@@ -204,8 +211,9 @@ function defaultState() {
             adventurerRank: 'F', magicRank: 'Beginner', swordRank: 'Beginner', experience: 0, experienceMax: 100, reputation: 0,
             currency: { gold: 0, silver: 0, copper: 0 },
         },
-        worldClock: { day: 1, time: '08:00', phase: 'Morning' },
+        worldClock: { day: 1, dayName: 'Day 1', time: '08:00', phase: 'Morning' },
         location: { continent: 'Central Continent', region: 'Asura Kingdom', place: 'Unknown', detail: '', zoneType: 'Safe Zone', discovered: ['Asura Kingdom'], pins: [] },
+        scene: { position: 'Unknown', weather: 'Unknown', temperature: null },
         inventory: [{ id: uid(), name: "Traveler's Clothes", quantity: 1, category: 'Equipment', description: '' }],
         skills: [],
         proficiencies: { magic, sword, techniques: [] },
@@ -387,7 +395,7 @@ function normalize(candidate, base = defaultState()) {
     const currency = progress.currency && typeof progress.currency === 'object' ? progress.currency : {};
     const location = source.location && typeof source.location === 'object' ? source.location : {};
 
-    result.version = 7;
+    result.version = 9;
     const portraitView = player.portraitView && typeof player.portraitView === 'object' ? player.portraitView : {};
     result.player = {
         name: text(player.name, result.player.name, 100), portrait: text(player.portrait, result.player.portrait, 1500000),
@@ -417,8 +425,10 @@ function normalize(candidate, base = defaultState()) {
         },
     };
     const worldClock = source.worldClock && typeof source.worldClock === 'object' ? source.worldClock : {};
+    const worldDay = number(worldClock.day, result.worldClock.day, 1, 999999);
     result.worldClock = {
-        day: number(worldClock.day, result.worldClock.day, 1, 999999),
+        day: worldDay,
+        dayName: text(worldClock.dayName, `Day ${worldDay}`, 80),
         time: /^([01]\d|2[0-3]):[0-5]\d$/.test(worldClock.time) ? worldClock.time : result.worldClock.time,
         phase: DAY_PHASES.includes(worldClock.phase) ? worldClock.phase : result.worldClock.phase,
     };
@@ -435,6 +445,12 @@ function normalize(candidate, base = defaultState()) {
             id: text(pin?.id, uid(), 100), locationId: text(pin?.locationId, '', 100),
             label: text(pin?.label, 'Marked location', 100), note: text(pin?.note, '', 300),
         })).filter(pin => pin.locationId).slice(0, 100) : result.location.pins,
+    };
+    const scene = source.scene && typeof source.scene === 'object' ? source.scene : {};
+    result.scene = {
+        position: text(scene.position, result.scene.position, 200),
+        weather: text(scene.weather, result.scene.weather, 120),
+        temperature: optionalNumber(scene.temperature, result.scene.temperature, -100, 100),
     };
     if (Array.isArray(source.inventory)) result.inventory = source.inventory.map(item).filter(Boolean).slice(0, 200);
     if (Array.isArray(source.skills)) result.skills = source.skills.map(skill).filter(Boolean).slice(0, 100);
@@ -556,6 +572,7 @@ function aiState(state) {
         progression: state.progression,
         worldClock: state.worldClock,
         location: { ...state.location, pins: undefined },
+        scene: state.scene,
         inventory: state.inventory.map(({ id, name, quantity, category }) => ({ id, name, quantity, category })),
         skills: state.skills.map(({ id, name, rank, type }) => ({ id, name, rank, type })),
         proficiencies: state.proficiencies,
@@ -584,11 +601,13 @@ function hasUserReply(context = SillyTavern.getContext()) {
 function patchInstructions() {
     return [
         'After the role-play reply, append one invisible HTML comment only when confirmed state changed:',
-        '<!--tensei_patch:{"ops":[["set","player.hp.current",90],["inc","progression.experience",10],["upsert","inventory",{"name":"Potion","quantity":1,"category":"Consumable"}],["delete","inventory","Broken Sword"],["add","location.discovered","Roa"]],"summary":"brief change"}-->',
+        '<!--tensei_patch:{"ops":[["set","worldClock.time","14:30"],["set","scene.weather","Rain"],["set","player.hp.current",90],["upsert","inventory",{"name":"Potion","quantity":1,"category":"Consumable"}]],"summary":"brief change"}-->',
         'Allowed verbs: set or inc for scalar paths; upsert or delete for inventory, skills, proficiencies.techniques, quests, npcs, contacts, letters; upsert or delete for npcAbilities and npcMeters; append for npcDiary; add for location.discovered.',
         'Use canonical paths shown in the state JSON. For a new incoming physical letter include contactId/fromName/toName/subject/body/direction:"incoming"/status:"unread". Ordinary dialogue is not a letter.',
         'Create or update a named NPC dossier with an upsert on npcs only when that NPC becomes relevant or a confirmed fact changes. Use partial NPC objects and preserve the canonical id from npcIndex. When a relationship becomes a correspondence, also upsert contacts with npcId; do not make every incidental NPC a contact.',
         'For a meaningful private thought or relationship turning point, append npcDiary with {npcId,text,mood}, or npcName when the NPC was created in the same patch; do not write a diary entry every turn. Update abilities granularly through npcAbilities with npcId or npcName. NPC portraits and portrait framing are local-only and forbidden in patches.',
+        'Track the active scene when confirmed: time, phase, day/dayName, continent, region, place, location detail, scene position, weather, and temperature. Do not invent weather or temperature when the reply provides no evidence.',
+        'Handle all story genres and mature or NSFW scenes neutrally. Do not censor, rewrite, omit, or classify confirmed state merely because the scene is adult; follow the active SillyTavern, model, and provider settings.',
         'Record only outcomes confirmed by this reply. Never record plans, attempts, questions, hypotheticals, rejected actions, or out-of-character discussion. Keep proficiency changes conservative.',
         'Omit the comment when nothing changed. Never print a full state, Markdown fence, explanation, or visible system text.',
     ].join('\n');
@@ -598,7 +617,7 @@ function statePrompt(state, { includeState = true, track = true } = {}) {
     const lines = ['<tensei_system_state>'];
     if (includeState) {
         lines.push('Canonical role-play state. Preserve it unless the story confirms a change.');
-        lines.push('Current location, inventory, ranks, conditions, skills, quests, NPC dossiers, contacts, and physical letters are established facts.');
+        lines.push('Current scene, location, inventory, ranks, conditions, skills, quests, NPC dossiers, contacts, and physical letters are established facts.');
         lines.push(JSON.stringify(aiState(state)));
     }
     if (track) lines.push(patchInstructions());
@@ -707,7 +726,7 @@ function appearanceMenu() {
     return `<details class="tensei-appearance-menu">
         <summary aria-label="${html(tr('Appearance'))}" title="${html(tr('Appearance'))}"><i class="fa-solid fa-sliders"></i></summary>
         <div class="tensei-appearance-popover">
-            <div class="tensei-popover-heading"><span>${html(tr('Appearance'))}</span><small>UI 0.8</small></div>
+            <div class="tensei-popover-heading"><span>${html(tr('Appearance'))}</span><small>UI 0.9</small></div>
             <label class="tensei-setting-row"><span>${html(tr('Accent'))}</span><input type="color" data-ui-setting="accentColor" value="${settings.accentColor}"></label>
             <label class="tensei-setting-row"><span>${html(tr('Glass'))}</span><input type="range" data-ui-setting="glassOpacity" min="55" max="98" value="${settings.glassOpacity}"></label>
             <label class="tensei-setting-row"><span>${html(tr('Glow'))}</span><input type="range" data-ui-setting="glowStrength" min="0" max="100" value="${settings.glowStrength}"></label>
@@ -761,8 +780,10 @@ function buildInterface() {
                 <div class="tensei-app-layout">
                     <nav class="tensei-tab-list" aria-label="Tensei System sections">
                         ${tabButton('status', 'fa-solid fa-user', 'Status', true)}
+                        ${tabButton('scene', 'fa-solid fa-cloud-sun', 'Scene')}
                         ${tabButton('inventory', 'fa-solid fa-box-open', 'Inventory')}
-                        ${tabButton('skills', 'fa-solid fa-wand-magic-sparkles', 'Magic & Technique')}
+                        ${tabButton('skills', 'fa-solid fa-layer-group', 'Skills')}
+                        ${tabButton('techniques', 'fa-solid fa-wand-magic-sparkles', 'Techniques')}
                         ${tabButton('quests', 'fa-solid fa-scroll', 'Quests')}
                         ${tabButton('rank', 'fa-solid fa-medal', 'Rank')}
                         ${tabButton('map', 'fa-solid fa-map', 'World Map')}
@@ -771,7 +792,7 @@ function buildInterface() {
                         ${tabButton('music', 'fa-solid fa-music', 'Music')}
                     </nav>
                     <main class="tensei-system-panel-body">
-                        ${['status', 'inventory', 'skills', 'quests', 'rank', 'map', 'npcs', 'mail', 'music'].map((id, index) =>
+                        ${['status', 'scene', 'inventory', 'skills', 'techniques', 'quests', 'rank', 'map', 'npcs', 'mail', 'music'].map((id, index) =>
                             `<section class="tensei-tab-panel${index === 0 ? ' is-active' : ''}" data-panel="${id}"
                                 ${index ? 'hidden' : ''}></section>`).join('')}
                     </main>
@@ -829,8 +850,11 @@ function onInterfaceSettingChange(event) {
         const row = proficiency.closest('.tensei-proficiency-row');
         const fill = row?.querySelector('.tensei-proficiency-track i');
         const output = row?.querySelector('output');
+        const rankCopy = row?.querySelector('.tensei-discipline-copy small');
+        const rank = tr(proficiencyRank(proficiency.value));
         if (fill) fill.style.width = `${proficiency.value}%`;
-        if (output) output.textContent = `${proficiency.value}%`;
+        if (output) output.textContent = rank;
+        if (rankCopy) rankCopy.textContent = `${rank} Rank · ${proficiency.value}%`;
         return;
     }
     const seek = event.target.closest('#tensei-music-seek');
@@ -906,8 +930,10 @@ function renderAll(state = getState()) {
     const overlay = document.getElementById('tensei-system-overlay');
     if (!overlay) return;
     renderStatus(overlay.querySelector('[data-panel="status"]'), state);
+    renderScene(overlay.querySelector('[data-panel="scene"]'), state);
     renderInventory(overlay.querySelector('[data-panel="inventory"]'), state);
-    renderSkills(overlay.querySelector('[data-panel="skills"]'), state);
+    renderSkillStorage(overlay.querySelector('[data-panel="skills"]'), state);
+    renderTechniques(overlay.querySelector('[data-panel="techniques"]'), state);
     renderQuests(overlay.querySelector('[data-panel="quests"]'), state);
     renderRank(overlay.querySelector('[data-panel="rank"]'), state);
     renderMap(overlay.querySelector('[data-panel="map"]'), state);
@@ -924,7 +950,6 @@ function renderAll(state = getState()) {
 function renderStatus(panel, state) {
     if (!panel) return;
     const persona = currentPersonaName(state);
-    const phaseIndex = Math.max(0, DAY_PHASES.indexOf(state.worldClock.phase));
     const expPercent = Math.min(100, Math.round(state.progression.experience / Math.max(1, state.progression.experienceMax) * 100));
     const initial = html((persona || '?').charAt(0).toUpperCase());
     panel.innerHTML = `
@@ -938,12 +963,8 @@ function renderStatus(panel, state) {
                 <span><i class="fa-solid fa-dna"></i>${html(state.player.race)}</span><span><i class="fa-solid fa-shield-halved"></i>${html(state.player.guild)}</span>
                 <span><i class="fa-solid fa-people-group"></i>${html(state.player.party)}</span></div></div>
             <span class="tensei-rank-seal"><small>${html(tr('Guild rank'))}</small>${html(state.progression.adventurerRank)}</span></section>
-        <section class="tensei-progress-deck"><div class="tensei-day-cycle" style="--phase:${phaseIndex}">
-            <div class="tensei-cycle-line"><span></span></div>${DAY_PHASES.map((phase, index) => `<div class="tensei-cycle-stop${index === phaseIndex ? ' is-current' : ''}">
-                <i class="${['fa-solid fa-sun','fa-regular fa-sun','fa-solid fa-cloud-sun','fa-solid fa-moon'][index]}"></i><span>${html(tr(phase))}</span></div>`).join('')}
-            <div class="tensei-clock-label"><b>${getSettings().language === 'th' ? `วันที่ ${state.worldClock.day}` : `Day ${state.worldClock.day}`}</b><span>${html(state.worldClock.time)}</span></div></div>
-            <div class="tensei-exp-line"><div class="tensei-exp-track"><span style="width:${expPercent}%"></span><i style="left:${expPercent}%"></i></div>
-            <p><strong>${state.progression.experience} / ${state.progression.experienceMax} EXP</strong><span>Lv. ${state.player.level} · ${html(tr(state.location.zoneType))} · ${html(state.location.place === 'Unknown' ? state.location.region : state.location.place)}</span></p></div></section>
+        <section class="tensei-progress-deck"><div class="tensei-exp-line"><div class="tensei-exp-track"><span style="width:${expPercent}%"></span><i style="left:${expPercent}%"></i></div>
+            <p><strong>${state.progression.experience} / ${state.progression.experienceMax} EXP</strong><span>Lv. ${state.player.level} · ${html(state.progression.adventurerRank)} Rank</span></p></div></section>
         <div class="tensei-dashboard-grid">
             <article class="tensei-card tensei-vitals-card"><div class="tensei-card-title"><span>${html(tr('Vital status'))}</span>
                 <em><i class="fa-solid fa-wave-square"></i> ${html(state.player.condition)}</em></div><div class="tensei-vitals-grid">
@@ -956,8 +977,8 @@ function renderStatus(panel, state) {
                 <div><dt>${html(tr('Age'))}</dt><dd>${html(state.player.age || 'Unknown')}</dd></div>
                 <div><dt>${html(tr('Guild'))}</dt><dd>${html(state.player.guild)}</dd></div>
                 <div><dt>${html(tr('Party'))}</dt><dd>${html(state.player.party)}</dd></div>
-                <div><dt>${html(tr('Current region'))}</dt><dd>${html(state.location.region)}</dd></div>
-                <div><dt>${html(tr('Exact place'))}</dt><dd>${html(state.location.place)}</dd></div></dl></article>
+                <div><dt>${html(tr('Condition'))}</dt><dd>${html(state.player.condition)}</dd></div>
+                <div><dt>${html(tr('Level'))}</dt><dd>${state.player.level}</dd></div></dl></article>
         </div>
         <details class="tensei-editor"><summary><i class="fa-solid fa-pen"></i> ${html(tr('Edit status'))}</summary>
             <form data-form="status" class="tensei-form-grid">
@@ -965,12 +986,52 @@ function renderStatus(panel, state) {
                 ${input('Race', 'race', state.player.race)}${input('Age', 'age', state.player.age)}
                 ${input('Guild', 'guild', state.player.guild)}${input('Party', 'party', state.player.party)}
                 ${input('Condition', 'condition', state.player.condition)}${input('Level', 'level', state.player.level, 'number', 'min="1"')}
-                ${select('Day phase', 'phase', DAY_PHASES, state.worldClock.phase)}${input('World time', 'time', state.worldClock.time, 'time')}
-                ${input('World day', 'day', state.worldClock.day, 'number', 'min="1"')}${select('Zone type', 'zoneType', ZONE_TYPES, state.location.zoneType)}
                 ${input('HP', 'hpCurrent', state.player.hp.current, 'number', 'min="0"')}${input('HP max', 'hpMax', state.player.hp.max, 'number', 'min="1"')}
                 ${input('MP', 'mpCurrent', state.player.mp.current, 'number', 'min="0"')}${input('MP max', 'mpMax', state.player.mp.max, 'number', 'min="1"')}
                 ${input('Stamina', 'staminaCurrent', state.player.stamina.current, 'number', 'min="0"')}${input('Stamina max', 'staminaMax', state.player.stamina.max, 'number', 'min="1"')}
                 <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Save status'))}</button>
+            </form></details>`;
+}
+
+function weatherIcon(condition) {
+    const value = String(condition || '').toLocaleLowerCase();
+    if (!value || value === 'unknown') return 'fa-solid fa-circle-question';
+    if (/storm|thunder/.test(value)) return 'fa-solid fa-cloud-bolt';
+    if (/rain|drizzle/.test(value)) return 'fa-solid fa-cloud-rain';
+    if (/snow|blizzard/.test(value)) return 'fa-solid fa-snowflake';
+    if (/fog|mist|haze/.test(value)) return 'fa-solid fa-smog';
+    if (/cloud|overcast/.test(value)) return 'fa-solid fa-cloud';
+    if (/night|moon/.test(value)) return 'fa-solid fa-moon';
+    return 'fa-solid fa-sun';
+}
+
+function renderScene(panel, state) {
+    if (!panel) return;
+    const phaseIndex = Math.max(0, DAY_PHASES.indexOf(state.worldClock.phase));
+    const exactLocation = state.location.detail || state.location.place || state.location.region;
+    const temperature = state.scene.temperature === null ? '—' : `${Number(state.scene.temperature).toLocaleString()}°C`;
+    panel.innerHTML = `${heading('Scene Tracker', 'Live environment and position', 'fa-solid fa-cloud-sun')}
+        <section class="tensei-scene-hero">
+            <div class="tensei-scene-time"><span>${html(state.worldClock.dayName)}</span><strong>${html(state.worldClock.time)}</strong><small>${html(tr(state.worldClock.phase))} · ${html(tr('Day counter'))} ${state.worldClock.day}</small></div>
+            <div class="tensei-scene-weather"><i class="${weatherIcon(state.scene.weather)}"></i><div><span>${html(tr('Weather'))}</span><strong>${html(state.scene.weather)}</strong></div>
+                <output>${temperature}</output></div>
+        </section>
+        <section class="tensei-day-cycle tensei-scene-cycle" style="--phase:${phaseIndex}"><div class="tensei-cycle-line"><span></span></div>
+            ${DAY_PHASES.map((phase, index) => `<div class="tensei-cycle-stop${index === phaseIndex ? ' is-current' : ''}"><i class="${['fa-solid fa-sun','fa-regular fa-sun','fa-solid fa-cloud-sun','fa-solid fa-moon'][index]}"></i><span>${html(tr(phase))}</span></div>`).join('')}</section>
+        <section class="tensei-scene-grid">
+            <article><i class="fa-solid fa-earth-americas"></i><span>${html(tr('Current region'))}</span><strong>${html(state.location.continent)}</strong><small>${html(state.location.region)}</small></article>
+            <article><i class="fa-solid fa-location-dot"></i><span>${html(tr('Current place'))}</span><strong>${html(state.location.place)}</strong><small>${html(exactLocation)}</small></article>
+            <article><i class="fa-solid fa-street-view"></i><span>${html(tr('Scene position'))}</span><strong>${html(state.scene.position)}</strong><small>${html(tr(state.location.zoneType))}</small></article>
+        </section>
+        <details class="tensei-editor"><summary><i class="fa-solid fa-pen"></i> ${html(tr('Save scene'))}</summary>
+            <form data-form="scene" class="tensei-form-grid">
+                ${input('Day name', 'dayName', state.worldClock.dayName)}${input('Day counter', 'day', state.worldClock.day, 'number', 'min="1"')}
+                ${input('World time', 'time', state.worldClock.time, 'time')}${select('Day phase', 'phase', DAY_PHASES, state.worldClock.phase)}
+                ${input('Continent', 'continent', state.location.continent)}${input('Current region', 'region', state.location.region)}
+                ${input('Current place', 'place', state.location.place)}${input('Current location detail', 'detail', state.location.detail)}
+                ${input('Scene position', 'position', state.scene.position)}${select('Zone type', 'zoneType', ZONE_TYPES, state.location.zoneType)}
+                ${input('Weather', 'weather', state.scene.weather)}${input('Temperature', 'temperature', state.scene.temperature, 'number', 'min="-100" max="100" step="0.1"')}
+                <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Save scene'))}</button>
             </form></details>`;
 }
 
@@ -1026,13 +1087,42 @@ function renderInventory(panel, state) {
             </form></details>`;
 }
 
-function renderSkills(panel, state) {
+function proficiencyRank(value) {
+    const score = number(value, 0, 0, 100);
+    if (score <= 0) return 'None';
+    if (score < 20) return 'Beginner';
+    if (score < 40) return 'Intermediate';
+    if (score < 60) return 'Advanced';
+    if (score < 75) return 'Saint';
+    if (score < 87) return 'King';
+    if (score < 97) return 'Emperor';
+    return 'God';
+}
+
+function renderSkillStorage(panel, state) {
     if (!panel) return;
-    const proficiencyRow = (entry, group, value) => `<label class="tensei-proficiency-row" style="--discipline-tone:${entry.tone || 'var(--tensei-accent)'}">
+    panel.innerHTML = `${heading('Skill Storage', `${state.skills.length} ${tr('Skills').toLowerCase()}`, 'fa-solid fa-layer-group')}
+        <section class="tensei-skill-storage"><div class="tensei-section-label"><i class="fa-solid fa-box-archive"></i><span>${html(tr('All acquired user skills'))}</span></div>
+            <div class="tensei-skill-storage-grid">${state.skills.length ? state.skills.map(entry => `<article class="tensei-skill-card">
+                <div class="tensei-skill-rank"><strong>${html(tr(entry.rank))}</strong><small>${html(tr('Proficiency rank'))}</small></div>
+                <div><span>${html(entry.type)}</span><h4>${html(entry.name)}</h4><p>${html(entry.description || tr('No description'))}</p></div>
+                <button type="button" data-action="delete-skill" data-id="${html(entry.id)}" title="${html(tr('Remove'))}"><i class="fa-solid fa-trash"></i></button></article>`).join('') : empty('Skills learned during role-play will appear here.')}</div>
+            <details class="tensei-editor"><summary><i class="fa-solid fa-plus"></i> ${html(tr('Add skill'))}</summary>
+                <form data-form="skill" class="tensei-form-grid">${input('Skill name', 'name', '')}${input('Type', 'type', 'General')}
+                    ${select('Proficiency rank', 'rank', MASTERY, 'Beginner')}${input('Description', 'description', '')}
+                    <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add skill'))}</button></form></details></section>`;
+}
+
+function renderTechniques(panel, state) {
+    if (!panel) return;
+    const proficiencyRow = (entry, group, value) => {
+        const rank = proficiencyRank(value);
+        return `<label class="tensei-proficiency-row" style="--discipline-tone:${entry.tone || 'var(--tensei-accent)'}">
         <span class="tensei-discipline-icon"><i class="${entry.icon}"></i></span><span class="tensei-discipline-copy"><strong>${html(entry.name)}</strong>
-        <span class="tensei-proficiency-track"><i style="width:${value}%"></i></span></span><output>${value}%</output>
+        <small>${html(tr(rank))} Rank · ${value}%</small><span class="tensei-proficiency-track"><i style="width:${value}%"></i></span></span><output>${html(tr(rank))}</output>
         <input type="range" name="${group}-${entry.id}" min="0" max="100" value="${value}" aria-label="${html(entry.name)} proficiency"></label>`;
-    panel.innerHTML = `${heading('Magic & Technique', `${state.proficiencies.techniques.length} ${tr('Techniques').toLowerCase()}`, 'fa-solid fa-wand-magic-sparkles')}
+    };
+    panel.innerHTML = `${heading('Techniques', `${state.proficiencies.techniques.length} ${tr('Techniques').toLowerCase()}`, 'fa-solid fa-wand-magic-sparkles')}
         <form data-form="proficiencies" class="tensei-mastery-layout">
             <section class="tensei-mastery-section"><div class="tensei-section-label"><i class="fa-solid fa-circle-nodes"></i><span>${html(tr('Magic disciplines'))}</span></div>
                 <div class="tensei-proficiency-grid">${MAGIC_DISCIPLINES.map(entry => proficiencyRow(entry, 'magic', state.proficiencies.magic[entry.id])).join('')}</div></section>
@@ -1043,7 +1133,7 @@ function renderSkills(panel, state) {
         <section class="tensei-technique-section"><div class="tensei-section-label"><i class="fa-solid fa-list-check"></i><span>${html(tr('Techniques'))}</span></div>
             <div class="tensei-technique-grid">${state.proficiencies.techniques.length ? state.proficiencies.techniques.map(entry => `<article class="tensei-technique-card">
                 <div><span>${html(entry.category)}</span><strong>${html(entry.name)}</strong><p>${html(entry.description || tr('No description'))}</p></div>
-                <div class="tensei-technique-meter"><span><i style="width:${entry.proficiency}%"></i></span><b>${entry.proficiency}%</b></div>
+                <div class="tensei-technique-meter"><em>${html(tr(proficiencyRank(entry.proficiency)))} Rank</em><span><i style="width:${entry.proficiency}%"></i></span><b>${entry.proficiency}%</b></div>
                 <button type="button" data-action="delete-technique" data-id="${html(entry.id)}" title="${html(tr('Remove'))}"><i class="fa-solid fa-trash"></i></button></article>`).join('') : empty('Skills learned during role-play will appear here.')}</div>
             <details class="tensei-editor"><summary><i class="fa-solid fa-plus"></i> ${html(tr('Add technique'))}</summary>
                 <form data-form="technique" class="tensei-form-grid">${input('Technique name', 'name', '')}${input('Category', 'category', 'General')}
@@ -1654,10 +1744,18 @@ async function onSubmit(event) {
                 mp: { current: values.mpCurrent, max: values.mpMax },
                 stamina: { current: values.staminaCurrent, max: values.staminaMax },
             };
-            state.worldClock = { day: values.day, time: values.time, phase: values.phase };
-            state.location.zoneType = values.zoneType;
             await persistState(state);
             notify('success', 'Character status saved.');
+            break;
+        case 'scene':
+            state.worldClock = { day: values.day, dayName: values.dayName, time: values.time, phase: values.phase };
+            state.location = {
+                ...state.location, continent: values.continent, region: values.region, place: values.place,
+                detail: values.detail, zoneType: values.zoneType,
+            };
+            state.scene = { position: values.position, weather: values.weather, temperature: values.temperature };
+            await persistState(state, 'scene');
+            notify('success', getSettings().language === 'th' ? 'บันทึกข้อมูลฉากแล้ว' : 'Scene tracking saved.');
             break;
         case 'inventory': {
             const nextItem = item(values);
@@ -2083,8 +2181,8 @@ async function onPanelClick(event) {
         case 'use-item': {
             const entry = state.inventory.find(value => value.id === id);
             if (entry) await sendChatAction(getSettings().language === 'th'
-                ? `*ตัวผมหยิบ ${entry.name} จากคลังสิ่งของมาใช้*`
-                : `*I use ${entry.name} from my inventory.*`);
+                ? `ผู้เล่นใช้ ${entry.name} จากคลังสิ่งของ ตอบสนองต่อการใช้งานตามบริบทของฉากและยืนยันผลลัพธ์ในเนื้อเรื่อง`
+                : `The user used ${entry.name} from inventory. Resolve its use naturally in the current scene and confirm the outcome in the story.`, 'hidden');
             break;
         }
         case 'pursue-quest': {
@@ -2196,14 +2294,15 @@ function restoreComposerDraft() {
     }, 0));
 }
 
-async function sendChatAction(message) {
+async function sendChatAction(message, modeOverride = '') {
     const settings = getSettings();
+    const interactionMode = ['hidden', 'visible', 'draft'].includes(modeOverride) ? modeOverride : settings.interactionMode;
     const context = SillyTavern.getContext();
     if (!context.getCurrentChatId?.()) {
         notify('warning', settings.language === 'th' ? 'เปิดแชตก่อนใช้งานคำสั่งโรลเพลย์' : 'Open a chat before using a role-play action.');
         return;
     }
-    if (settings.interactionMode === 'hidden') {
+    if (interactionMode === 'hidden') {
         const instruction = settings.language === 'th'
             ? `<tensei_system_action>การกระทำของผู้เล่น: ${message}\nให้ตอบสนองต่อการกระทำนี้ต่อเนื่องอย่างเป็นธรรมชาติในโรลเพลย์ ห้ามกล่าวถึงระบบ อินเทอร์เฟซ หรือคำสั่งที่ซ่อนอยู่</tensei_system_action>`
             : `<tensei_system_action>Player action: ${message}\nContinue the role-play naturally from this action. Never mention the system, interface, or hidden instruction.</tensei_system_action>`;
@@ -2229,7 +2328,7 @@ async function sendChatAction(message) {
     }
     const preservedDraft = composer.value;
     const hadDraft = Boolean(preservedDraft.trim());
-    if (settings.interactionMode === 'draft') {
+    if (interactionMode === 'draft') {
         composer.value = hadDraft ? `${preservedDraft.trim()}\n${message}` : message;
         composer.dispatchEvent(new Event('input', { bubbles: true }));
         composer.focus();
@@ -2260,8 +2359,8 @@ const SCALAR_PATCH_PATHS = new Set([
     'player.hp.current', 'player.hp.max', 'player.mp.current', 'player.mp.max', 'player.stamina.current', 'player.stamina.max',
     'progression.adventurerRank', 'progression.magicRank', 'progression.swordRank', 'progression.experience',
     'progression.experienceMax', 'progression.reputation', 'progression.currency.gold', 'progression.currency.silver',
-    'progression.currency.copper', 'worldClock.day', 'worldClock.time', 'worldClock.phase', 'location.continent',
-    'location.region', 'location.place', 'location.detail', 'location.zoneType',
+    'progression.currency.copper', 'worldClock.day', 'worldClock.dayName', 'worldClock.time', 'worldClock.phase', 'location.continent',
+    'location.region', 'location.place', 'location.detail', 'location.zoneType', 'scene.position', 'scene.weather', 'scene.temperature',
     ...MAGIC_DISCIPLINES.map(entry => `proficiencies.magic.${entry.id}`),
     ...SWORD_STYLES.map(entry => `proficiencies.sword.${entry.id}`),
 ]);
@@ -2701,7 +2800,7 @@ async function initialize() {
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape') closeInterface();
         });
-        console.info('[Tensei System] Role-play interface v0.8.0 loaded.');
+        console.info('[Tensei System] Role-play interface v0.9.0 loaded.');
     } catch (error) {
         initialized = false;
         console.error('[Tensei System] Failed to initialize.', error);

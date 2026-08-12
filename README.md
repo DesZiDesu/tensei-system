@@ -11,7 +11,7 @@ A responsive, persistent Mushoku Tensei role-play interface for SillyTavern.
 - Formal segmented health, mana, and stamina instruments.
 - Smooth pointer and touch tab transitions.
 - Desktop side drawer and phone-specific full-screen layout.
-- Status, Inventory, Magic & Technique, Quests, Rank, World Map, NPC Codex, Mailbox, and Music tabs.
+- Status, Scene, Inventory, Skill Storage, Techniques, Quests, Rank, World Map, NPC Codex, Mailbox, and Music tabs.
 - Per-chat state stored in SillyTavern chat metadata.
 - Current state injected into role-play prompts for continuity.
 - Zero-extra-call state tracking from the normal AI reply.
@@ -25,6 +25,8 @@ A responsive, persistent Mushoku Tensei role-play interface for SillyTavern.
 - Map zoom, pan, pinch gestures, current-position pulse, discoveries, and custom pins.
 - English/Thai interface and generated role-play actions.
 - Hidden, visible, and draft-only action delivery modes.
+- Scene tracking for day name/counter, time/phase, place, exact location, position, weather, and temperature.
+- Named proficiency ranks alongside percentage progress for every magic discipline, sword school, and technique.
 - Optional floating Full/Compact activity capsule for waiting, patch checks, updates, no-change replies, disabled tracking, and errors.
 - User-configurable accent color, glass opacity, glow strength, and information density.
 
@@ -48,13 +50,23 @@ chat input. Use **Sync latest turn** to test the connected model manually.
 
 ## Current scope
 
-Version 0.8.0 makes zero-call tracking visible through an optional floating status
-capsule and clarifies action delivery. A fresh chat still does not inject, analyze,
+Version 0.9.0 separates Skill Storage from Techniques and adds zero-extra-call Scene
+tracking. A fresh chat still does not inject, analyze,
 or create extension state for the character's First Message; tracking starts only
 after the user sends the first reply. NPC Codex and Mailbox remain separate tabs,
 connected only through optional NPC/Contact links and physical letters.
 
 ## Changelog
+
+### 0.9.0
+
+- Added a Scene tab immediately after Status with time, day name, day counter, phase, region, place, location detail, position, weather, and temperature.
+- Added validated Scene patch paths without adding a background AI request.
+- Split Skill Storage and Techniques into independent tabs.
+- Exposed the complete stored user skill collection with manual add/delete controls.
+- Added derived None through God proficiency ranks alongside percentage bars.
+- Forced Inventory Use actions through Hidden delivery without creating a visible user bubble or disturbing the composer draft.
+- Kept story tracking content-neutral with no extension-level NSFW filter; model/provider restrictions still apply.
 
 ### 0.8.0
 
