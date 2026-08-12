@@ -5,16 +5,19 @@ A responsive, persistent Mushoku Tensei role-play interface for SillyTavern.
 ## Features
 
 - Animated magic-interface boot sequence.
-- Selectable, locally resized per-chat profile portrait with animated magic-circle frame.
+- Selectable full-aspect portrait with separate desktop/phone X, Y, and zoom framing.
 - Active SillyTavern persona header with title, race, guild, and party identity.
 - Canonical day phase, world time, level, EXP requirement, and zone classification.
 - Formal segmented health, mana, and stamina instruments.
 - Smooth pointer and touch tab transitions.
 - Desktop side drawer and phone-specific full-screen layout.
-- Status, Inventory, Skills, Quests, Rank, and World Map tabs.
+- Status, Inventory, Magic & Technique, Quests, Rank, World Map, Mailbox, and Music tabs.
 - Per-chat state stored in SillyTavern chat metadata.
 - Current state injected into role-play prompts for continuity.
-- Optional automatic AI synchronization after replies.
+- Queued automatic AI synchronization after both user messages and AI replies.
+- Elemental magic and North/Water/Sword God Style proficiency meters plus extensible techniques.
+- Per-chat NPC contacts and physical letters with unread state, animated reading, reply, and delete actions.
+- Per-chat music playlists with MP3/audio files stored locally on each device.
 - Manual editing and immediate actions from the interface.
 - Interactive original SVG world atlas with canonical Mushoku Tensei geography.
 - Map zoom, pan, pinch gestures, current-position pulse, discoveries, and custom pins.
@@ -41,13 +44,24 @@ chat input. Use **Sync latest turn** to test the connected model manually.
 
 ## Current scope
 
-Version 0.4.0 introduces the black-and-umber fantasy glass interface, bilingual
-actions, and configurable action delivery. Existing chats migrate forward without
-resetting their saved state.
+Version 0.5.0 adds dual-phase automatic tracking, device-specific portrait framing,
+proficiency records, physical correspondence, and local playlists. Existing chats
+migrate forward without resetting their saved state.
 Deeper settlement maps, equipment rules, combat calculations, relationships, and
 factions can be layered on in later milestones.
 
 ## Changelog
+
+### 0.5.0
+
+- Added queued state analysis after user submissions and after AI responses, with per-message cursors to prevent duplicate sync.
+- Added uncropped portrait storage and independent desktop/mobile positioning and zoom controls.
+- Added nine magic discipline proficiency meters and the three sword-school meters.
+- Added an extensible technique list with independent proficiency values.
+- Added per-chat NPC contacts and incoming/outgoing physical letters.
+- Added unread/read/sent states, animated letter opening, reply composition, clearing, and deletion.
+- Added per-chat playlists with local-device MP3/audio storage, playback, seek, shuffle, repeat, and track controls.
+- Kept portraits and audio files out of AI prompts; only structured story state is synchronized.
 
 ### 0.4.0
 

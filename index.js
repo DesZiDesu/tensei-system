@@ -7,6 +7,22 @@ const PROMPT_KEY = 'tensei_system_roleplay_state';
 const ACTION_PROMPT_KEY = 'tensei_system_hidden_action';
 const RANKS = ['F', 'E', 'D', 'C', 'B', 'A', 'S'];
 const MASTERY = ['None', 'Beginner', 'Intermediate', 'Advanced', 'Saint', 'King', 'Emperor', 'God'];
+const MAGIC_DISCIPLINES = [
+    { id: 'fire', name: 'Fire', icon: 'fa-solid fa-fire', tone: '#d86b43' },
+    { id: 'water', name: 'Water', icon: 'fa-solid fa-droplet', tone: '#4f9fd8' },
+    { id: 'earth', name: 'Earth', icon: 'fa-solid fa-mountain', tone: '#a47b4e' },
+    { id: 'wind', name: 'Wind', icon: 'fa-solid fa-wind', tone: '#79b6a2' },
+    { id: 'healing', name: 'Healing', icon: 'fa-solid fa-hand-holding-heart', tone: '#72bd83' },
+    { id: 'detoxification', name: 'Detoxification', icon: 'fa-solid fa-flask', tone: '#9b82c4' },
+    { id: 'divine', name: 'Divine / Exorcism', icon: 'fa-solid fa-sun', tone: '#d7bd68' },
+    { id: 'barrier', name: 'Barrier', icon: 'fa-solid fa-shield-halved', tone: '#7194c6' },
+    { id: 'summoning', name: 'Summoning', icon: 'fa-solid fa-draw-polygon', tone: '#b579b2' },
+];
+const SWORD_STYLES = [
+    { id: 'northGod', name: 'North God Style', icon: 'fa-solid fa-compass' },
+    { id: 'waterGod', name: 'Water God Style', icon: 'fa-solid fa-water' },
+    { id: 'swordGod', name: 'Sword God Style', icon: 'fa-solid fa-khanda' },
+];
 const DAY_PHASES = ['Morning', 'Afternoon', 'Evening', 'Night'];
 const ZONE_TYPES = ['Safe Zone', 'Neutral Zone', 'Danger Zone', 'Unknown Zone'];
 const WORLD_LOCATIONS = [
@@ -64,6 +80,7 @@ const TRANSLATIONS = {
         'Synchronizing world state': 'กำลังเชื่อมข้อมูลโลก',
         'Connecting to the active role-play...': 'กำลังเชื่อมต่อกับโรลเพลย์ปัจจุบัน...',
         Ready: 'พร้อม', Status: 'สถานะ', Inventory: 'คลังสิ่งของ', Skills: 'ทักษะ', Quests: 'ภารกิจ', Rank: 'อันดับ', 'World Map': 'แผนที่โลก',
+        Music: 'เพลง', Mailbox: 'กล่องจดหมาย', Contacts: 'รายชื่อ', Letters: 'จดหมาย', 'Magic & Technique': 'เวทมนตร์และวิชา',
         'Waiting for chat': 'กำลังรอแชต', 'Sync latest turn': 'ซิงก์เหตุการณ์ล่าสุด', 'System interface': 'ข้อมูลระบบ',
         'Current persona': 'ตัวตนปัจจุบัน', 'Guild rank': 'อันดับกิลด์', 'Vital status': 'สถานะพลังชีวิต', Identity: 'ข้อมูลส่วนตัว',
         Health: 'พลังชีวิต', Mana: 'มานา', Stamina: 'พละกำลัง', Race: 'เผ่าพันธุ์', Age: 'อายุ', Guild: 'กิลด์', Party: 'ปาร์ตี้',
@@ -89,6 +106,14 @@ const TRANSLATIONS = {
         Appearance: 'รูปแบบหน้าจอ', Accent: 'สีหลัก', Glass: 'ความโปร่งใส', Glow: 'แสงเรือง', Density: 'ความหนาแน่น', Language: 'ภาษา', 'Action delivery': 'รูปแบบการส่งคำสั่ง',
         Compact: 'กระชับ', Comfortable: 'สบายตา', Hidden: 'ซ่อนข้อความ', Visible: 'แสดงข้อความ', 'Draft only': 'ร่างเท่านั้น',
         'Choose profile picture': 'เลือกรูปโปรไฟล์', 'Use in role-play': 'ใช้ในโรลเพลย์', Remove: 'ลบ', 'Pursue in role-play': 'ดำเนินภารกิจในโรลเพลย์',
+        'Adjust portrait': 'จัดตำแหน่งรูป', 'Desktop framing': 'กรอบภาพ PC', 'Phone framing': 'กรอบภาพมือถือ',
+        Horizontal: 'แนวนอน', Vertical: 'แนวตั้ง', Zoom: 'ซูม', 'Save framing': 'บันทึกกรอบภาพ',
+        'Magic disciplines': 'สาขาเวทมนตร์', 'Sword schools': 'สามสำนักดาบ', Techniques: 'วิชาและทักษะ', Proficiency: 'ความชำนาญ',
+        'Add technique': 'เพิ่มวิชา', 'Technique name': 'ชื่อวิชา', Category: 'หมวดหมู่', 'Save proficiency': 'บันทึกความชำนาญ',
+        Playlist: 'เพลย์ลิสต์', 'Add audio files': 'เพิ่มไฟล์เสียง', 'No tracks in this chat.': 'ยังไม่มีเพลงในแชทนี้',
+        'Stored locally on this device': 'เก็บไว้ในอุปกรณ์นี้เท่านั้น', 'Now playing': 'กำลังเล่น',
+        Inbox: 'กล่องขาเข้า', Unread: 'ยังไม่อ่าน', Read: 'อ่านแล้ว', Sent: 'ส่งแล้ว', 'Add contact': 'เพิ่มรายชื่อ', 'Compose letter': 'เขียนจดหมาย',
+        Subject: 'หัวข้อ', Message: 'เนื้อหา', 'Send letter': 'ส่งจดหมาย', Reply: 'ตอบกลับ', Close: 'ปิด', 'Clear letter': 'ลบจดหมาย', Affiliation: 'สังกัด', Relationship: 'ความสัมพันธ์', Notes: 'บันทึก',
     },
 };
 
@@ -98,8 +123,12 @@ let menuObserver = null;
 let bootTimer = null;
 let aiSyncInProgress = false;
 let pendingSave = Promise.resolve();
+let syncQueue = Promise.resolve();
 let tabTransitionToken = 0;
 let mapSelectionId = null;
+let openedLetterId = null;
+let audioPlayer = null;
+let audioObjectUrl = '';
 const mapView = { scale: 1, x: 0, y: 0 };
 
 const uid = () => globalThis.crypto?.randomUUID?.() || `tensei-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -137,10 +166,13 @@ function applyAppearance() {
 }
 
 function defaultState() {
+    const magic = Object.fromEntries(MAGIC_DISCIPLINES.map(entry => [entry.id, 0]));
+    const sword = Object.fromEntries(SWORD_STYLES.map(entry => [entry.id, 0]));
     return {
-        version: 3,
+        version: 5,
         player: {
             name: 'Adventurer', portrait: '', race: 'Human', age: '', title: 'Newcomer', guild: 'Unaffiliated', party: 'Solo', condition: 'Stable', level: 1,
+            portraitView: { desktop: { x: 50, y: 50, zoom: 1 }, mobile: { x: 50, y: 50, zoom: 1 } },
             hp: { current: 100, max: 100 }, mp: { current: 100, max: 100 }, stamina: { current: 100, max: 100 },
         },
         progression: {
@@ -151,8 +183,13 @@ function defaultState() {
         location: { continent: 'Central Continent', region: 'Asura Kingdom', place: 'Unknown', detail: '', zoneType: 'Safe Zone', discovered: ['Asura Kingdom'], pins: [] },
         inventory: [{ id: uid(), name: "Traveler's Clothes", quantity: 1, category: 'Equipment', description: '' }],
         skills: [],
+        proficiencies: { magic, sword, techniques: [] },
         quests: [],
+        contacts: [],
+        letters: [],
+        music: { tracks: [], currentId: '', repeat: false, shuffle: false },
         journal: [],
+        syncCursor: { user: null, assistant: null },
         updatedAt: null,
         updateSource: 'initial',
     };
@@ -197,6 +234,55 @@ function skill(value) {
     };
 }
 
+function portraitFrame(value, fallback) {
+    return {
+        x: number(value?.x, fallback.x, 0, 100),
+        y: number(value?.y, fallback.y, 0, 100),
+        zoom: number(value?.zoom, fallback.zoom, 1, 3),
+    };
+}
+
+function technique(value) {
+    if (!value || typeof value !== 'object' || !text(value.name)) return null;
+    return {
+        id: text(value.id, uid(), 100), name: text(value.name, '', 120),
+        category: text(value.category, 'General', 80), proficiency: number(value.proficiency, 0, 0, 100),
+        description: text(value.description, '', 300),
+    };
+}
+
+function contact(value) {
+    if (!value || typeof value !== 'object' || !text(value.name)) return null;
+    return {
+        id: text(value.id, uid(), 100), name: text(value.name, '', 120), title: text(value.title, '', 120),
+        affiliation: text(value.affiliation, '', 120), relationship: text(value.relationship, 'Acquaintance', 100),
+        notes: text(value.notes, '', 400), lastLetterAt: text(value.lastLetterAt, '', 60),
+    };
+}
+
+function letter(value) {
+    if (!value || typeof value !== 'object' || !text(value.body)) return null;
+    const direction = value.direction === 'outgoing' ? 'outgoing' : 'incoming';
+    const status = ['unread', 'read', 'sent', 'draft'].includes(value.status)
+        ? value.status : direction === 'incoming' ? 'unread' : 'sent';
+    return {
+        id: text(value.id, uid(), 100), contactId: text(value.contactId, '', 100),
+        fromName: text(value.fromName, direction === 'incoming' ? 'Unknown sender' : 'Adventurer', 120),
+        toName: text(value.toName, direction === 'incoming' ? 'Adventurer' : 'Unknown recipient', 120),
+        subject: text(value.subject, 'Untitled letter', 160), body: text(value.body, '', 5000),
+        direction, status, createdAt: text(value.createdAt, new Date().toISOString(), 60),
+    };
+}
+
+function musicTrack(value) {
+    if (!value || typeof value !== 'object' || !text(value.name)) return null;
+    return {
+        id: text(value.id, uid(), 100), name: text(value.name, '', 180), fileName: text(value.fileName, '', 240),
+        type: text(value.type, 'audio/mpeg', 80), duration: number(value.duration, 0, 0, 86400),
+        addedAt: text(value.addedAt, new Date().toISOString(), 60),
+    };
+}
+
 function quest(value) {
     if (!value || typeof value !== 'object' || !text(value.name)) return null;
     const statuses = ['Active', 'Completed', 'Failed', 'On Hold'];
@@ -215,9 +301,14 @@ function normalize(candidate, base = defaultState()) {
     const currency = progress.currency && typeof progress.currency === 'object' ? progress.currency : {};
     const location = source.location && typeof source.location === 'object' ? source.location : {};
 
-    result.version = 3;
+    result.version = 5;
+    const portraitView = player.portraitView && typeof player.portraitView === 'object' ? player.portraitView : {};
     result.player = {
         name: text(player.name, result.player.name, 100), portrait: text(player.portrait, result.player.portrait, 1500000),
+        portraitView: {
+            desktop: portraitFrame(portraitView.desktop, result.player.portraitView.desktop),
+            mobile: portraitFrame(portraitView.mobile, result.player.portraitView.mobile),
+        },
         race: text(player.race, result.player.race, 80),
         age: text(player.age, result.player.age, 40), title: text(player.title, result.player.title, 100),
         guild: text(player.guild, result.player.guild, 100), party: text(player.party, result.player.party, 100),
@@ -261,7 +352,39 @@ function normalize(candidate, base = defaultState()) {
     };
     if (Array.isArray(source.inventory)) result.inventory = source.inventory.map(item).filter(Boolean).slice(0, 200);
     if (Array.isArray(source.skills)) result.skills = source.skills.map(skill).filter(Boolean).slice(0, 100);
+    const proficiencies = source.proficiencies && typeof source.proficiencies === 'object' ? source.proficiencies : {};
+    result.proficiencies.magic = Object.fromEntries(MAGIC_DISCIPLINES.map(entry => [
+        entry.id, number(proficiencies.magic?.[entry.id], result.proficiencies.magic[entry.id], 0, 100),
+    ]));
+    result.proficiencies.sword = Object.fromEntries(SWORD_STYLES.map(entry => [
+        entry.id, number(proficiencies.sword?.[entry.id], result.proficiencies.sword[entry.id], 0, 100),
+    ]));
+    if (Array.isArray(proficiencies.techniques)) result.proficiencies.techniques = proficiencies.techniques.map(technique).filter(Boolean).slice(0, 150);
     if (Array.isArray(source.quests)) result.quests = source.quests.map(quest).filter(Boolean).slice(0, 100);
+    if (Array.isArray(source.contacts)) {
+        const byName = new Map();
+        source.contacts.map(contact).filter(Boolean).forEach(entry => {
+            const key = entry.name.toLocaleLowerCase();
+            byName.set(key, byName.has(key) ? { ...byName.get(key), ...entry, id: byName.get(key).id } : entry);
+        });
+        result.contacts = [...byName.values()].slice(0, 200);
+    }
+    if (Array.isArray(source.letters)) {
+        const signatures = new Set();
+        result.letters = source.letters.map(letter).filter(Boolean).filter(entry => {
+            const signature = [entry.direction, entry.contactId, entry.fromName, entry.toName, entry.subject, entry.body]
+                .map(value => String(value).trim().toLocaleLowerCase()).join('|');
+            if (signatures.has(signature)) return false;
+            signatures.add(signature);
+            return true;
+        }).slice(-300);
+    }
+    const music = source.music && typeof source.music === 'object' ? source.music : {};
+    result.music = {
+        tracks: Array.isArray(music.tracks) ? music.tracks.map(musicTrack).filter(Boolean).slice(0, 100) : result.music.tracks,
+        currentId: text(music.currentId, '', 100), repeat: Boolean(music.repeat), shuffle: Boolean(music.shuffle),
+    };
+    if (!result.music.tracks.some(track => track.id === result.music.currentId)) result.music.currentId = result.music.tracks[0]?.id || '';
     if (Array.isArray(source.journal)) {
         result.journal = source.journal.map(entry => ({
             id: text(entry?.id, uid(), 100), text: text(entry?.text, '', 500), at: text(entry?.at, '', 60),
@@ -269,6 +392,10 @@ function normalize(candidate, base = defaultState()) {
     }
     result.updatedAt = typeof source.updatedAt === 'string' ? source.updatedAt : result.updatedAt;
     result.updateSource = text(source.updateSource, result.updateSource, 40);
+    result.syncCursor = {
+        user: Number.isInteger(source.syncCursor?.user) ? source.syncCursor.user : result.syncCursor.user,
+        assistant: Number.isInteger(source.syncCursor?.assistant) ? source.syncCursor.assistant : result.syncCursor.assistant,
+    };
     return result;
 }
 
@@ -299,9 +426,11 @@ async function persistState(candidate, source = 'manual') {
 function aiState(state) {
     const safePlayer = { ...state.player };
     delete safePlayer.portrait;
+    delete safePlayer.portraitView;
     return {
         player: safePlayer, progression: state.progression, worldClock: state.worldClock, location: state.location,
-        inventory: state.inventory, skills: state.skills, quests: state.quests,
+        inventory: state.inventory, skills: state.skills, proficiencies: state.proficiencies, quests: state.quests,
+        contacts: state.contacts, letters: state.letters.slice(-30),
     };
 }
 
@@ -314,6 +443,7 @@ function statePrompt(state) {
         'Canonical current role-play state. Maintain continuity with these facts.',
         'Naturally acknowledge the current location when the scene or movement makes it relevant.',
         'Treat inventory, ranks, conditions, skills, and quests as established facts; change them only when story events justify it.',
+        'Contacts and letters are part of the story. NPCs may send physical letters naturally; do not describe them as smartphone messages.',
         JSON.stringify(canonical),
         '</tensei_system_state>',
     ].join('\n');
@@ -403,13 +533,15 @@ function buildInterface() {
                     <nav class="tensei-tab-list" aria-label="Tensei System sections">
                         ${tabButton('status', 'fa-solid fa-user', 'Status', true)}
                         ${tabButton('inventory', 'fa-solid fa-box-open', 'Inventory')}
-                        ${tabButton('skills', 'fa-solid fa-wand-magic-sparkles', 'Skills')}
+                        ${tabButton('skills', 'fa-solid fa-wand-magic-sparkles', 'Magic & Technique')}
                         ${tabButton('quests', 'fa-solid fa-scroll', 'Quests')}
                         ${tabButton('rank', 'fa-solid fa-medal', 'Rank')}
                         ${tabButton('map', 'fa-solid fa-map', 'World Map')}
+                        ${tabButton('mail', 'fa-solid fa-envelope', 'Mailbox')}
+                        ${tabButton('music', 'fa-solid fa-music', 'Music')}
                     </nav>
                     <main class="tensei-system-panel-body">
-                        ${['status', 'inventory', 'skills', 'quests', 'rank', 'map'].map((id, index) =>
+                        ${['status', 'inventory', 'skills', 'quests', 'rank', 'map', 'mail', 'music'].map((id, index) =>
                             `<section class="tensei-tab-panel${index === 0 ? ' is-active' : ''}" data-panel="${id}"
                                 ${index ? 'hidden' : ''}></section>`).join('')}
                     </main>
@@ -420,16 +552,17 @@ function buildInterface() {
                         <i class="fa-solid fa-rotate"></i> ${html(tr('Sync latest turn'))}</button>
                 </footer>
             </div>
+            <div id="tensei-portrait-editor" class="tensei-submodal" hidden></div>
+            <div id="tensei-letter-reader" class="tensei-submodal" hidden></div>
         </section>`;
     document.body.appendChild(overlay);
     overlay.querySelector('.tensei-system-backdrop')?.addEventListener('click', closeInterface);
     overlay.querySelector('#tensei-system-close')?.addEventListener('click', closeInterface);
-    overlay.querySelector('#tensei-sync-now')?.addEventListener('click', () => analyzeChat({ manual: true }));
+    overlay.querySelector('#tensei-sync-now')?.addEventListener('click', () => queueAnalyze({ manual: true }));
     overlay.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => activateTab(button.dataset.tab)));
-    const body = overlay.querySelector('.tensei-system-panel-body');
-    body?.addEventListener('submit', onSubmit);
-    body?.addEventListener('click', onPanelClick);
-    body?.addEventListener('change', onPanelChange);
+    overlay.addEventListener('submit', onSubmit);
+    overlay.addEventListener('click', onPanelClick);
+    overlay.addEventListener('change', onPanelChange);
     overlay.addEventListener('input', onInterfaceSettingChange);
     overlay.addEventListener('change', onInterfaceSettingChange);
     applyAppearance();
@@ -449,6 +582,31 @@ function rebuildInterface() {
 }
 
 function onInterfaceSettingChange(event) {
+    const portraitControl = event.target.closest('[data-portrait-control]');
+    if (portraitControl instanceof HTMLInputElement) {
+        const device = portraitControl.closest('.tensei-portrait-device');
+        const preview = device?.querySelector('img');
+        const output = portraitControl.closest('label')?.querySelector('output');
+        const property = portraitControl.dataset.portraitControl;
+        if (preview) preview.style.setProperty(`--preview-${property}`, property === 'zoom' ? portraitControl.value : `${portraitControl.value}%`);
+        if (output) output.textContent = property === 'zoom' ? `${Number(portraitControl.value).toFixed(2)}×` : `${Math.round(Number(portraitControl.value))}%`;
+        return;
+    }
+    const proficiency = event.target.closest('.tensei-proficiency-row input[type="range"]');
+    if (proficiency instanceof HTMLInputElement) {
+        const row = proficiency.closest('.tensei-proficiency-row');
+        const fill = row?.querySelector('.tensei-proficiency-track i');
+        const output = row?.querySelector('output');
+        if (fill) fill.style.width = `${proficiency.value}%`;
+        if (output) output.textContent = `${proficiency.value}%`;
+        return;
+    }
+    const seek = event.target.closest('#tensei-music-seek');
+    if (seek instanceof HTMLInputElement && audioPlayer?.duration) {
+        audioPlayer.currentTime = Number(seek.value) / 1000 * audioPlayer.duration;
+        updateMusicProgress();
+        return;
+    }
     const control = event.target.closest('[data-ui-setting]');
     if (!(control instanceof HTMLInputElement || control instanceof HTMLSelectElement)) return;
     const key = control.dataset.uiSetting;
@@ -517,6 +675,8 @@ function renderAll(state = getState()) {
     renderQuests(overlay.querySelector('[data-panel="quests"]'), state);
     renderRank(overlay.querySelector('[data-panel="rank"]'), state);
     renderMap(overlay.querySelector('[data-panel="map"]'), state);
+    renderMailbox(overlay.querySelector('[data-panel="mail"]'), state);
+    renderMusic(overlay.querySelector('[data-panel="music"]'), state);
     const label = overlay.querySelector('#tensei-context-label');
     if (label) label.innerHTML = SillyTavern.getContext().getCurrentChatId?.()
         ? `<i class="fa-solid fa-location-dot"></i> ${html(state.location.region)} · ${html(state.location.place)}`
@@ -530,10 +690,10 @@ function renderStatus(panel, state) {
     const expPercent = Math.min(100, Math.round(state.progression.experience / Math.max(1, state.progression.experienceMax) * 100));
     const initial = html((persona || '?').charAt(0).toUpperCase());
     panel.innerHTML = `
-        <section class="tensei-character-hero"><button class="tensei-avatar" type="button" data-action="choose-portrait" aria-label="${html(tr('Choose profile picture'))}">
+        <section class="tensei-character-hero"><button class="tensei-avatar" type="button" data-action="${state.player.portrait ? 'open-portrait-editor' : 'choose-portrait'}" aria-label="${html(tr(state.player.portrait ? 'Adjust portrait' : 'Choose profile picture'))}">
             <span class="tensei-magic-ring ring-one"></span><span class="tensei-magic-ring ring-two"></span>
-            ${state.player.portrait ? `<img src="${html(state.player.portrait)}" alt="${html(persona)} portrait">` : `<span class="tensei-avatar-initial">${initial}</span>`}
-            <span class="tensei-avatar-edit"><i class="fa-solid fa-camera"></i></span></button>
+            ${state.player.portrait ? `<span class="tensei-avatar-photo"><img src="${html(state.player.portrait)}" alt="${html(persona)} portrait" style="--portrait-desktop-x:${state.player.portraitView.desktop.x}%;--portrait-desktop-y:${state.player.portraitView.desktop.y}%;--portrait-desktop-zoom:${state.player.portraitView.desktop.zoom};--portrait-mobile-x:${state.player.portraitView.mobile.x}%;--portrait-mobile-y:${state.player.portraitView.mobile.y}%;--portrait-mobile-zoom:${state.player.portraitView.mobile.zoom}"></span>` : `<span class="tensei-avatar-initial">${initial}</span>`}
+            <span class="tensei-avatar-edit"><i class="fa-solid ${state.player.portrait ? 'fa-crop-simple' : 'fa-camera'}"></i></span></button>
             <input id="tensei-avatar-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
             <div class="tensei-character-copy"><span class="tensei-eyebrow">${html(tr('Current persona'))}</span><h3>${html(persona)}</h3>
                 <p class="tensei-character-title">${html(state.player.title)}</p><div class="tensei-identity-chips">
@@ -576,6 +736,40 @@ function renderStatus(panel, state) {
             </form></details>`;
 }
 
+function portraitPreview(label, mode, frame, portrait) {
+    return `<section class="tensei-portrait-device ${mode}"><span>${html(tr(label))}</span><div class="tensei-portrait-preview">
+        <img src="${html(portrait)}" alt="" style="--preview-x:${frame.x}%;--preview-y:${frame.y}%;--preview-zoom:${frame.zoom}"></div>
+        <label><span>${html(tr('Horizontal'))}<output>${Math.round(frame.x)}%</output></span><input type="range" name="${mode}X" data-portrait-control="x" data-portrait-mode="${mode}" min="0" max="100" value="${frame.x}"></label>
+        <label><span>${html(tr('Vertical'))}<output>${Math.round(frame.y)}%</output></span><input type="range" name="${mode}Y" data-portrait-control="y" data-portrait-mode="${mode}" min="0" max="100" value="${frame.y}"></label>
+        <label><span>${html(tr('Zoom'))}<output>${Number(frame.zoom).toFixed(2)}×</output></span><input type="range" name="${mode}Zoom" data-portrait-control="zoom" data-portrait-mode="${mode}" min="1" max="3" step="0.05" value="${frame.zoom}"></label></section>`;
+}
+
+function openPortraitEditor() {
+    const state = getState();
+    const modal = document.getElementById('tensei-portrait-editor');
+    if (!modal || !state.player.portrait) {
+        document.getElementById('tensei-avatar-input')?.click();
+        return;
+    }
+    const frame = state.player.portraitView;
+    modal.hidden = false;
+    modal.innerHTML = `<button class="tensei-submodal-backdrop" type="button" data-action="close-portrait-editor" aria-label="${html(tr('Close'))}"></button>
+        <article class="tensei-portrait-editor-card"><header><div><span>${html(tr('Choose profile picture'))}</span><h3>${html(tr('Adjust portrait'))}</h3></div>
+            <button type="button" data-action="close-portrait-editor"><i class="fa-solid fa-xmark"></i></button></header>
+            <form data-form="portrait-frame"><div class="tensei-portrait-previews">${portraitPreview('Desktop framing', 'desktop', frame.desktop, state.player.portrait)}
+                ${portraitPreview('Phone framing', 'mobile', frame.mobile, state.player.portrait)}</div>
+                <footer><button type="button" class="tensei-secondary-button" data-action="choose-portrait"><i class="fa-solid fa-image"></i>${html(tr('Choose profile picture'))}</button>
+                    <button class="tensei-primary-button" type="submit"><i class="fa-solid fa-crop-simple"></i>${html(tr('Save framing'))}</button></footer></form></article>`;
+}
+
+function closePortraitEditor() {
+    const modal = document.getElementById('tensei-portrait-editor');
+    if (modal) {
+        modal.hidden = true;
+        modal.innerHTML = '';
+    }
+}
+
 function renderInventory(panel, state) {
     if (!panel) return;
     panel.innerHTML = `${heading('Inventory', `${state.inventory.length} item types`, 'fa-solid fa-box-open')}
@@ -594,16 +788,27 @@ function renderInventory(panel, state) {
 
 function renderSkills(panel, state) {
     if (!panel) return;
-    panel.innerHTML = `${heading('Skills & Magic', `${state.skills.length} recorded abilities`, 'fa-solid fa-wand-magic-sparkles')}
-        <div class="tensei-item-grid">${state.skills.length ? state.skills.map(entry => `
-            <article class="tensei-list-card"><div class="tensei-item-icon"><i class="fa-solid fa-sparkles"></i></div>
-                <div class="tensei-item-copy"><strong>${html(entry.name)}</strong><span>${html(entry.type)} · ${html(entry.rank)}</span>
-                <p>${html(entry.description || tr('No description'))}</p></div><div class="tensei-card-actions">
-                <button type="button" data-action="delete-skill" data-id="${html(entry.id)}" title="${html(tr('Remove'))}"><i class="fa-solid fa-trash"></i></button></div></article>`).join('') : empty('Skills learned during role-play will appear here.')}</div>
-        <details class="tensei-editor"><summary><i class="fa-solid fa-plus"></i> ${html(tr('Add skill'))}</summary>
-            <form data-form="skill" class="tensei-form-grid">${input('Skill name', 'name', '')}${select('Rank', 'rank', MASTERY, 'Beginner')}
-                ${input('Type', 'type', 'Magic')}${input('Description', 'description', '')}
-                <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add skill'))}</button></form></details>`;
+    const proficiencyRow = (entry, group, value) => `<label class="tensei-proficiency-row" style="--discipline-tone:${entry.tone || 'var(--tensei-accent)'}">
+        <span class="tensei-discipline-icon"><i class="${entry.icon}"></i></span><span class="tensei-discipline-copy"><strong>${html(entry.name)}</strong>
+        <span class="tensei-proficiency-track"><i style="width:${value}%"></i></span></span><output>${value}%</output>
+        <input type="range" name="${group}-${entry.id}" min="0" max="100" value="${value}" aria-label="${html(entry.name)} proficiency"></label>`;
+    panel.innerHTML = `${heading('Magic & Technique', `${state.proficiencies.techniques.length} ${tr('Techniques').toLowerCase()}`, 'fa-solid fa-wand-magic-sparkles')}
+        <form data-form="proficiencies" class="tensei-mastery-layout">
+            <section class="tensei-mastery-section"><div class="tensei-section-label"><i class="fa-solid fa-circle-nodes"></i><span>${html(tr('Magic disciplines'))}</span></div>
+                <div class="tensei-proficiency-grid">${MAGIC_DISCIPLINES.map(entry => proficiencyRow(entry, 'magic', state.proficiencies.magic[entry.id])).join('')}</div></section>
+            <section class="tensei-mastery-section"><div class="tensei-section-label"><i class="fa-solid fa-khanda"></i><span>${html(tr('Sword schools'))}</span></div>
+                <div class="tensei-sword-grid">${SWORD_STYLES.map(entry => proficiencyRow(entry, 'sword', state.proficiencies.sword[entry.id])).join('')}</div></section>
+            <button class="tensei-primary-button tensei-mastery-save" type="submit"><i class="fa-solid fa-floppy-disk"></i>${html(tr('Save proficiency'))}</button>
+        </form>
+        <section class="tensei-technique-section"><div class="tensei-section-label"><i class="fa-solid fa-list-check"></i><span>${html(tr('Techniques'))}</span></div>
+            <div class="tensei-technique-grid">${state.proficiencies.techniques.length ? state.proficiencies.techniques.map(entry => `<article class="tensei-technique-card">
+                <div><span>${html(entry.category)}</span><strong>${html(entry.name)}</strong><p>${html(entry.description || tr('No description'))}</p></div>
+                <div class="tensei-technique-meter"><span><i style="width:${entry.proficiency}%"></i></span><b>${entry.proficiency}%</b></div>
+                <button type="button" data-action="delete-technique" data-id="${html(entry.id)}" title="${html(tr('Remove'))}"><i class="fa-solid fa-trash"></i></button></article>`).join('') : empty('Skills learned during role-play will appear here.')}</div>
+            <details class="tensei-editor"><summary><i class="fa-solid fa-plus"></i> ${html(tr('Add technique'))}</summary>
+                <form data-form="technique" class="tensei-form-grid">${input('Technique name', 'name', '')}${input('Category', 'category', 'General')}
+                    ${input('Proficiency', 'proficiency', 0, 'number', 'min="0" max="100"')}${input('Description', 'description', '')}
+                    <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add technique'))}</button></form></details></section>`;
 }
 
 function renderQuests(panel, state) {
@@ -708,6 +913,252 @@ function renderMap(panel, state) {
     setupMapInteractions(panel);
 }
 
+function renderMailbox(panel, state) {
+    if (!panel) return;
+    const unread = state.letters.filter(entry => entry.direction === 'incoming' && entry.status === 'unread').length;
+    const contactOptions = state.contacts.map(entry => `<option value="${html(entry.id)}">${html(entry.name)}</option>`).join('');
+    const sortedLetters = [...state.letters].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    panel.innerHTML = `${heading('Mailbox', `${unread} ${tr('Unread').toLowerCase()} · ${state.contacts.length} ${tr('Contacts').toLowerCase()}`, 'fa-solid fa-envelope-open-text')}
+        <div class="tensei-mail-layout"><section class="tensei-contact-rail"><div class="tensei-section-label"><i class="fa-solid fa-address-book"></i><span>${html(tr('Contacts'))}</span></div>
+            <div class="tensei-contact-list">${state.contacts.length ? state.contacts.map(entry => `<article class="tensei-contact-card">
+                <div class="tensei-contact-sigil">${html(entry.name.charAt(0).toUpperCase())}</div><div><strong>${html(entry.name)}</strong>
+                <span>${html(entry.title || entry.affiliation || entry.relationship)}</span><small>${html(entry.relationship)}</small></div>
+                <button type="button" data-action="delete-contact" data-id="${html(entry.id)}" title="${html(tr('Remove'))}"><i class="fa-solid fa-user-xmark"></i></button></article>`).join('') : `<div class="tensei-mail-empty"><i class="fa-solid fa-feather"></i><p>${getSettings().language === 'th' ? 'NPC ที่รู้จักระหว่างโรลเพลย์จะปรากฏที่นี่' : 'NPCs discovered during role-play will appear here.'}</p></div>`}</div>
+            <details class="tensei-editor"><summary><i class="fa-solid fa-user-plus"></i> ${html(tr('Add contact'))}</summary>
+                <form data-form="contact" class="tensei-form-grid">${input('Name', 'name', '')}${input('Title', 'title', '')}${input('Affiliation', 'affiliation', '')}
+                    ${input('Relationship', 'relationship', 'Acquaintance')}${input('Notes', 'notes', '')}<button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add contact'))}</button></form></details></section>
+            <section class="tensei-letter-desk"><div class="tensei-letter-desk-head"><div class="tensei-section-label"><i class="fa-solid fa-inbox"></i><span>${html(tr('Letters'))}</span></div>
+                ${state.letters.length ? `<button type="button" class="tensei-small-button" data-action="clear-letters"><i class="fa-solid fa-broom"></i>${html(tr('Clear letter'))}</button>` : ''}</div>
+                <div class="tensei-letter-list">${sortedLetters.length ? sortedLetters.map(entry => `<article class="tensei-letter-row${entry.status === 'unread' ? ' is-unread' : ''}" data-direction="${entry.direction}">
+                    <button class="tensei-letter-open" type="button" data-action="open-letter" data-id="${html(entry.id)}"><span class="tensei-wax-seal"><i class="fa-solid ${entry.direction === 'incoming' ? 'fa-envelope' : 'fa-paper-plane'}"></i></span>
+                    <span class="tensei-letter-summary"><b>${html(entry.subject)}</b><em>${html(entry.direction === 'incoming' ? entry.fromName : entry.toName)}</em>
+                    <small>${html(formatDate(entry.createdAt))}</small></span>${entry.status === 'unread' ? `<i class="tensei-unread-dot" title="${html(tr('Unread'))}"></i>` : ''}</button>
+                    <button type="button" data-action="delete-letter" data-id="${html(entry.id)}" title="${html(tr('Remove'))}"><i class="fa-solid fa-trash"></i></button></article>`).join('') : `<div class="tensei-mail-empty large"><i class="fa-regular fa-envelope-open"></i><p>${getSettings().language === 'th' ? 'ยังไม่มีจดหมายในแชทนี้' : 'No letters have arrived in this chat.'}</p></div>`}</div>
+                <details class="tensei-editor tensei-compose-editor"><summary><i class="fa-solid fa-feather-pointed"></i> ${html(tr('Compose letter'))}</summary>
+                    <form data-form="letter" class="tensei-form-grid"><label class="tensei-field"><span>${html(tr('Contacts'))}</span>${state.contacts.length
+                        ? `<select name="contactId" required><option value="">—</option>${contactOptions}</select>`
+                        : `<input name="recipientName" maxlength="120" required placeholder="NPC name">`}</label>
+                        ${input('Subject', 'subject', '')}<label class="tensei-field tensei-field-wide"><span>${html(tr('Message'))}</span><textarea name="body" rows="6" maxlength="5000" required></textarea></label>
+                        <button class="tensei-primary-button tensei-form-submit" type="submit"><i class="fa-solid fa-paper-plane"></i>${html(tr('Send letter'))}</button></form></details></section></div>`;
+    renderLetterReader(state);
+}
+
+function formatDate(value) {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return '';
+    return new Intl.DateTimeFormat(getSettings().language === 'th' ? 'th-TH' : 'en', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+}
+
+function renderLetterReader(state) {
+    const modal = document.getElementById('tensei-letter-reader');
+    if (!modal) return;
+    const entry = state.letters.find(value => value.id === openedLetterId);
+    if (!entry) {
+        modal.hidden = true;
+        modal.innerHTML = '';
+        return;
+    }
+    modal.hidden = false;
+    modal.innerHTML = `<button class="tensei-submodal-backdrop" type="button" data-action="close-letter" aria-label="${html(tr('Close'))}"></button>
+        <article class="tensei-letter-sheet" data-direction="${entry.direction}"><div class="tensei-letter-fold"></div><header><span>${html(entry.direction === 'incoming' ? entry.fromName : entry.toName)}</span>
+            <button type="button" data-action="close-letter" aria-label="${html(tr('Close'))}"><i class="fa-solid fa-xmark"></i></button></header>
+            <div class="tensei-letter-paper"><span class="tensei-letter-date">${html(formatDate(entry.createdAt))}</span><h3>${html(entry.subject)}</h3>
+                <p>${html(entry.body).replaceAll('\n', '<br>')}</p><div class="tensei-letter-signature">${html(entry.direction === 'incoming' ? entry.fromName : currentPersonaName(state))}</div></div>
+            <footer>${entry.direction === 'incoming' ? `<button class="tensei-primary-button" type="button" data-action="reply-letter" data-id="${html(entry.id)}"><i class="fa-solid fa-reply"></i>${html(tr('Reply'))}</button>` : ''}
+                <button class="tensei-secondary-button" type="button" data-action="delete-letter" data-id="${html(entry.id)}"><i class="fa-solid fa-trash"></i>${html(tr('Clear letter'))}</button>
+                <button class="tensei-text-button" type="button" data-action="close-letter">${html(tr('Close'))}</button></footer></article>`;
+}
+
+function renderMusic(panel, state) {
+    if (!panel) return;
+    const current = state.music.tracks.find(track => track.id === state.music.currentId) || state.music.tracks[0];
+    const playing = Boolean(audioPlayer && !audioPlayer.paused && current && audioPlayer.dataset.trackId === current.id);
+    panel.innerHTML = `${heading('Music', `${state.music.tracks.length} ${tr('Playlist').toLowerCase()}`, 'fa-solid fa-compact-disc')}
+        <section class="tensei-music-console"><div class="tensei-now-playing"><div class="tensei-record${playing ? ' is-playing' : ''}"><i class="fa-solid fa-compact-disc"></i></div>
+            <div><span>${html(tr('Now playing'))}</span><h3>${html(current?.name || (getSettings().language === 'th' ? 'ยังไม่ได้เลือกเพลง' : 'No track selected'))}</h3>
+            <small><i class="fa-solid fa-lock"></i>${html(tr('Stored locally on this device'))}</small></div></div>
+            <div class="tensei-player-progress"><input id="tensei-music-seek" type="range" min="0" max="1000" value="0" ${current ? '' : 'disabled'}><div><span id="tensei-music-current-time">0:00</span><span id="tensei-music-duration">${formatDuration(current?.duration || 0)}</span></div></div>
+            <div class="tensei-player-controls"><button type="button" data-action="music-shuffle" class="${state.music.shuffle ? 'is-active' : ''}" title="Shuffle"><i class="fa-solid fa-shuffle"></i></button>
+                <button type="button" data-action="music-prev" title="Previous"><i class="fa-solid fa-backward-step"></i></button>
+                <button class="tensei-play-button" type="button" data-action="music-toggle" ${current ? '' : 'disabled'}><i class="fa-solid ${playing ? 'fa-pause' : 'fa-play'}"></i></button>
+                <button type="button" data-action="music-next" title="Next"><i class="fa-solid fa-forward-step"></i></button>
+                <button type="button" data-action="music-repeat" class="${state.music.repeat ? 'is-active' : ''}" title="Repeat"><i class="fa-solid fa-repeat"></i></button></div></section>
+        <section class="tensei-playlist"><div class="tensei-section-label"><i class="fa-solid fa-list-ol"></i><span>${html(tr('Playlist'))}</span>
+            <button type="button" class="tensei-small-button" data-action="choose-audio"><i class="fa-solid fa-plus"></i>${html(tr('Add audio files'))}</button><input id="tensei-audio-input" type="file" accept="audio/mpeg,audio/mp3,audio/ogg,audio/wav,audio/mp4,audio/aac" multiple hidden></div>
+            <div class="tensei-track-list">${state.music.tracks.length ? state.music.tracks.map((track, index) => `<article class="tensei-track-row${track.id === state.music.currentId ? ' is-current' : ''}">
+                <button type="button" data-action="music-play" data-id="${html(track.id)}"><span>${String(index + 1).padStart(2, '0')}</span><i class="fa-solid ${track.id === state.music.currentId && playing ? 'fa-volume-high' : 'fa-music'}"></i>
+                    <span><b>${html(track.name)}</b><small>${html(track.fileName)}</small></span><em>${formatDuration(track.duration)}</em></button>
+                <button type="button" data-action="delete-track" data-id="${html(track.id)}"><i class="fa-solid fa-trash"></i></button></article>`).join('') : empty('No tracks in this chat.')}</div></section>`;
+    updateMusicProgress();
+}
+
+function formatDuration(seconds) {
+    const value = Math.max(0, Math.floor(Number(seconds) || 0));
+    return `${Math.floor(value / 60)}:${String(value % 60).padStart(2, '0')}`;
+}
+
+async function prefillLetterReply(entry) {
+    const state = clone(getState());
+    let npc = state.contacts.find(value => value.id === entry.contactId)
+        || state.contacts.find(value => value.name.toLowerCase() === entry.fromName.toLowerCase());
+    if (!npc) {
+        npc = contact({ name: entry.fromName, relationship: 'Correspondent', lastLetterAt: entry.createdAt });
+        state.contacts.push(npc);
+        await persistState(state, 'contact');
+    }
+    openedLetterId = null;
+    renderLetterReader(getState());
+    activateTab('mail');
+    requestAnimationFrame(() => {
+        const form = document.querySelector('form[data-form="letter"]');
+        const details = form?.closest('details');
+        if (details) details.open = true;
+        const contactSelect = form?.querySelector('[name="contactId"]');
+        if (contactSelect) contactSelect.value = npc.id;
+        const subject = form?.querySelector('[name="subject"]');
+        if (subject) subject.value = /^re:/i.test(entry.subject) ? entry.subject : `Re: ${entry.subject}`;
+        form?.querySelector('[name="body"]')?.focus();
+    });
+}
+
+function audioStorageKey(trackId) {
+    const chatId = SillyTavern.getContext().getCurrentChatId?.() || 'no-chat';
+    return `tensei-system:audio:${chatId}:${trackId}`;
+}
+
+async function readAudioDuration(file) {
+    return new Promise(resolve => {
+        const probe = document.createElement('audio');
+        const url = URL.createObjectURL(file);
+        const finish = value => {
+            URL.revokeObjectURL(url);
+            probe.removeAttribute('src');
+            resolve(Number.isFinite(value) ? value : 0);
+        };
+        probe.preload = 'metadata';
+        probe.addEventListener('loadedmetadata', () => finish(probe.duration), { once: true });
+        probe.addEventListener('error', () => finish(0), { once: true });
+        probe.src = url;
+    });
+}
+
+async function addAudioFiles(files) {
+    const context = SillyTavern.getContext();
+    if (!context.getCurrentChatId?.()) return notify('warning', getSettings().language === 'th' ? 'เปิดแชทก่อนเพิ่มเพลง' : 'Open a chat before adding music.');
+    const store = SillyTavern.libs?.localforage;
+    if (!store) return notify('error', 'Local audio storage is unavailable in this SillyTavern build.');
+    const state = clone(getState());
+    for (const file of files.slice(0, 30)) {
+        if (!file.type.startsWith('audio/') || file.size > 100 * 1024 * 1024) {
+            notify('warning', `${file.name}: unsupported audio or larger than 100 MB.`);
+            continue;
+        }
+        const id = uid();
+        try {
+            await store.setItem(audioStorageKey(id), file);
+            state.music.tracks.push(musicTrack({ id, name: file.name.replace(/\.[^.]+$/, ''), fileName: file.name,
+                type: file.type, duration: await readAudioDuration(file), addedAt: new Date().toISOString() }));
+        } catch (error) {
+            console.error('[Tensei System] Could not store audio.', error);
+            notify('error', `${file.name}: could not be stored on this device.`);
+        }
+    }
+    if (!state.music.currentId) state.music.currentId = state.music.tracks[0]?.id || '';
+    await persistState(state, 'music');
+}
+
+function ensureAudioPlayer() {
+    if (audioPlayer) return audioPlayer;
+    audioPlayer = document.createElement('audio');
+    audioPlayer.preload = 'metadata';
+    audioPlayer.addEventListener('timeupdate', updateMusicProgress);
+    audioPlayer.addEventListener('loadedmetadata', updateMusicProgress);
+    audioPlayer.addEventListener('play', () => renderMusic(document.querySelector('[data-panel="music"]'), getState()));
+    audioPlayer.addEventListener('pause', () => renderMusic(document.querySelector('[data-panel="music"]'), getState()));
+    audioPlayer.addEventListener('ended', () => {
+        if (!getState().music.repeat) void stepTrack(1);
+    });
+    return audioPlayer;
+}
+
+async function playTrack(id) {
+    const state = clone(getState());
+    const track = state.music.tracks.find(entry => entry.id === id);
+    if (!track) return;
+    const store = SillyTavern.libs?.localforage;
+    const blob = await store?.getItem(audioStorageKey(id));
+    if (!(blob instanceof Blob)) return notify('warning', getSettings().language === 'th'
+        ? 'ไฟล์เพลงนี้ไม่อยู่ในอุปกรณ์นี้ กรุณาเพิ่มไฟล์ใหม่' : 'This audio file is not stored on this device. Add it again here.');
+    const player = ensureAudioPlayer();
+    player.pause();
+    if (audioObjectUrl) URL.revokeObjectURL(audioObjectUrl);
+    audioObjectUrl = URL.createObjectURL(blob);
+    player.src = audioObjectUrl;
+    player.dataset.trackId = id;
+    player.loop = state.music.repeat;
+    state.music.currentId = id;
+    await persistState(state, 'music');
+    try {
+        await player.play();
+    } catch (error) {
+        console.warn('[Tensei System] Audio playback requires a direct user gesture.', error);
+        notify('warning', getSettings().language === 'th' ? 'แตะปุ่มเล่นอีกครั้งเพื่ออนุญาตเสียง' : 'Tap play again to allow audio playback.');
+    }
+    renderMusic(document.querySelector('[data-panel="music"]'), getState());
+}
+
+async function toggleMusic() {
+    const state = getState();
+    const current = state.music.tracks.find(track => track.id === state.music.currentId) || state.music.tracks[0];
+    if (!current) return;
+    if (!audioPlayer || audioPlayer.dataset.trackId !== current.id || !audioPlayer.src) return playTrack(current.id);
+    if (audioPlayer.paused) await audioPlayer.play();
+    else audioPlayer.pause();
+    renderMusic(document.querySelector('[data-panel="music"]'), getState());
+}
+
+async function stepTrack(direction) {
+    const state = getState();
+    if (!state.music.tracks.length) return;
+    let index = state.music.tracks.findIndex(track => track.id === state.music.currentId);
+    if (state.music.shuffle && state.music.tracks.length > 1) {
+        let next = index;
+        while (next === index) next = Math.floor(Math.random() * state.music.tracks.length);
+        index = next;
+    } else index = (Math.max(0, index) + direction + state.music.tracks.length) % state.music.tracks.length;
+    await playTrack(state.music.tracks[index].id);
+}
+
+async function removeAudioTrack(id) {
+    const state = clone(getState());
+    await SillyTavern.libs?.localforage?.removeItem(audioStorageKey(id));
+    state.music.tracks = state.music.tracks.filter(track => track.id !== id);
+    if (state.music.currentId === id) {
+        cleanupAudio();
+        state.music.currentId = state.music.tracks[0]?.id || '';
+    }
+    await persistState(state, 'music');
+}
+
+function cleanupAudio() {
+    if (audioPlayer) {
+        audioPlayer.pause();
+        audioPlayer.removeAttribute('src');
+        audioPlayer.load?.();
+    }
+    if (audioObjectUrl) URL.revokeObjectURL(audioObjectUrl);
+    audioObjectUrl = '';
+}
+
+function updateMusicProgress() {
+    const seek = document.getElementById('tensei-music-seek');
+    const current = document.getElementById('tensei-music-current-time');
+    const duration = document.getElementById('tensei-music-duration');
+    if (seek && audioPlayer?.duration) seek.value = String(Math.round(audioPlayer.currentTime / audioPlayer.duration * 1000));
+    if (current) current.textContent = formatDuration(audioPlayer?.currentTime || 0);
+    if (duration && audioPlayer?.duration) duration.textContent = formatDuration(audioPlayer.duration);
+}
+
 async function onSubmit(event) {
     const form = event.target.closest('form[data-form]');
     if (!form) return;
@@ -715,6 +1166,15 @@ async function onSubmit(event) {
     const values = Object.fromEntries(new FormData(form).entries());
     const state = clone(getState());
     switch (form.dataset.form) {
+        case 'portrait-frame':
+            state.player.portraitView = {
+                desktop: { x: values.desktopX, y: values.desktopY, zoom: values.desktopZoom },
+                mobile: { x: values.mobileX, y: values.mobileY, zoom: values.mobileZoom },
+            };
+            await persistState(state, 'portrait');
+            closePortraitEditor();
+            notify('success', getSettings().language === 'th' ? 'บันทึกตำแหน่งรูปแล้ว' : 'Portrait framing saved.');
+            break;
         case 'status':
             state.player = {
                 ...state.player, name: values.name, title: values.title, race: values.race,
@@ -744,12 +1204,50 @@ async function onSubmit(event) {
             notify('success', `${nextSkill.name} added to skills.`);
             break;
         }
+        case 'proficiencies':
+            MAGIC_DISCIPLINES.forEach(entry => { state.proficiencies.magic[entry.id] = values[`magic-${entry.id}`]; });
+            SWORD_STYLES.forEach(entry => { state.proficiencies.sword[entry.id] = values[`sword-${entry.id}`]; });
+            await persistState(state, 'proficiency');
+            notify('success', getSettings().language === 'th' ? 'บันทึกความชำนาญแล้ว' : 'Proficiency record saved.');
+            break;
+        case 'technique': {
+            const nextTechnique = technique(values);
+            if (!nextTechnique) return notify('warning', getSettings().language === 'th' ? 'กรุณาใส่ชื่อวิชา' : 'Enter a technique name first.');
+            state.proficiencies.techniques.push(nextTechnique);
+            await persistState(state, 'technique');
+            break;
+        }
         case 'quest': {
             const nextQuest = quest(values);
             if (!nextQuest) return notify('warning', 'Enter a quest name first.');
             state.quests.push(nextQuest);
             await persistState(state);
             notify('success', `${nextQuest.name} added to the quest log.`);
+            break;
+        }
+        case 'contact': {
+            const nextContact = contact(values);
+            if (!nextContact) return notify('warning', getSettings().language === 'th' ? 'กรุณาใส่ชื่อ NPC' : 'Enter the NPC name first.');
+            state.contacts.push(nextContact);
+            await persistState(state, 'contact');
+            break;
+        }
+        case 'letter': {
+            let recipient = state.contacts.find(entry => entry.id === values.contactId);
+            if (!recipient && values.recipientName) {
+                recipient = contact({ name: values.recipientName, relationship: 'Correspondent' });
+                state.contacts.push(recipient);
+            }
+            if (!recipient || !text(values.body)) return notify('warning', getSettings().language === 'th' ? 'กรุณาเลือกผู้รับและเขียนเนื้อหา' : 'Choose a recipient and write the letter first.');
+            const outgoing = letter({ contactId: recipient.id, fromName: currentPersonaName(state), toName: recipient.name,
+                subject: values.subject || 'Letter', body: values.body, direction: 'outgoing', status: 'sent', createdAt: new Date().toISOString() });
+            state.letters.push(outgoing);
+            recipient.lastLetterAt = outgoing.createdAt;
+            if (await persistState(state, 'letter')) {
+                await sendChatAction(getSettings().language === 'th'
+                    ? `*ตัวผมเขียนจดหมายถึง ${recipient.name} หัวข้อ “${outgoing.subject}” มีเนื้อหาว่า: ${outgoing.body} และส่งจดหมายออกไปตามวิธีที่เหมาะสม*`
+                    : `*I write a physical letter to ${recipient.name}, titled "${outgoing.subject}": ${outgoing.body}. I send it through an appropriate courier or delivery method.*`);
+            }
             break;
         }
         case 'rank':
@@ -799,11 +1297,19 @@ async function onPanelChange(event) {
         try {
             const state = clone(getState());
             state.player.portrait = await resizePortrait(portrait.files[0]);
+            state.player.portraitView = clone(defaultState().player.portraitView);
             await persistState(state, 'portrait');
             notify('success', 'Profile picture updated.');
+            openPortraitEditor();
         } catch (error) {
             notify('error', error.message || 'Could not use that image.');
         }
+        return;
+    }
+    const audioInput = event.target.closest('#tensei-audio-input');
+    if (audioInput instanceof HTMLInputElement && audioInput.files?.length) {
+        await addAudioFiles([...audioInput.files]);
+        audioInput.value = '';
         return;
     }
     const destination = event.target.closest('form[data-form="travel"] select[name="destination"]');
@@ -827,6 +1333,12 @@ async function onPanelClick(event) {
     switch (button.dataset.action) {
         case 'choose-portrait':
             document.getElementById('tensei-avatar-input')?.click();
+            break;
+        case 'open-portrait-editor':
+            openPortraitEditor();
+            break;
+        case 'close-portrait-editor':
+            closePortraitEditor();
             break;
         case 'map-zoom-in':
             setMapZoom(mapView.scale * 1.25);
@@ -858,9 +1370,75 @@ async function onPanelClick(event) {
             state.skills = state.skills.filter(entry => entry.id !== id);
             await persistState(state);
             break;
+        case 'delete-technique':
+            state.proficiencies.techniques = state.proficiencies.techniques.filter(entry => entry.id !== id);
+            await persistState(state, 'technique');
+            break;
         case 'delete-quest':
             state.quests = state.quests.filter(entry => entry.id !== id);
             await persistState(state);
+            break;
+        case 'delete-contact':
+            state.contacts = state.contacts.filter(entry => entry.id !== id);
+            await persistState(state, 'contact');
+            break;
+        case 'open-letter': {
+            const entry = state.letters.find(value => value.id === id);
+            if (!entry) break;
+            openedLetterId = entry.id;
+            if (entry.status === 'unread') {
+                entry.status = 'read';
+                await persistState(state, 'mailbox');
+            } else renderLetterReader(state);
+            break;
+        }
+        case 'close-letter':
+            openedLetterId = null;
+            renderLetterReader(state);
+            break;
+        case 'delete-letter':
+            state.letters = state.letters.filter(entry => entry.id !== id);
+            if (openedLetterId === id) openedLetterId = null;
+            await persistState(state, 'mailbox');
+            break;
+        case 'clear-letters':
+            if (globalThis.confirm?.(getSettings().language === 'th' ? 'ลบจดหมายทั้งหมดในแชทนี้?' : 'Clear every letter in this chat?') !== false) {
+                state.letters = [];
+                openedLetterId = null;
+                await persistState(state, 'mailbox');
+            }
+            break;
+        case 'reply-letter': {
+            const entry = state.letters.find(value => value.id === id);
+            if (entry) await prefillLetterReply(entry);
+            break;
+        }
+        case 'choose-audio':
+            document.getElementById('tensei-audio-input')?.click();
+            break;
+        case 'music-play':
+            await playTrack(id);
+            break;
+        case 'music-toggle':
+            await toggleMusic();
+            break;
+        case 'music-next':
+            await stepTrack(1);
+            break;
+        case 'music-prev':
+            await stepTrack(-1);
+            break;
+        case 'music-repeat':
+            state.music.repeat = !state.music.repeat;
+            await persistState(state, 'music');
+            if (audioPlayer) audioPlayer.loop = state.music.repeat;
+            break;
+        case 'music-shuffle':
+            state.music.shuffle = !state.music.shuffle;
+            await persistState(state, 'music');
+            break;
+        case 'delete-track':
+            await removeAudioTrack(id);
             break;
         case 'use-item': {
             const entry = state.inventory.find(value => value.id === id);
@@ -889,15 +1467,14 @@ function resizePortrait(file) {
             const image = new Image();
             image.onerror = () => reject(new Error('The image format is not supported.'));
             image.onload = () => {
-                const size = 512;
+                const maxSide = 1200;
+                const ratio = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
                 const canvas = document.createElement('canvas');
-                canvas.width = size; canvas.height = size;
+                canvas.width = Math.max(1, Math.round(image.naturalWidth * ratio));
+                canvas.height = Math.max(1, Math.round(image.naturalHeight * ratio));
                 const context = canvas.getContext('2d');
-                const crop = Math.min(image.naturalWidth, image.naturalHeight);
-                const sx = (image.naturalWidth - crop) / 2;
-                const sy = (image.naturalHeight - crop) / 2;
-                context.drawImage(image, sx, sy, crop, crop, 0, 0, size, size);
-                resolve(canvas.toDataURL('image/jpeg', .86));
+                context.drawImage(image, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', .84));
             };
             image.src = reader.result;
         };
@@ -1018,8 +1595,10 @@ async function sendChatAction(message) {
     }
 }
 
-function analyzerPrompt(state, transcript) {
+function analyzerPrompt(state, transcript, phase = 'assistant') {
     return `You maintain structured state for an ongoing Mushoku Tensei role-play.
+
+SYNC PHASE: ${phase === 'user' ? 'The user message was just submitted. Record only facts or actions already true in that message; intentions and attempts remain pending.' : 'The AI reply just completed. Resolve the outcome of the latest user action and record newly confirmed facts.'}
 
 CURRENT STATE:
 ${JSON.stringify(aiState(state))}
@@ -1030,9 +1609,14 @@ ${transcript}
 Return ONLY valid JSON: {"state": <complete updated state object>, "summary": "short description of confirmed changes"}.
 Preserve every existing value unless the latest chat clearly establishes a change. Do not treat plans, questions,
 out-of-character discussion, hypothetical events, rejected actions, or failed attempts as completed changes. Keep IDs
-for inventory items, skills, quests, and map pins that still exist. Update location only after completed movement or a clear scene
+for inventory items, skills, techniques, contacts, letters, quests, and map pins that still exist. Update location only after completed movement or a clear scene
 change. Advance day, time, phase, experience, and level only when the story supports it. Update inventory, conditions, meters,
-ranks, currency, skills, and quests only with chat evidence. The profile portrait is local UI data and is intentionally omitted. No prose
+ranks, currency, skills, quests, magic proficiency, sword-style proficiency, and technique proficiency only with chat evidence.
+Proficiency values are integers from 0 to 100 and should move conservatively. When a named NPC becomes an established correspondent,
+create or update one contact. When an NPC actually sends or delivers a physical letter, add exactly one incoming letter with status
+"unread", direction "incoming", the NPC contactId, sender, subject, body, and timestamp. Never create a letter from ordinary dialogue,
+telepathy, or smartphone-like chat. Do not duplicate a letter already present. User-sent letters remain direction "outgoing" and status
+"sent". Music and the profile portrait are local UI data and are intentionally omitted. No prose
 outside the JSON.`;
 }
 
@@ -1048,15 +1632,23 @@ function parseJson(response) {
     }
 }
 
-async function analyzeChat({ manual = false, messageId = null, generationType = '' } = {}) {
-    if (aiSyncInProgress || (!manual && !getSettings().autoTrack)) return;
+function queueAnalyze(options = {}) {
+    syncQueue = syncQueue.catch(() => undefined).then(() => analyzeChat(options));
+    return syncQueue;
+}
+
+async function analyzeChat({ manual = false, messageId = null, generationType = '', phase = 'assistant' } = {}) {
+    if (!manual && !getSettings().autoTrack) return;
     if (generationType === 'quiet' || generationType === 'impersonate') return;
     const context = SillyTavern.getContext();
     if (!context.getCurrentChatId?.()) {
         if (manual) notify('warning', 'Open a chat before synchronizing.');
         return;
     }
-    const transcript = context.chat.filter(message => message?.mes && !message.is_system).slice(-8)
+    const cursorKey = phase === 'user' ? 'user' : 'assistant';
+    const currentBefore = getState();
+    if (!manual && Number.isInteger(messageId) && currentBefore.syncCursor[cursorKey] === messageId) return;
+    const transcript = context.chat.filter(message => message?.mes && !message.is_system).slice(phase === 'user' ? -1 : -2)
         .map(message => `${message.is_user ? 'User' : 'Character'}: ${message.mes}`).join('\n\n');
     if (!transcript) {
         if (manual) notify('info', 'There are no role-play messages to analyze yet.');
@@ -1068,13 +1660,20 @@ async function analyzeChat({ manual = false, messageId = null, generationType = 
     try {
         const current = getState();
         const response = await context.generateQuietPrompt({
-            quietPrompt: analyzerPrompt(current, transcript),
+            quietPrompt: analyzerPrompt(current, transcript, phase),
             skipWIAN: true,
-            responseLength: 1400,
+            responseLength: 2200,
             removeReasoning: true,
         });
         const parsed = parseJson(response);
-        const next = normalize(parsed.state || parsed, current);
+        const parsedState = parsed.state || parsed;
+        const next = normalize(parsedState, current);
+        if (Array.isArray(parsedState.letters)) {
+            const returnedIds = new Set(next.letters.map(entry => entry.id));
+            next.letters = [...current.letters.filter(entry => !returnedIds.has(entry.id)), ...next.letters].slice(-300);
+        }
+        next.syncCursor = clone(current.syncCursor);
+        if (!manual && Number.isInteger(messageId)) next.syncCursor[cursorKey] = messageId;
         const summary = text(parsed.summary, 'Role-play state synchronized.', 300);
         next.journal = [...current.journal, { id: uid(), text: summary, at: new Date().toISOString() }].slice(-30);
         await persistState(next, 'ai');
@@ -1207,25 +1806,29 @@ async function addSettingsDrawer() {
     bindSettingControl('tensei-system-glass', 'glassOpacity', settings, applyAppearance);
     bindSettingControl('tensei-system-glow', 'glowStrength', settings, applyAppearance);
     document.getElementById('tensei-system-open-from-settings')?.addEventListener('click', openInterface);
-    document.getElementById('tensei-system-sync-from-settings')?.addEventListener('click', () => analyzeChat({ manual: true }));
+    document.getElementById('tensei-system-sync-from-settings')?.addEventListener('click', () => queueAnalyze({ manual: true }));
 }
 
 function bindChatEvents() {
     const { eventSource, eventTypes } = SillyTavern.getContext();
     eventSource.on(eventTypes.CHAT_CHANGED, () => {
+        cleanupAudio();
+        openedLetterId = null;
         updatePrompt();
         renderAll();
         setSync('ready', tr('Ready'));
     });
     if (eventTypes.PERSONA_CHANGED) eventSource.on(eventTypes.PERSONA_CHANGED, () => renderAll());
+    if (eventTypes.MESSAGE_SENT) eventSource.on(eventTypes.MESSAGE_SENT, (messageId, generationType) =>
+        queueAnalyze({ messageId, generationType, phase: 'user' }));
     eventSource.on(eventTypes.MESSAGE_RECEIVED, (messageId, generationType) => {
-        void analyzeChat({ messageId, generationType });
+        return queueAnalyze({ messageId, generationType, phase: 'assistant' });
     });
     eventSource.on(eventTypes.MESSAGE_EDITED, () => {
-        if (getSettings().autoTrack) void analyzeChat();
+        if (getSettings().autoTrack) return queueAnalyze({ phase: 'assistant' });
     });
     eventSource.on(eventTypes.MESSAGE_SWIPED, messageId => {
-        if (getSettings().autoTrack) void analyzeChat({ messageId, generationType: 'swipe' });
+        if (getSettings().autoTrack) return queueAnalyze({ messageId, generationType: 'swipe', phase: 'assistant' });
     });
 }
 
@@ -1243,7 +1846,7 @@ async function initialize() {
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape') closeInterface();
         });
-        console.info('[Tensei System] Role-play interface v0.4.0 loaded.');
+        console.info('[Tensei System] Role-play interface v0.5.0 loaded.');
     } catch (error) {
         initialized = false;
         console.error('[Tensei System] Failed to initialize.', error);
