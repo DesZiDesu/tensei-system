@@ -5,19 +5,35 @@
             <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down" aria-hidden="true"></div>
         </div>
         <div class="inline-drawer-content">
-            <p class="tensei-system-settings-copy">Mushoku Tensei role-play interface for SillyTavern.</p>
+            <p class="tensei-system-settings-copy">A persistent Mushoku Tensei role-play state linked to the current chat.</p>
             <label class="checkbox_label" for="tensei-system-show-launcher">
                 <input id="tensei-system-show-launcher" type="checkbox" />
                 <span>Show in the wand menu</span>
             </label>
+            <label class="checkbox_label" for="tensei-system-auto-track">
+                <input id="tensei-system-auto-track" type="checkbox" />
+                <span>Automatically update state after AI replies</span>
+            </label>
+            <label class="checkbox_label" for="tensei-system-inject-state">
+                <input id="tensei-system-inject-state" type="checkbox" />
+                <span>Include current state in role-play prompts</span>
+            </label>
+            <div class="tensei-system-settings-note">
+                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                <span>Uses SillyTavern's active API and model. This extension does not read, copy, or store API keys.</span>
+            </div>
             <div class="tensei-system-settings-actions">
                 <button id="tensei-system-open-from-settings" class="menu_button">
                     <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
                     Open Tensei System
                 </button>
+                <button id="tensei-system-sync-from-settings" class="menu_button">
+                    <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+                    Sync latest turn
+                </button>
                 <span class="tensei-system-ready-state">
                     <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-                    Drawer shell ready
+                    Role-play engine ready
                 </span>
             </div>
         </div>

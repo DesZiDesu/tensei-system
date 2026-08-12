@@ -1,28 +1,41 @@
 # Tensei System
 
-A responsive Mushoku Tensei role-play interface extension for SillyTavern.
+A responsive, persistent Mushoku Tensei role-play interface for SillyTavern.
 
-## Current milestone
+## Features
 
-This initial version provides only the loadable interface foundation:
+- Animated magic-interface boot sequence.
+- Desktop side drawer and phone-specific full-screen layout.
+- Status, Inventory, Skills, Quests, Rank, and World Map tabs.
+- Per-chat state stored in SillyTavern chat metadata.
+- Current state injected into role-play prompts for continuity.
+- Optional automatic AI synchronization after replies.
+- Manual editing and immediate actions from the interface.
+- Travel, item-use, and quest actions sent through the normal chat composer.
 
-- An inline **Tensei System** drawer in SillyTavern's Extensions panel.
-- An **Open Tensei System** launcher inside the chat wand menu.
-- A shared placeholder interface opened by either launcher.
-- A desktop side-drawer layout and a phone-specific full-screen layout.
+## API and privacy
 
-Role-play tabs, character data, stats, lore, and system logic are intentionally
-reserved for later milestones.
+Tensei System uses SillyTavern's active API/provider and selected model through
+SillyTavern's extension context. It does not ask for, read, copy, store, or send
+the user's API key anywhere. Automatic state synchronization is an additional
+quiet generation and may therefore consume tokens or provider credits.
 
-## Install in SillyTavern
+## Install
 
 1. Open **Extensions** in SillyTavern.
 2. Select **Install extension**.
 3. Paste `https://github.com/DesZiDesu/tensei-system`.
 4. Reload SillyTavern after installation if prompted.
 
-Open the shell from **Extensions → Tensei System** or from the wand menu beside
-the chat input.
+Open the system from **Extensions → Tensei System** or the wand menu beside the
+chat input. Use **Sync latest turn** to test the connected model manually.
+
+## Current scope
+
+Version 0.2.0 is the functional foundation. It ships a stylized selector map and
+generic state schema; deeper Mushoku Tensei location data, equipment rules,
+combat calculations, relationships, factions, and custom imagery can be layered
+on in later milestones.
 
 ## License
 
