@@ -14,7 +14,7 @@ A responsive, persistent Mushoku Tensei role-play interface for SillyTavern.
 - Status, Inventory, Magic & Technique, Quests, Rank, World Map, Mailbox, and Music tabs.
 - Per-chat state stored in SillyTavern chat metadata.
 - Current state injected into role-play prompts for continuity.
-- Queued automatic AI synchronization after both user messages and AI replies.
+- Zero-extra-call state tracking from the normal AI reply.
 - Elemental magic and North/Water/Sword God Style proficiency meters plus extensible techniques.
 - Per-chat NPC contacts and physical letters with unread state, animated reading, reply, and delete actions.
 - Per-chat music playlists with MP3/audio files stored locally on each device.
@@ -29,8 +29,9 @@ A responsive, persistent Mushoku Tensei role-play interface for SillyTavern.
 
 Tensei System uses SillyTavern's active API/provider and selected model through
 SillyTavern's extension context. It does not ask for, read, copy, store, or send
-the user's API key anywhere. Automatic state synchronization is an additional
-quiet generation and may therefore consume tokens or provider credits.
+the user's API key anywhere. Automatic tracking is parsed from the normal role-play
+reply and adds no background request. Manual Sync is the only state feature that
+uses a separate quiet generation.
 
 ## Install
 
@@ -44,13 +45,26 @@ chat input. Use **Sync latest turn** to test the connected model manually.
 
 ## Current scope
 
-Version 0.5.0 adds dual-phase automatic tracking, device-specific portrait framing,
-proficiency records, physical correspondence, and local playlists. Existing chats
-migrate forward without resetting their saved state.
+Version 0.6.0 replaces dual background synchronization with an inline, validated
+state patch taken from the normal role-play reply. A fresh chat does not inject,
+analyze, or create extension state for the character's First Message; tracking
+starts only after the user sends the first reply. Existing chats migrate without
+resetting their saved state.
 Deeper settlement maps, equipment rules, combat calculations, relationships, and
 factions can be layered on in later milestones.
 
 ## Changelog
+
+### 0.6.0
+
+- Removed automatic quiet generations after user and AI messages.
+- Added zero-extra-call state patches carried by the normal AI reply.
+- Added a strict path and collection allowlist before any AI patch can modify chat state.
+- Protected portraits, portrait framing, music, UI settings, and map pins from AI patches.
+- Stripped patch metadata before the AI message is rendered or saved to chat history.
+- Delayed prompt injection, state creation, and tracking until the user replies to the First Message.
+- Kept Manual Sync as an optional one-request fallback and reduced its response budget from 2,200 to 900 tokens.
+- Reduced prompt state size by omitting local-only data, map pins, descriptions, letter bodies, and all but the five latest letter headers.
 
 ### 0.5.0
 

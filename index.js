@@ -5,6 +5,8 @@ const SETTINGS_KEY = 'tensei_system';
 const METADATA_KEY = 'tensei_system_state';
 const PROMPT_KEY = 'tensei_system_roleplay_state';
 const ACTION_PROMPT_KEY = 'tensei_system_hidden_action';
+const PATCH_COMMENT_PATTERN = /<!--\s*tensei_patch\s*:\s*([\s\S]*?)\s*-->/gi;
+const PATCH_TAG_PATTERN = /<tensei_patch>\s*([\s\S]*?)\s*<\/tensei_patch>/gi;
 const RANKS = ['F', 'E', 'D', 'C', 'B', 'A', 'S'];
 const MASTERY = ['None', 'Beginner', 'Intermediate', 'Advanced', 'Saint', 'King', 'Emperor', 'God'];
 const MAGIC_DISCIPLINES = [
@@ -102,7 +104,7 @@ const TRANSLATIONS = {
         Active: 'กำลังดำเนินการ', Completed: 'สำเร็จ', Failed: 'ล้มเหลว', 'On Hold': 'พักไว้', Beginner: 'เริ่มต้น', Intermediate: 'กลาง', Advanced: 'ขั้นสูง', Saint: 'เซนต์', King: 'คิง', Emperor: 'จักรพรรดิ', God: 'เทพ',
         'No description': 'ไม่มีรายละเอียด', 'No objective recorded': 'ยังไม่ได้บันทึกเป้าหมาย', 'Your inventory is empty.': 'คลังสิ่งของยังว่างอยู่',
         'Skills learned during role-play will appear here.': 'ทักษะที่เรียนรู้ระหว่างโรลเพลย์จะแสดงที่นี่', 'No quests have been recorded yet.': 'ยังไม่มีภารกิจที่ถูกบันทึก',
-        'Open a chat to activate this system': 'เปิดแชตเพื่อใช้งานระบบ', 'Reading latest turn': 'กำลังอ่านเหตุการณ์ล่าสุด', 'AI synchronized': 'ซิงก์กับ AI แล้ว', 'Sync unavailable': 'ไม่สามารถซิงก์ได้',
+        'Open a chat to activate this system': 'เปิดแชตเพื่อใช้งานระบบ', 'Reading latest turn': 'กำลังอ่านเหตุการณ์ล่าสุด', 'AI synchronized': 'ซิงก์กับ AI แล้ว', 'State updated': 'อัปเดตข้อมูลแล้ว', 'Sync unavailable': 'ไม่สามารถซิงก์ได้',
         Appearance: 'รูปแบบหน้าจอ', Accent: 'สีหลัก', Glass: 'ความโปร่งใส', Glow: 'แสงเรือง', Density: 'ความหนาแน่น', Language: 'ภาษา', 'Action delivery': 'รูปแบบการส่งคำสั่ง',
         Compact: 'กระชับ', Comfortable: 'สบายตา', Hidden: 'ซ่อนข้อความ', Visible: 'แสดงข้อความ', 'Draft only': 'ร่างเท่านั้น',
         'Choose profile picture': 'เลือกรูปโปรไฟล์', 'Use in role-play': 'ใช้ในโรลเพลย์', Remove: 'ลบ', 'Pursue in role-play': 'ดำเนินภารกิจในโรลเพลย์',
@@ -169,7 +171,7 @@ function defaultState() {
     const magic = Object.fromEntries(MAGIC_DISCIPLINES.map(entry => [entry.id, 0]));
     const sword = Object.fromEntries(SWORD_STYLES.map(entry => [entry.id, 0]));
     return {
-        version: 5,
+        version: 6,
         player: {
             name: 'Adventurer', portrait: '', race: 'Human', age: '', title: 'Newcomer', guild: 'Unaffiliated', party: 'Solo', condition: 'Stable', level: 1,
             portraitView: { desktop: { x: 50, y: 50, zoom: 1 }, mobile: { x: 50, y: 50, zoom: 1 } },
@@ -301,7 +303,7 @@ function normalize(candidate, base = defaultState()) {
     const currency = progress.currency && typeof progress.currency === 'object' ? progress.currency : {};
     const location = source.location && typeof source.location === 'object' ? source.location : {};
 
-    result.version = 5;
+    result.version = 6;
     const portraitView = player.portraitView && typeof player.portraitView === 'object' ? player.portraitView : {};
     result.player = {
         name: text(player.name, result.player.name, 100), portrait: text(player.portrait, result.player.portrait, 1500000),
@@ -402,8 +404,8 @@ function normalize(candidate, base = defaultState()) {
 function getState() {
     const context = SillyTavern.getContext();
     if (!context.getCurrentChatId?.()) return defaultState();
-    context.chatMetadata[METADATA_KEY] = normalize(context.chatMetadata[METADATA_KEY]);
-    return context.chatMetadata[METADATA_KEY];
+    const saved = context.chatMetadata[METADATA_KEY];
+    return saved && typeof saved === 'object' ? normalize(saved) : defaultState();
 }
 
 async function persistState(candidate, source = 'manual') {
@@ -428,31 +430,56 @@ function aiState(state) {
     delete safePlayer.portrait;
     delete safePlayer.portraitView;
     return {
-        player: safePlayer, progression: state.progression, worldClock: state.worldClock, location: state.location,
-        inventory: state.inventory, skills: state.skills, proficiencies: state.proficiencies, quests: state.quests,
-        contacts: state.contacts, letters: state.letters.slice(-30),
+        player: safePlayer,
+        progression: state.progression,
+        worldClock: state.worldClock,
+        location: { ...state.location, pins: undefined },
+        inventory: state.inventory.map(({ id, name, quantity, category }) => ({ id, name, quantity, category })),
+        skills: state.skills.map(({ id, name, rank, type }) => ({ id, name, rank, type })),
+        proficiencies: state.proficiencies,
+        quests: state.quests,
+        contacts: state.contacts.map(({ id, name, title, affiliation, relationship }) => ({ id, name, title, affiliation, relationship })),
+        letters: state.letters.slice(-5).map(({ id, contactId, fromName, toName, subject, direction, status, createdAt }) => (
+            { id, contactId, fromName, toName, subject, direction, status, createdAt }
+        )),
     };
 }
 
-function statePrompt(state) {
-    const canonical = {
-        ...aiState(state),
-    };
+function hasUserReply(context = SillyTavern.getContext()) {
+    return context.chat.some(message => message?.is_user && !message.is_system && text(message.mes));
+}
+
+function patchInstructions() {
     return [
-        '<tensei_system_state>',
-        'Canonical current role-play state. Maintain continuity with these facts.',
-        'Naturally acknowledge the current location when the scene or movement makes it relevant.',
-        'Treat inventory, ranks, conditions, skills, and quests as established facts; change them only when story events justify it.',
-        'Contacts and letters are part of the story. NPCs may send physical letters naturally; do not describe them as smartphone messages.',
-        JSON.stringify(canonical),
-        '</tensei_system_state>',
+        'After the role-play reply, append one invisible HTML comment only when confirmed state changed:',
+        '<!--tensei_patch:{"ops":[["set","player.hp.current",90],["inc","progression.experience",10],["upsert","inventory",{"name":"Potion","quantity":1,"category":"Consumable"}],["delete","inventory","Broken Sword"],["add","location.discovered","Roa"]],"summary":"brief change"}-->',
+        'Allowed verbs: set or inc for scalar paths; upsert or delete for inventory, skills, proficiencies.techniques, quests, contacts, letters; add for location.discovered.',
+        'Use canonical paths shown in the state JSON. For a new incoming physical letter include contactId/fromName/toName/subject/body/direction:"incoming"/status:"unread". Ordinary dialogue is not a letter.',
+        'Record only outcomes confirmed by this reply. Never record plans, attempts, questions, hypotheticals, rejected actions, or out-of-character discussion. Keep proficiency changes conservative.',
+        'Omit the comment when nothing changed. Never print a full state, Markdown fence, explanation, or visible system text.',
     ].join('\n');
+}
+
+function statePrompt(state, { includeState = true, track = true } = {}) {
+    const lines = ['<tensei_system_state>'];
+    if (includeState) {
+        lines.push('Canonical role-play state. Preserve it unless the story confirms a change.');
+        lines.push('Current location, inventory, ranks, conditions, skills, quests, contacts, and physical letters are established facts.');
+        lines.push(JSON.stringify(aiState(state)));
+    }
+    if (track) lines.push(patchInstructions());
+    lines.push('</tensei_system_state>');
+    return lines.join('\n');
 }
 
 function updatePrompt(state = getState()) {
     const context = SillyTavern.getContext();
-    const enabled = getSettings().injectState && context.getCurrentChatId?.();
-    context.setExtensionPrompt(PROMPT_KEY, enabled ? statePrompt(state) : '', 1, 1, false, 0);
+    const settings = getSettings();
+    const activeChat = Boolean(context.getCurrentChatId?.() && hasUserReply(context));
+    const enabled = activeChat && (settings.injectState || settings.autoTrack);
+    context.setExtensionPrompt(PROMPT_KEY, enabled
+        ? statePrompt(state, { includeState: settings.injectState || settings.autoTrack, track: settings.autoTrack })
+        : '', 1, 1, false, 0);
 }
 
 function notify(type, message) {
@@ -1595,30 +1622,17 @@ async function sendChatAction(message) {
     }
 }
 
-function analyzerPrompt(state, transcript, phase = 'assistant') {
-    return `You maintain structured state for an ongoing Mushoku Tensei role-play.
-
-SYNC PHASE: ${phase === 'user' ? 'The user message was just submitted. Record only facts or actions already true in that message; intentions and attempts remain pending.' : 'The AI reply just completed. Resolve the outcome of the latest user action and record newly confirmed facts.'}
-
-CURRENT STATE:
-${JSON.stringify(aiState(state))}
-
-LATEST CHAT:
-${transcript}
-
-Return ONLY valid JSON: {"state": <complete updated state object>, "summary": "short description of confirmed changes"}.
-Preserve every existing value unless the latest chat clearly establishes a change. Do not treat plans, questions,
-out-of-character discussion, hypothetical events, rejected actions, or failed attempts as completed changes. Keep IDs
-for inventory items, skills, techniques, contacts, letters, quests, and map pins that still exist. Update location only after completed movement or a clear scene
-change. Advance day, time, phase, experience, and level only when the story supports it. Update inventory, conditions, meters,
-ranks, currency, skills, quests, magic proficiency, sword-style proficiency, and technique proficiency only with chat evidence.
-Proficiency values are integers from 0 to 100 and should move conservatively. When a named NPC becomes an established correspondent,
-create or update one contact. When an NPC actually sends or delivers a physical letter, add exactly one incoming letter with status
-"unread", direction "incoming", the NPC contactId, sender, subject, body, and timestamp. Never create a letter from ordinary dialogue,
-telepathy, or smartphone-like chat. Do not duplicate a letter already present. User-sent letters remain direction "outgoing" and status
-"sent". Music and the profile portrait are local UI data and are intentionally omitted. No prose
-outside the JSON.`;
-}
+const SCALAR_PATCH_PATHS = new Set([
+    'player.name', 'player.race', 'player.age', 'player.title', 'player.guild', 'player.party', 'player.condition', 'player.level',
+    'player.hp.current', 'player.hp.max', 'player.mp.current', 'player.mp.max', 'player.stamina.current', 'player.stamina.max',
+    'progression.adventurerRank', 'progression.magicRank', 'progression.swordRank', 'progression.experience',
+    'progression.experienceMax', 'progression.reputation', 'progression.currency.gold', 'progression.currency.silver',
+    'progression.currency.copper', 'worldClock.day', 'worldClock.time', 'worldClock.phase', 'location.continent',
+    'location.region', 'location.place', 'location.detail', 'location.zoneType',
+    ...MAGIC_DISCIPLINES.map(entry => `proficiencies.magic.${entry.id}`),
+    ...SWORD_STYLES.map(entry => `proficiencies.sword.${entry.id}`),
+]);
+const PATCH_COLLECTIONS = new Set(['inventory', 'skills', 'proficiencies.techniques', 'quests', 'contacts', 'letters']);
 
 function parseJson(response) {
     const cleaned = String(response || '').trim().replace(/^\`\`\`(?:json)?\s*/i, '').replace(/\s*\`\`\`$/, '');
@@ -1632,26 +1646,177 @@ function parseJson(response) {
     }
 }
 
+function collectionForPatch(state, path) {
+    if (path === 'proficiencies.techniques') return state.proficiencies.techniques;
+    return state[path];
+}
+
+function patchIdentity(value) {
+    if (value && typeof value === 'object') return text(value.id, '', 100) || text(value.name, '', 160).toLocaleLowerCase();
+    return text(value, '', 160).toLocaleLowerCase();
+}
+
+function matchesPatchIdentity(entry, value) {
+    const requestedId = value && typeof value === 'object' ? text(value.id, '', 100) : text(value, '', 160);
+    const requestedName = value && typeof value === 'object' ? text(value.name, '', 160).toLocaleLowerCase() : requestedId.toLocaleLowerCase();
+    return Boolean((requestedId && entry?.id === requestedId)
+        || (requestedName && text(entry?.name, '', 160).toLocaleLowerCase() === requestedName));
+}
+
+function applyPatchOperation(state, operation) {
+    if (!Array.isArray(operation) || operation.length < 3) return false;
+    const [verb, path, value] = operation;
+    if ((verb === 'set' || verb === 'inc') && SCALAR_PATCH_PATHS.has(path)) {
+        const parts = path.split('.');
+        const key = parts.pop();
+        let target = state;
+        for (const part of parts) {
+            if (!target?.[part] || typeof target[part] !== 'object') return false;
+            target = target[part];
+        }
+        target[key] = verb === 'inc' ? number(target[key], 0, -999999999, 999999999) + number(value, 0, -999999999, 999999999) : value;
+        return true;
+    }
+    if (verb === 'add' && path === 'location.discovered' && typeof value === 'string') {
+        state.location.discovered = [...new Set([...state.location.discovered, text(value, '', 120)])].filter(Boolean);
+        return true;
+    }
+    if (!PATCH_COLLECTIONS.has(path)) return false;
+    const collection = collectionForPatch(state, path);
+    if (!Array.isArray(collection)) return false;
+    if (verb === 'upsert' && value && typeof value === 'object') {
+        const identity = patchIdentity(value);
+        if (!identity && path !== 'letters') return false;
+        const index = collection.findIndex(entry => matchesPatchIdentity(entry, value));
+        const candidate = { ...(index >= 0 ? collection[index] : {}), ...value };
+        if (!candidate.id) candidate.id = uid();
+        if (index >= 0) collection[index] = candidate;
+        else collection.push(candidate);
+        return true;
+    }
+    if (verb === 'delete') {
+        const identity = patchIdentity(value);
+        if (!identity) return false;
+        const previousLength = collection.length;
+        const retained = collection.filter(entry => !matchesPatchIdentity(entry, value));
+        collection.splice(0, collection.length, ...retained);
+        return retained.length !== previousLength;
+    }
+    return false;
+}
+
+function applyStatePatch(current, patch) {
+    if (!patch || typeof patch !== 'object' || !Array.isArray(patch.ops)) throw new Error('State patch is missing an ops array.');
+    const candidate = clone(current);
+    let accepted = 0;
+    for (const operation of patch.ops.slice(0, 50)) {
+        if (applyPatchOperation(candidate, operation)) accepted += 1;
+    }
+    const next = normalize(candidate, current);
+    next.player.portrait = current.player.portrait;
+    next.player.portraitView = clone(current.player.portraitView);
+    next.music = clone(current.music);
+    next.location.pins = clone(current.location.pins);
+    const summary = text(patch.summary, accepted ? 'Role-play state updated.' : '', 300);
+    if (accepted && summary) next.journal = [...current.journal, { id: uid(), text: summary, at: new Date().toISOString() }].slice(-30);
+    return { next, accepted, summary };
+}
+
+function extractStatePatch(message) {
+    const patches = [];
+    let found = false;
+    const strip = pattern => message.replace(pattern, (_match, payload) => {
+        found = true;
+        try {
+            const parsed = parseJson(payload);
+            if (parsed && typeof parsed === 'object') patches.push(parsed);
+        } catch (error) {
+            console.warn('[Tensei System] Ignored malformed inline state patch.', error);
+        }
+        return '';
+    });
+    let visible = strip(PATCH_COMMENT_PATTERN);
+    visible = visible.replace(PATCH_TAG_PATTERN, (_match, payload) => {
+        found = true;
+        try {
+            const parsed = parseJson(payload);
+            if (parsed && typeof parsed === 'object') patches.push(parsed);
+        } catch (error) {
+            console.warn('[Tensei System] Ignored malformed inline state patch.', error);
+        }
+        return '';
+    });
+    const combined = patches.length ? {
+        ops: patches.flatMap(patch => Array.isArray(patch.ops) ? patch.ops : []).slice(0, 50),
+        summary: patches.map(patch => text(patch.summary, '', 300)).filter(Boolean).join('; ').slice(0, 300),
+    } : null;
+    return { visible: visible.trimEnd(), patch: combined, found };
+}
+
+async function processAssistantPatch(messageId, generationType = '') {
+    if (!getSettings().autoTrack || ['first_message', 'quiet', 'impersonate'].includes(generationType)) return;
+    const context = SillyTavern.getContext();
+    if (!hasUserReply(context) || !Number.isInteger(messageId)) return;
+    const message = context.chat[messageId];
+    if (!message || message.is_user || message.is_system || typeof message.mes !== 'string') return;
+    const extracted = extractStatePatch(message.mes);
+    if (!extracted.found) return;
+    message.mes = extracted.visible;
+    if (Array.isArray(message.swipes) && Number.isInteger(message.swipe_id) && message.swipes[message.swipe_id] !== undefined) {
+        message.swipes[message.swipe_id] = extracted.visible;
+    }
+    if (!extracted.patch) {
+        setSync('error', tr('Sync unavailable'));
+        return;
+    }
+    try {
+        const { next, accepted } = applyStatePatch(getState(), extracted.patch);
+        if (accepted) {
+            await persistState(next, 'inline-patch');
+            setSync('ready', tr('State updated'));
+            console.info(`[Tensei System] Applied ${accepted} inline state operation(s).`);
+        } else {
+            setSync('ready', tr('Ready'));
+        }
+    } catch (error) {
+        console.error('[Tensei System] Inline state patch failed.', error);
+        setSync('error', tr('Sync unavailable'));
+    }
+}
+
+function analyzerPrompt(state, transcript) {
+    return `Review only the latest completed Mushoku Tensei role-play turn and return a small state patch.
+
+CURRENT STATE:
+${JSON.stringify(aiState(state))}
+
+LATEST TURN:
+${transcript}
+
+${patchInstructions()}
+Return ONLY the JSON object that would appear after "tensei_patch:". Do not include the HTML comment. If nothing changed, return {"ops":[],"summary":"No confirmed changes."}.`;
+}
+
 function queueAnalyze(options = {}) {
     syncQueue = syncQueue.catch(() => undefined).then(() => analyzeChat(options));
     return syncQueue;
 }
 
-async function analyzeChat({ manual = false, messageId = null, generationType = '', phase = 'assistant' } = {}) {
-    if (!manual && !getSettings().autoTrack) return;
-    if (generationType === 'quiet' || generationType === 'impersonate') return;
+async function analyzeChat({ manual = false } = {}) {
+    if (!manual) return;
     const context = SillyTavern.getContext();
     if (!context.getCurrentChatId?.()) {
-        if (manual) notify('warning', 'Open a chat before synchronizing.');
+        notify('warning', 'Open a chat before synchronizing.');
         return;
     }
-    const cursorKey = phase === 'user' ? 'user' : 'assistant';
-    const currentBefore = getState();
-    if (!manual && Number.isInteger(messageId) && currentBefore.syncCursor[cursorKey] === messageId) return;
-    const transcript = context.chat.filter(message => message?.mes && !message.is_system).slice(phase === 'user' ? -1 : -2)
+    if (!hasUserReply(context)) {
+        notify('info', getSettings().language === 'th' ? 'ระบบจะเริ่มหลังจากผู้เล่นตอบ First Message' : 'Tracking starts after the user replies to the first message.');
+        return;
+    }
+    const transcript = context.chat.filter(message => message?.mes && !message.is_system).slice(-2)
         .map(message => `${message.is_user ? 'User' : 'Character'}: ${message.mes}`).join('\n\n');
     if (!transcript) {
-        if (manual) notify('info', 'There are no role-play messages to analyze yet.');
+        notify('info', 'There are no role-play messages to analyze yet.');
         return;
     }
 
@@ -1660,30 +1825,21 @@ async function analyzeChat({ manual = false, messageId = null, generationType = 
     try {
         const current = getState();
         const response = await context.generateQuietPrompt({
-            quietPrompt: analyzerPrompt(current, transcript, phase),
+            quietPrompt: analyzerPrompt(current, transcript),
             skipWIAN: true,
-            responseLength: 2200,
+            responseLength: 900,
             removeReasoning: true,
         });
         const parsed = parseJson(response);
-        const parsedState = parsed.state || parsed;
-        const next = normalize(parsedState, current);
-        if (Array.isArray(parsedState.letters)) {
-            const returnedIds = new Set(next.letters.map(entry => entry.id));
-            next.letters = [...current.letters.filter(entry => !returnedIds.has(entry.id)), ...next.letters].slice(-300);
-        }
-        next.syncCursor = clone(current.syncCursor);
-        if (!manual && Number.isInteger(messageId)) next.syncCursor[cursorKey] = messageId;
-        const summary = text(parsed.summary, 'Role-play state synchronized.', 300);
-        next.journal = [...current.journal, { id: uid(), text: summary, at: new Date().toISOString() }].slice(-30);
-        await persistState(next, 'ai');
+        const { next, accepted, summary } = applyStatePatch(current, parsed);
+        if (accepted) await persistState(next, 'manual-ai-patch');
         setSync('ready', tr('AI synchronized'));
-        if (manual) notify('success', summary);
-        console.info('[Tensei System] State synchronized.', messageId);
+        notify('success', summary || 'No confirmed changes.');
+        console.info(`[Tensei System] Manual sync applied ${accepted} operation(s).`);
     } catch (error) {
         console.error('[Tensei System] AI synchronization failed.', error);
         setSync('error', tr('Sync unavailable'));
-        if (manual) notify('error', `Could not synchronize: ${error.message}`);
+        notify('error', `Could not synchronize: ${error.message}`);
     } finally {
         aiSyncInProgress = false;
     }
@@ -1797,7 +1953,7 @@ async function addSettingsDrawer() {
     container.insertAdjacentHTML('beforeend', await context.renderExtensionTemplateAsync(EXTENSION_FOLDER, 'settings'));
     const settings = getSettings();
     bindCheckbox('tensei-system-show-launcher', 'showWandLauncher', settings, syncLauncherVisibility);
-    bindCheckbox('tensei-system-auto-track', 'autoTrack', settings);
+    bindCheckbox('tensei-system-auto-track', 'autoTrack', settings, updatePrompt);
     bindCheckbox('tensei-system-inject-state', 'injectState', settings, updatePrompt);
     bindSettingControl('tensei-system-language', 'language', settings, rebuildInterface);
     bindSettingControl('tensei-system-interaction-mode', 'interactionMode', settings);
@@ -1819,17 +1975,11 @@ function bindChatEvents() {
         setSync('ready', tr('Ready'));
     });
     if (eventTypes.PERSONA_CHANGED) eventSource.on(eventTypes.PERSONA_CHANGED, () => renderAll());
-    if (eventTypes.MESSAGE_SENT) eventSource.on(eventTypes.MESSAGE_SENT, (messageId, generationType) =>
-        queueAnalyze({ messageId, generationType, phase: 'user' }));
-    eventSource.on(eventTypes.MESSAGE_RECEIVED, (messageId, generationType) => {
-        return queueAnalyze({ messageId, generationType, phase: 'assistant' });
+    if (eventTypes.MESSAGE_SENT) eventSource.on(eventTypes.MESSAGE_SENT, () => {
+        updatePrompt();
+        setSync('ready', tr('Ready'));
     });
-    eventSource.on(eventTypes.MESSAGE_EDITED, () => {
-        if (getSettings().autoTrack) return queueAnalyze({ phase: 'assistant' });
-    });
-    eventSource.on(eventTypes.MESSAGE_SWIPED, messageId => {
-        if (getSettings().autoTrack) return queueAnalyze({ messageId, generationType: 'swipe', phase: 'assistant' });
-    });
+    eventSource.on(eventTypes.MESSAGE_RECEIVED, (messageId, generationType) => processAssistantPatch(messageId, generationType));
 }
 
 async function initialize() {
@@ -1846,7 +1996,7 @@ async function initialize() {
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape') closeInterface();
         });
-        console.info('[Tensei System] Role-play interface v0.5.0 loaded.');
+        console.info('[Tensei System] Role-play interface v0.6.0 loaded.');
     } catch (error) {
         initialized = false;
         console.error('[Tensei System] Failed to initialize.', error);
