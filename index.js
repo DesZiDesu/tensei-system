@@ -25,6 +25,10 @@ const SWORD_STYLES = [
     { id: 'waterGod', name: 'Water God Style', icon: 'fa-solid fa-water' },
     { id: 'swordGod', name: 'Sword God Style', icon: 'fa-solid fa-khanda' },
 ];
+const NPC_CORE_STATS = [
+    { id: 'strength', name: 'Strength' }, { id: 'agility', name: 'Agility' },
+    { id: 'intelligence', name: 'Intelligence' }, { id: 'endurance', name: 'Endurance' },
+];
 const DAY_PHASES = ['Morning', 'Afternoon', 'Evening', 'Night'];
 const ZONE_TYPES = ['Safe Zone', 'Neutral Zone', 'Danger Zone', 'Unknown Zone'];
 const WORLD_LOCATIONS = [
@@ -82,7 +86,7 @@ const TRANSLATIONS = {
         'Synchronizing world state': 'กำลังเชื่อมข้อมูลโลก',
         'Connecting to the active role-play...': 'กำลังเชื่อมต่อกับโรลเพลย์ปัจจุบัน...',
         Ready: 'พร้อม', Status: 'สถานะ', Inventory: 'คลังสิ่งของ', Skills: 'ทักษะ', Quests: 'ภารกิจ', Rank: 'อันดับ', 'World Map': 'แผนที่โลก',
-        Music: 'เพลง', Mailbox: 'กล่องจดหมาย', Contacts: 'รายชื่อ', Letters: 'จดหมาย', 'Magic & Technique': 'เวทมนตร์และวิชา',
+        Music: 'เพลง', Mailbox: 'กล่องจดหมาย', Contacts: 'รายชื่อ', Letters: 'จดหมาย', NPCs: 'ตัวละคร NPC', 'NPC Codex': 'สารบบ NPC', 'Magic & Technique': 'เวทมนตร์และวิชา',
         'Waiting for chat': 'กำลังรอแชต', 'Sync latest turn': 'ซิงก์เหตุการณ์ล่าสุด', 'System interface': 'ข้อมูลระบบ',
         'Current persona': 'ตัวตนปัจจุบัน', 'Guild rank': 'อันดับกิลด์', 'Vital status': 'สถานะพลังชีวิต', Identity: 'ข้อมูลส่วนตัว',
         Health: 'พลังชีวิต', Mana: 'มานา', Stamina: 'พละกำลัง', Race: 'เผ่าพันธุ์', Age: 'อายุ', Guild: 'กิลด์', Party: 'ปาร์ตี้',
@@ -116,6 +120,13 @@ const TRANSLATIONS = {
         'Stored locally on this device': 'เก็บไว้ในอุปกรณ์นี้เท่านั้น', 'Now playing': 'กำลังเล่น',
         Inbox: 'กล่องขาเข้า', Unread: 'ยังไม่อ่าน', Read: 'อ่านแล้ว', Sent: 'ส่งแล้ว', 'Add contact': 'เพิ่มรายชื่อ', 'Compose letter': 'เขียนจดหมาย',
         Subject: 'หัวข้อ', Message: 'เนื้อหา', 'Send letter': 'ส่งจดหมาย', Reply: 'ตอบกลับ', Close: 'ปิด', 'Clear letter': 'ลบจดหมาย', Affiliation: 'สังกัด', Relationship: 'ความสัมพันธ์', Notes: 'บันทึก',
+        'Add NPC': 'เพิ่ม NPC', 'Edit NPC': 'แก้ไข NPC', 'Save NPC': 'บันทึก NPC', Faction: 'ฝ่าย', Alignment: 'จุดยืน', Occupation: 'อาชีพ', Gender: 'เพศ',
+        'Current location': 'ตำแหน่งปัจจุบัน', 'Last seen': 'พบล่าสุด', Affection: 'ความชอบพอ', Trust: 'ความไว้ใจ', Loyalty: 'ความภักดี', Fear: 'ความกลัว', Corruption: 'ความเสื่อมทราม', Lust: 'แรงปรารถนา',
+        'Relationship state': 'สถานะความสัมพันธ์', Partner: 'คู่ครอง', 'Marital status': 'สถานภาพ', Children: 'บุตร', 'Family & bonds': 'ครอบครัวและสายสัมพันธ์',
+        'Core stats': 'ค่าสถานะหลัก', Strength: 'พละกำลัง', Agility: 'ความคล่องตัว', Intelligence: 'สติปัญญา', Endurance: 'ความอดทน',
+        Abilities: 'สกิลและความสามารถ', 'Add ability': 'เพิ่มความสามารถ', 'Ability name': 'ชื่อความสามารถ', 'Ability level': 'ระดับความสามารถ',
+        Diary: 'ไดอารี', 'Add diary entry': 'เพิ่มบันทึกไดอารี', Thought: 'ความคิด', Mood: 'อารมณ์', 'Custom meters': 'ค่าสถานะกำหนดเอง', 'Add custom meter': 'เพิ่มค่ากำหนดเอง',
+        'Link to Mailbox': 'เชื่อมกับ Mailbox', 'Open Mailbox': 'เปิดกล่องจดหมาย', 'Remove portrait': 'ลบรูปตัวละคร',
     },
 };
 
@@ -129,6 +140,10 @@ let syncQueue = Promise.resolve();
 let tabTransitionToken = 0;
 let mapSelectionId = null;
 let openedLetterId = null;
+let selectedNpcId = null;
+let npcPortraitRenderToken = 0;
+let npcEditorObjectUrl = '';
+const npcPortraitObjectUrls = new Map();
 let audioPlayer = null;
 let audioObjectUrl = '';
 const mapView = { scale: 1, x: 0, y: 0 };
@@ -171,7 +186,7 @@ function defaultState() {
     const magic = Object.fromEntries(MAGIC_DISCIPLINES.map(entry => [entry.id, 0]));
     const sword = Object.fromEntries(SWORD_STYLES.map(entry => [entry.id, 0]));
     return {
-        version: 6,
+        version: 7,
         player: {
             name: 'Adventurer', portrait: '', race: 'Human', age: '', title: 'Newcomer', guild: 'Unaffiliated', party: 'Solo', condition: 'Stable', level: 1,
             portraitView: { desktop: { x: 50, y: 50, zoom: 1 }, mobile: { x: 50, y: 50, zoom: 1 } },
@@ -187,6 +202,7 @@ function defaultState() {
         skills: [],
         proficiencies: { magic, sword, techniques: [] },
         quests: [],
+        npcs: [],
         contacts: [],
         letters: [],
         music: { tracks: [], currentId: '', repeat: false, shuffle: false },
@@ -258,7 +274,65 @@ function contact(value) {
     return {
         id: text(value.id, uid(), 100), name: text(value.name, '', 120), title: text(value.title, '', 120),
         affiliation: text(value.affiliation, '', 120), relationship: text(value.relationship, 'Acquaintance', 100),
-        notes: text(value.notes, '', 400), lastLetterAt: text(value.lastLetterAt, '', 60),
+        notes: text(value.notes, '', 400), lastLetterAt: text(value.lastLetterAt, '', 60), npcId: text(value.npcId, '', 100),
+    };
+}
+
+function npcAbility(value) {
+    if (!value || typeof value !== 'object' || !text(value.name)) return null;
+    return {
+        id: text(value.id, uid(), 100), name: text(value.name, '', 120), category: text(value.category, 'General', 80),
+        level: text(value.level, 'Unknown', 80), proficiency: number(value.proficiency, 0, 0, 100),
+        description: text(value.description, '', 400),
+    };
+}
+
+function npcMeter(value) {
+    if (!value || typeof value !== 'object' || !text(value.name)) return null;
+    return { id: text(value.id, uid(), 100), name: text(value.name, '', 80), value: number(value.value, 0, 0, 100) };
+}
+
+function npcDiaryEntry(value) {
+    if (!value || typeof value !== 'object' || !text(value.text)) return null;
+    return {
+        id: text(value.id, uid(), 100), text: text(value.text, '', 1200), mood: text(value.mood, '', 80),
+        at: text(value.at, new Date().toISOString(), 60),
+    };
+}
+
+function npcProfile(value, fallback = {}) {
+    if (!value || typeof value !== 'object' || !text(value.name, text(fallback.name))) return null;
+    const baseFrame = fallback.portraitView || defaultState().player.portraitView;
+    const portraitView = value.portraitView && typeof value.portraitView === 'object' ? value.portraitView : {};
+    const baseStats = fallback.stats && typeof fallback.stats === 'object' ? fallback.stats : {};
+    const stats = value.stats && typeof value.stats === 'object' ? value.stats : {};
+    const sourceAbilities = Array.isArray(value.abilities) ? value.abilities : Array.isArray(fallback.abilities) ? fallback.abilities : [];
+    const sourceMeters = Array.isArray(value.customMeters) ? value.customMeters : Array.isArray(fallback.customMeters) ? fallback.customMeters : [];
+    const sourceDiary = Array.isArray(value.diary) ? value.diary : Array.isArray(fallback.diary) ? fallback.diary : [];
+    return {
+        id: text(value.id, text(fallback.id, uid(), 100), 100), contactId: text(value.contactId, text(fallback.contactId, '', 100), 100),
+        name: text(value.name, text(fallback.name, 'Unknown NPC', 120), 120), title: text(value.title, text(fallback.title, '', 120), 120),
+        race: text(value.race, text(fallback.race, 'Unknown', 80), 80), age: text(value.age, text(fallback.age, '', 40), 40),
+        gender: text(value.gender, text(fallback.gender, '', 60), 60), occupation: text(value.occupation, text(fallback.occupation, '', 120), 120),
+        faction: text(value.faction, text(fallback.faction, text(value.affiliation, text(fallback.affiliation, '', 120), 120), 120), 120),
+        alignment: text(value.alignment, text(fallback.alignment, '', 100), 100), relationship: text(value.relationship, text(fallback.relationship, 'Acquaintance', 100), 100),
+        relationshipState: text(value.relationshipState, text(fallback.relationshipState, '', 160), 160),
+        affection: number(value.affection, number(fallback.affection, 0, 0, 100), 0, 100), trust: number(value.trust, number(fallback.trust, 0, 0, 100), 0, 100),
+        loyalty: number(value.loyalty, number(fallback.loyalty, 0, 0, 100), 0, 100), fear: number(value.fear, number(fallback.fear, 0, 0, 100), 0, 100),
+        corruption: number(value.corruption, number(fallback.corruption, 0, 0, 100), 0, 100), lust: number(value.lust, number(fallback.lust, 0, 0, 100), 0, 100),
+        location: text(value.location, text(fallback.location, 'Unknown', 200), 200), lastSeen: text(value.lastSeen, text(fallback.lastSeen, '', 120), 120),
+        maritalStatus: text(value.maritalStatus, text(fallback.maritalStatus, 'Unknown', 100), 100), partner: text(value.partner, text(fallback.partner, '', 160), 160),
+        children: text(value.children, text(fallback.children, '', 400), 400), notes: text(value.notes, text(fallback.notes, '', 1000), 1000),
+        stats: {
+            level: number(stats.level, number(baseStats.level, 1, 1, 9999), 1, 9999), rank: text(stats.rank, text(baseStats.rank, 'Unknown', 80), 80),
+            hp: number(stats.hp, number(baseStats.hp, 0, 0, 999999), 0, 999999), mp: number(stats.mp, number(baseStats.mp, 0, 0, 999999), 0, 999999),
+            stamina: number(stats.stamina, number(baseStats.stamina, 0, 0, 999999), 0, 999999),
+            ...Object.fromEntries(NPC_CORE_STATS.map(entry => [entry.id, number(stats[entry.id], number(baseStats[entry.id], 0, 0, 9999), 0, 9999)])),
+        },
+        abilities: sourceAbilities.map(npcAbility).filter(Boolean).slice(0, 100), customMeters: sourceMeters.map(npcMeter).filter(Boolean).slice(0, 30),
+        diary: sourceDiary.map(npcDiaryEntry).filter(Boolean).slice(-40), hasPortrait: Boolean(value.hasPortrait ?? fallback.hasPortrait),
+        portraitView: { desktop: portraitFrame(portraitView.desktop, baseFrame.desktop), mobile: portraitFrame(portraitView.mobile, baseFrame.mobile) },
+        updatedAt: text(value.updatedAt, text(fallback.updatedAt, new Date().toISOString(), 60), 60),
     };
 }
 
@@ -297,13 +371,14 @@ function quest(value) {
 
 function normalize(candidate, base = defaultState()) {
     const source = candidate && typeof candidate === 'object' ? candidate : {};
+    const migratingLegacyNpcs = !Array.isArray(source.npcs);
     const result = clone(base);
     const player = source.player && typeof source.player === 'object' ? source.player : {};
     const progress = source.progression && typeof source.progression === 'object' ? source.progression : {};
     const currency = progress.currency && typeof progress.currency === 'object' ? progress.currency : {};
     const location = source.location && typeof source.location === 'object' ? source.location : {};
 
-    result.version = 6;
+    result.version = 7;
     const portraitView = player.portraitView && typeof player.portraitView === 'object' ? player.portraitView : {};
     result.player = {
         name: text(player.name, result.player.name, 100), portrait: text(player.portrait, result.player.portrait, 1500000),
@@ -363,6 +438,19 @@ function normalize(candidate, base = defaultState()) {
     ]));
     if (Array.isArray(proficiencies.techniques)) result.proficiencies.techniques = proficiencies.techniques.map(technique).filter(Boolean).slice(0, 150);
     if (Array.isArray(source.quests)) result.quests = source.quests.map(quest).filter(Boolean).slice(0, 100);
+    if (Array.isArray(source.npcs)) {
+        const existingById = new Map((result.npcs || []).map(entry => [entry.id, entry]));
+        const existingByName = new Map((result.npcs || []).map(entry => [entry.name.toLocaleLowerCase(), entry]));
+        const byName = new Map();
+        source.npcs.forEach(value => {
+            const fallbackNpc = existingById.get(value?.id) || existingByName.get(text(value?.name).toLocaleLowerCase()) || {};
+            const entry = npcProfile(value, fallbackNpc);
+            if (!entry) return;
+            const key = entry.name.toLocaleLowerCase();
+            byName.set(key, byName.has(key) ? npcProfile(entry, byName.get(key)) : entry);
+        });
+        result.npcs = [...byName.values()].slice(0, 200);
+    }
     if (Array.isArray(source.contacts)) {
         const byName = new Map();
         source.contacts.map(contact).filter(Boolean).forEach(entry => {
@@ -371,6 +459,30 @@ function normalize(candidate, base = defaultState()) {
         });
         result.contacts = [...byName.values()].slice(0, 200);
     }
+    const npcById = new Map(result.npcs.map(entry => [entry.id, entry]));
+    const npcByName = new Map(result.npcs.map(entry => [entry.name.toLocaleLowerCase(), entry]));
+    result.contacts.forEach(entry => {
+        let linked = npcById.get(entry.npcId) || ((entry.npcId || migratingLegacyNpcs) ? npcByName.get(entry.name.toLocaleLowerCase()) : null);
+        if (!linked && (entry.npcId || migratingLegacyNpcs)) {
+            linked = npcProfile({ name: entry.name, title: entry.title, faction: entry.affiliation, relationship: entry.relationship,
+                notes: entry.notes, contactId: entry.id, updatedAt: entry.lastLetterAt || new Date().toISOString() });
+            if (linked) {
+                result.npcs.push(linked);
+                npcById.set(linked.id, linked);
+                npcByName.set(linked.name.toLocaleLowerCase(), linked);
+            }
+        }
+        if (linked) {
+            entry.npcId = linked.id;
+            linked.contactId = entry.id;
+        }
+    });
+    result.npcs.forEach(entry => {
+        const linked = result.contacts.find(contactEntry => contactEntry.id === entry.contactId);
+        if (linked) linked.npcId = entry.id;
+        else if (entry.contactId) entry.contactId = '';
+    });
+    result.npcs = result.npcs.slice(0, 200);
     if (Array.isArray(source.letters)) {
         const signatures = new Set();
         result.letters = source.letters.map(letter).filter(Boolean).filter(entry => {
@@ -429,6 +541,7 @@ function aiState(state) {
     const safePlayer = { ...state.player };
     delete safePlayer.portrait;
     delete safePlayer.portraitView;
+    const recentNpcs = [...state.npcs].sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt))).slice(0, 16);
     return {
         player: safePlayer,
         progression: state.progression,
@@ -438,6 +551,16 @@ function aiState(state) {
         skills: state.skills.map(({ id, name, rank, type }) => ({ id, name, rank, type })),
         proficiencies: state.proficiencies,
         quests: state.quests,
+        npcIndex: state.npcs.slice(0, 100).map(({ id, name, relationship, location, faction }) => ({ id, name, relationship, location, faction })),
+        npcs: recentNpcs.map(entry => ({
+            id: entry.id, name: entry.name, title: entry.title, race: entry.race, age: entry.age, faction: entry.faction,
+            relationship: entry.relationship, relationshipState: entry.relationshipState, affection: entry.affection,
+            trust: entry.trust, loyalty: entry.loyalty, fear: entry.fear, corruption: entry.corruption, lust: entry.lust,
+            location: entry.location, maritalStatus: entry.maritalStatus, partner: entry.partner, children: entry.children,
+            stats: { level: entry.stats.level, rank: entry.stats.rank },
+            abilities: entry.abilities.slice(0, 8).map(({ id, name, category, level, proficiency }) => ({ id, name, category, level, proficiency })),
+            diaryLatest: entry.diary.at(-1) ? { mood: entry.diary.at(-1).mood, text: entry.diary.at(-1).text.slice(0, 240) } : undefined,
+        })),
         contacts: state.contacts.map(({ id, name, title, affiliation, relationship }) => ({ id, name, title, affiliation, relationship })),
         letters: state.letters.slice(-5).map(({ id, contactId, fromName, toName, subject, direction, status, createdAt }) => (
             { id, contactId, fromName, toName, subject, direction, status, createdAt }
@@ -453,8 +576,10 @@ function patchInstructions() {
     return [
         'After the role-play reply, append one invisible HTML comment only when confirmed state changed:',
         '<!--tensei_patch:{"ops":[["set","player.hp.current",90],["inc","progression.experience",10],["upsert","inventory",{"name":"Potion","quantity":1,"category":"Consumable"}],["delete","inventory","Broken Sword"],["add","location.discovered","Roa"]],"summary":"brief change"}-->',
-        'Allowed verbs: set or inc for scalar paths; upsert or delete for inventory, skills, proficiencies.techniques, quests, contacts, letters; add for location.discovered.',
+        'Allowed verbs: set or inc for scalar paths; upsert or delete for inventory, skills, proficiencies.techniques, quests, npcs, contacts, letters; upsert or delete for npcAbilities and npcMeters; append for npcDiary; add for location.discovered.',
         'Use canonical paths shown in the state JSON. For a new incoming physical letter include contactId/fromName/toName/subject/body/direction:"incoming"/status:"unread". Ordinary dialogue is not a letter.',
+        'Create or update a named NPC dossier with an upsert on npcs only when that NPC becomes relevant or a confirmed fact changes. Use partial NPC objects and preserve the canonical id from npcIndex. When a relationship becomes a correspondence, also upsert contacts with npcId; do not make every incidental NPC a contact.',
+        'For a meaningful private thought or relationship turning point, append npcDiary with {npcId,text,mood}, or npcName when the NPC was created in the same patch; do not write a diary entry every turn. Update abilities granularly through npcAbilities with npcId or npcName. NPC portraits and portrait framing are local-only and forbidden in patches.',
         'Record only outcomes confirmed by this reply. Never record plans, attempts, questions, hypotheticals, rejected actions, or out-of-character discussion. Keep proficiency changes conservative.',
         'Omit the comment when nothing changed. Never print a full state, Markdown fence, explanation, or visible system text.',
     ].join('\n');
@@ -464,7 +589,7 @@ function statePrompt(state, { includeState = true, track = true } = {}) {
     const lines = ['<tensei_system_state>'];
     if (includeState) {
         lines.push('Canonical role-play state. Preserve it unless the story confirms a change.');
-        lines.push('Current location, inventory, ranks, conditions, skills, quests, contacts, and physical letters are established facts.');
+        lines.push('Current location, inventory, ranks, conditions, skills, quests, NPC dossiers, contacts, and physical letters are established facts.');
         lines.push(JSON.stringify(aiState(state)));
     }
     if (track) lines.push(patchInstructions());
@@ -511,7 +636,7 @@ function appearanceMenu() {
     return `<details class="tensei-appearance-menu">
         <summary aria-label="${html(tr('Appearance'))}" title="${html(tr('Appearance'))}"><i class="fa-solid fa-sliders"></i></summary>
         <div class="tensei-appearance-popover">
-            <div class="tensei-popover-heading"><span>${html(tr('Appearance'))}</span><small>UI 0.4</small></div>
+            <div class="tensei-popover-heading"><span>${html(tr('Appearance'))}</span><small>UI 0.7</small></div>
             <label class="tensei-setting-row"><span>${html(tr('Accent'))}</span><input type="color" data-ui-setting="accentColor" value="${settings.accentColor}"></label>
             <label class="tensei-setting-row"><span>${html(tr('Glass'))}</span><input type="range" data-ui-setting="glassOpacity" min="55" max="98" value="${settings.glassOpacity}"></label>
             <label class="tensei-setting-row"><span>${html(tr('Glow'))}</span><input type="range" data-ui-setting="glowStrength" min="0" max="100" value="${settings.glowStrength}"></label>
@@ -564,11 +689,12 @@ function buildInterface() {
                         ${tabButton('quests', 'fa-solid fa-scroll', 'Quests')}
                         ${tabButton('rank', 'fa-solid fa-medal', 'Rank')}
                         ${tabButton('map', 'fa-solid fa-map', 'World Map')}
+                        ${tabButton('npcs', 'fa-solid fa-users', 'NPCs')}
                         ${tabButton('mail', 'fa-solid fa-envelope', 'Mailbox')}
                         ${tabButton('music', 'fa-solid fa-music', 'Music')}
                     </nav>
                     <main class="tensei-system-panel-body">
-                        ${['status', 'inventory', 'skills', 'quests', 'rank', 'map', 'mail', 'music'].map((id, index) =>
+                        ${['status', 'inventory', 'skills', 'quests', 'rank', 'map', 'npcs', 'mail', 'music'].map((id, index) =>
                             `<section class="tensei-tab-panel${index === 0 ? ' is-active' : ''}" data-panel="${id}"
                                 ${index ? 'hidden' : ''}></section>`).join('')}
                     </main>
@@ -581,6 +707,7 @@ function buildInterface() {
             </div>
             <div id="tensei-portrait-editor" class="tensei-submodal" hidden></div>
             <div id="tensei-letter-reader" class="tensei-submodal" hidden></div>
+            <input id="tensei-npc-avatar-input" type="file" accept="image/*" hidden>
         </section>`;
     document.body.appendChild(overlay);
     overlay.querySelector('.tensei-system-backdrop')?.addEventListener('click', closeInterface);
@@ -702,12 +829,14 @@ function renderAll(state = getState()) {
     renderQuests(overlay.querySelector('[data-panel="quests"]'), state);
     renderRank(overlay.querySelector('[data-panel="rank"]'), state);
     renderMap(overlay.querySelector('[data-panel="map"]'), state);
+    renderNpcs(overlay.querySelector('[data-panel="npcs"]'), state);
     renderMailbox(overlay.querySelector('[data-panel="mail"]'), state);
     renderMusic(overlay.querySelector('[data-panel="music"]'), state);
     const label = overlay.querySelector('#tensei-context-label');
     if (label) label.innerHTML = SillyTavern.getContext().getCurrentChatId?.()
         ? `<i class="fa-solid fa-location-dot"></i> ${html(state.location.region)} · ${html(state.location.place)}`
         : `<i class="fa-solid fa-triangle-exclamation"></i> ${html(tr('Open a chat to activate this system'))}`;
+    void hydrateNpcPortraits(overlay, state);
 }
 
 function renderStatus(panel, state) {
@@ -795,6 +924,8 @@ function closePortraitEditor() {
         modal.hidden = true;
         modal.innerHTML = '';
     }
+    if (npcEditorObjectUrl) URL.revokeObjectURL(npcEditorObjectUrl);
+    npcEditorObjectUrl = '';
 }
 
 function renderInventory(panel, state) {
@@ -940,6 +1071,191 @@ function renderMap(panel, state) {
     setupMapInteractions(panel);
 }
 
+const textareaField = (label, name, value, rows = 4, extra = '') =>
+    `<label class="tensei-field tensei-field-wide"><span>${html(tr(label))}</span><textarea name="${name}" rows="${rows}" ${extra}>${html(value)}</textarea></label>`;
+
+function npcPortraitStyle(entry) {
+    const frame = entry.portraitView;
+    return `--portrait-desktop-x:${frame.desktop.x}%;--portrait-desktop-y:${frame.desktop.y}%;--portrait-desktop-zoom:${frame.desktop.zoom};--portrait-mobile-x:${frame.mobile.x}%;--portrait-mobile-y:${frame.mobile.y}%;--portrait-mobile-zoom:${frame.mobile.zoom}`;
+}
+
+function npcPortraitSlot(entry, className = 'tensei-npc-thumb') {
+    return `<span class="${className}${entry.hasPortrait ? ' has-photo' : ''}" data-npc-portrait="${html(entry.id)}" style="${npcPortraitStyle(entry)}">
+        <span class="tensei-npc-initial">${html(entry.name.charAt(0).toUpperCase() || '?')}</span></span>`;
+}
+
+function npcMeterView(label, value, tone = 'accent') {
+    return `<article class="tensei-npc-meter" data-tone="${tone}"><span><b>${html(tr(label))}</b><output>${value}%</output></span>
+        <div><i style="width:${value}%"></i></div></article>`;
+}
+
+function renderNpcs(panel, state) {
+    if (!panel) return;
+    if (!state.npcs.some(entry => entry.id === selectedNpcId)) selectedNpcId = state.npcs[0]?.id || null;
+    const selected = state.npcs.find(entry => entry.id === selectedNpcId);
+    const linkedContact = selected ? state.contacts.find(entry => entry.id === selected.contactId || entry.npcId === selected.id) : null;
+    const list = state.npcs.length ? state.npcs.map(entry => `<article class="tensei-npc-list-row${entry.id === selectedNpcId ? ' is-active' : ''}">
+        <button type="button" data-action="select-npc" data-id="${html(entry.id)}">${npcPortraitSlot(entry)}<span><strong>${html(entry.name)}</strong>
+        <em>${html(entry.title || entry.faction || tr('No description'))}</em><small>${html(entry.relationship)} · ${html(entry.location)}</small></span></button>
+        <button type="button" data-action="delete-npc" data-id="${html(entry.id)}" title="${html(tr('Remove'))}"><i class="fa-solid fa-trash"></i></button></article>`).join('')
+        : `<div class="tensei-mail-empty large"><i class="fa-solid fa-users-viewfinder"></i><p>${getSettings().language === 'th' ? 'NPC ที่ AI ตรวจพบหรือคุณเพิ่มเองจะปรากฏที่นี่' : 'NPCs discovered by the AI or added manually will appear here.'}</p></div>`;
+    const detail = selected ? renderNpcDossier(selected, linkedContact) : `<section class="tensei-npc-empty-dossier"><i class="fa-solid fa-address-card"></i><p>${getSettings().language === 'th' ? 'เพิ่ม NPC คนแรกเพื่อเริ่มสร้างสารบบ' : 'Add the first NPC to begin the codex.'}</p></section>`;
+    panel.innerHTML = `${heading('NPC Codex', `${state.npcs.length} ${tr('NPCs').toLowerCase()}`, 'fa-solid fa-users')}
+        <div class="tensei-npc-layout"><aside class="tensei-npc-index"><div class="tensei-section-label"><i class="fa-solid fa-list"></i><span>${html(tr('NPCs'))}</span></div>
+            <div class="tensei-npc-list">${list}</div><details class="tensei-editor tensei-npc-add"><summary><i class="fa-solid fa-user-plus"></i> ${html(tr('Add NPC'))}</summary>
+            <form data-form="npc-new" class="tensei-form-grid">${input('Name', 'name', '')}${input('Title', 'title', '')}${input('Faction', 'faction', '')}${input('Relationship', 'relationship', 'Acquaintance')}
+            <label class="tensei-checkbox-field"><input type="checkbox" name="linkContact" value="yes"><span>${html(tr('Link to Mailbox'))}</span></label>
+            <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add NPC'))}</button></form></details></aside>
+            <div class="tensei-npc-dossier">${detail}</div></div>`;
+    void hydrateNpcPortraits(panel, state);
+}
+
+function renderNpcDossier(entry, linkedContact) {
+    const relationshipMeters = [
+        ['Affection', entry.affection, 'rose'], ['Trust', entry.trust, 'blue'], ['Loyalty', entry.loyalty, 'gold'],
+        ['Fear', entry.fear, 'violet'], ['Corruption', entry.corruption, 'dark'], ['Lust', entry.lust, 'crimson'],
+    ];
+    const abilities = entry.abilities.length ? entry.abilities.map(ability => `<article class="tensei-npc-ability"><div><span>${html(ability.category)}</span><strong>${html(ability.name)}</strong>
+        <p>${html(ability.description || tr('No description'))}</p></div><div class="tensei-npc-ability-rank"><b>${html(ability.level)}</b><span><i style="width:${ability.proficiency}%"></i></span><small>${ability.proficiency}%</small></div>
+        <button type="button" data-action="delete-npc-ability" data-id="${html(ability.id)}" data-npc-id="${html(entry.id)}"><i class="fa-solid fa-trash"></i></button></article>`).join('') : empty('Skills learned during role-play will appear here.');
+    const diary = entry.diary.length ? [...entry.diary].reverse().map(note => `<article class="tensei-diary-entry"><span><i class="fa-solid fa-feather-pointed"></i>${html(note.mood || tr('Diary'))}<small>${html(formatDate(note.at))}</small></span>
+        <p>${html(note.text).replaceAll('\n', '<br>')}</p><button type="button" data-action="delete-npc-diary" data-id="${html(note.id)}" data-npc-id="${html(entry.id)}"><i class="fa-solid fa-trash"></i></button></article>`).join('')
+        : `<div class="tensei-mail-empty"><i class="fa-solid fa-feather"></i><p>${getSettings().language === 'th' ? 'ยังไม่มีความคิดที่ถูกบันทึก' : 'No private thoughts have been recorded.'}</p></div>`;
+    const customMeters = entry.customMeters.map(meterEntry => `<article class="tensei-custom-meter">${npcMeterView(meterEntry.name, meterEntry.value)}
+        <button type="button" data-action="delete-npc-meter" data-id="${html(meterEntry.id)}" data-npc-id="${html(entry.id)}"><i class="fa-solid fa-trash"></i></button></article>`).join('');
+    return `<section class="tensei-npc-hero"><button class="tensei-npc-avatar" type="button" data-action="${entry.hasPortrait ? 'open-npc-portrait-editor' : 'choose-npc-portrait'}" data-id="${html(entry.id)}">
+        ${npcPortraitSlot(entry, 'tensei-npc-portrait')}<span class="tensei-avatar-edit"><i class="fa-solid ${entry.hasPortrait ? 'fa-crop-simple' : 'fa-camera'}"></i></span></button>
+        <div><span class="tensei-eyebrow">NPC dossier</span><h3>${html(entry.name)}</h3><p>${html(entry.title || entry.occupation || entry.relationship)}</p>
+        <div class="tensei-identity-chips"><span><i class="fa-solid fa-dna"></i>${html(entry.race)}</span><span><i class="fa-solid fa-flag"></i>${html(entry.faction || 'Unaffiliated')}</span>
+        <span><i class="fa-solid fa-location-dot"></i>${html(entry.location)}</span></div></div>
+        <div class="tensei-npc-hero-actions">${linkedContact ? `<button type="button" class="tensei-small-button" data-action="open-npc-mailbox" data-id="${html(entry.id)}"><i class="fa-solid fa-envelope"></i>${html(tr('Open Mailbox'))}</button>`
+            : `<button type="button" class="tensei-small-button" data-action="link-npc-contact" data-id="${html(entry.id)}"><i class="fa-solid fa-address-book"></i>${html(tr('Link to Mailbox'))}</button>`}
+        ${entry.hasPortrait ? `<button type="button" class="tensei-small-button" data-action="remove-npc-portrait" data-id="${html(entry.id)}"><i class="fa-solid fa-image-slash"></i>${html(tr('Remove portrait'))}</button>` : ''}</div></section>
+        <section class="tensei-npc-meter-grid">${relationshipMeters.map(args => npcMeterView(...args)).join('')}${customMeters}</section>
+        <div class="tensei-npc-info-grid"><article class="tensei-card"><div class="tensei-card-title"><span>${html(tr('Relationship state'))}</span><i class="fa-solid fa-heart"></i></div><dl class="tensei-fact-list">
+            <div><dt>${html(tr('Relationship'))}</dt><dd>${html(entry.relationship)}</dd></div><div><dt>${html(tr('Current location'))}</dt><dd>${html(entry.location)}</dd></div>
+            <div><dt>${html(tr('Last seen'))}</dt><dd>${html(entry.lastSeen || 'Unknown')}</dd></div><div><dt>${html(tr('Alignment'))}</dt><dd>${html(entry.alignment || 'Unknown')}</dd></div></dl>
+            ${entry.relationshipState ? `<p class="tensei-npc-note">${html(entry.relationshipState)}</p>` : ''}</article>
+        <article class="tensei-card"><div class="tensei-card-title"><span>${html(tr('Family & bonds'))}</span><i class="fa-solid fa-ring"></i></div><dl class="tensei-fact-list">
+            <div><dt>${html(tr('Marital status'))}</dt><dd>${html(entry.maritalStatus)}</dd></div><div><dt>${html(tr('Partner'))}</dt><dd>${html(entry.partner || 'None')}</dd></div>
+            <div class="tensei-fact-wide"><dt>${html(tr('Children'))}</dt><dd>${html(entry.children || 'None')}</dd></div></dl></article></div>
+        <section class="tensei-npc-stats"><div class="tensei-section-label"><i class="fa-solid fa-chart-simple"></i><span>${html(tr('Core stats'))}</span></div><div>
+            <article><span>LV</span><strong>${entry.stats.level}</strong><small>${html(entry.stats.rank)}</small></article>
+            <article><span>HP</span><strong>${entry.stats.hp}</strong></article><article><span>MP</span><strong>${entry.stats.mp}</strong></article><article><span>STA</span><strong>${entry.stats.stamina}</strong></article>
+            ${NPC_CORE_STATS.map(stat => `<article><span>${html(tr(stat.name))}</span><strong>${entry.stats[stat.id]}</strong></article>`).join('')}</div></section>
+        <section class="tensei-npc-abilities"><div class="tensei-section-label"><i class="fa-solid fa-sparkles"></i><span>${html(tr('Abilities'))}</span></div><div class="tensei-npc-ability-list">${abilities}</div>
+            <details class="tensei-editor"><summary><i class="fa-solid fa-plus"></i> ${html(tr('Add ability'))}</summary><form data-form="npc-ability" class="tensei-form-grid"><input type="hidden" name="npcId" value="${html(entry.id)}">
+                ${input('Ability name', 'name', '')}${input('Category', 'category', 'General')}${input('Ability level', 'level', 'Beginner')}${input('Proficiency', 'proficiency', 0, 'number', 'min="0" max="100"')}
+                ${input('Description', 'description', '')}<button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add ability'))}</button></form></details></section>
+        <section class="tensei-npc-diary"><div class="tensei-section-label"><i class="fa-solid fa-book"></i><span>${html(tr('Diary'))}</span></div><div class="tensei-diary-list">${diary}</div>
+            <details class="tensei-editor"><summary><i class="fa-solid fa-feather"></i> ${html(tr('Add diary entry'))}</summary><form data-form="npc-diary" class="tensei-form-grid"><input type="hidden" name="npcId" value="${html(entry.id)}">
+                ${input('Mood', 'mood', '')}${textareaField('Thought', 'text', '', 4, 'maxlength="1200" required')}<button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add diary entry'))}</button></form></details></section>
+        <details class="tensei-editor"><summary><i class="fa-solid fa-gauge"></i> ${html(tr('Add custom meter'))}</summary><form data-form="npc-meter" class="tensei-form-grid"><input type="hidden" name="npcId" value="${html(entry.id)}">
+            ${input('Name', 'name', '')}${input('Proficiency', 'value', 0, 'number', 'min="0" max="100"')}<button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add custom meter'))}</button></form></details>
+        <details class="tensei-editor tensei-npc-edit"><summary><i class="fa-solid fa-pen"></i> ${html(tr('Edit NPC'))}</summary><form data-form="npc-profile" class="tensei-form-grid"><input type="hidden" name="id" value="${html(entry.id)}">
+            ${input('Name', 'name', entry.name)}${input('Title', 'title', entry.title)}${input('Race', 'race', entry.race)}${input('Age', 'age', entry.age)}${input('Gender', 'gender', entry.gender)}${input('Occupation', 'occupation', entry.occupation)}
+            ${input('Faction', 'faction', entry.faction)}${input('Alignment', 'alignment', entry.alignment)}${input('Relationship', 'relationship', entry.relationship)}${input('Current location', 'location', entry.location)}
+            ${input('Last seen', 'lastSeen', entry.lastSeen)}${input('Marital status', 'maritalStatus', entry.maritalStatus)}${input('Partner', 'partner', entry.partner)}${input('Children', 'children', entry.children)}
+            ${input('Affection', 'affection', entry.affection, 'number', 'min="0" max="100"')}${input('Trust', 'trust', entry.trust, 'number', 'min="0" max="100"')}${input('Loyalty', 'loyalty', entry.loyalty, 'number', 'min="0" max="100"')}${input('Fear', 'fear', entry.fear, 'number', 'min="0" max="100"')}
+            ${input('Corruption', 'corruption', entry.corruption, 'number', 'min="0" max="100"')}${input('Lust', 'lust', entry.lust, 'number', 'min="0" max="100"')}${input('Level', 'level', entry.stats.level, 'number', 'min="1"')}${input('Rank', 'rank', entry.stats.rank)}
+            ${input('HP', 'hp', entry.stats.hp, 'number', 'min="0"')}${input('MP', 'mp', entry.stats.mp, 'number', 'min="0"')}${input('Stamina', 'stamina', entry.stats.stamina, 'number', 'min="0"')}
+            ${NPC_CORE_STATS.map(stat => input(stat.name, stat.id, entry.stats[stat.id], 'number', 'min="0"')).join('')}${textareaField('Relationship state', 'relationshipState', entry.relationshipState, 3)}${textareaField('Notes', 'notes', entry.notes, 4)}
+            <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Save NPC'))}</button></form></details>`;
+}
+
+function npcPortraitStorageKey(npcId, chatId = SillyTavern.getContext().getCurrentChatId?.() || 'no-chat') {
+    return `tensei-system:npc-portrait:${chatId}:${npcId}`;
+}
+
+function clearNpcPortraitObjectUrls() {
+    npcPortraitObjectUrls.forEach(url => URL.revokeObjectURL(url));
+    npcPortraitObjectUrls.clear();
+}
+
+async function hydrateNpcPortraits(root, state = getState()) {
+    if (!root) return;
+    const token = ++npcPortraitRenderToken;
+    clearNpcPortraitObjectUrls();
+    const store = SillyTavern.libs?.localforage;
+    if (!store) return;
+    const nodes = [...root.querySelectorAll('[data-npc-portrait]')];
+    await Promise.all(nodes.map(async node => {
+        const entry = state.npcs.find(value => value.id === node.dataset.npcPortrait);
+        if (!entry?.hasPortrait) return;
+        try {
+            const blob = await store.getItem(npcPortraitStorageKey(entry.id));
+            if (!(blob instanceof Blob) || token !== npcPortraitRenderToken || !node.isConnected) return;
+            const url = URL.createObjectURL(blob);
+            npcPortraitObjectUrls.set(`${entry.id}:${npcPortraitObjectUrls.size}`, url);
+            const image = document.createElement('img');
+            image.src = url;
+            image.alt = `${entry.name} portrait`;
+            node.querySelector('img')?.remove();
+            node.appendChild(image);
+            node.classList.add('has-photo');
+        } catch (error) {
+            console.warn('[Tensei System] Could not load an NPC portrait.', error);
+        }
+    }));
+}
+
+function resizeImageBlob(file) {
+    if (!file?.type?.startsWith('image/')) return Promise.reject(new Error('Choose an image file.'));
+    if (file.size > 12 * 1024 * 1024) return Promise.reject(new Error('The image must be smaller than 12 MB.'));
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('The image could not be read.'));
+        reader.onload = () => {
+            const image = new Image();
+            image.onerror = () => reject(new Error('This device could not decode the image. Try JPG, PNG, or WebP.'));
+            image.onload = () => {
+                const maxSide = 1400;
+                const ratio = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.max(1, Math.round(image.naturalWidth * ratio));
+                canvas.height = Math.max(1, Math.round(image.naturalHeight * ratio));
+                const context = canvas.getContext('2d');
+                context.drawImage(image, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('The image could not be compressed.')), 'image/jpeg', .84);
+            };
+            image.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+async function openNpcPortraitEditor(npcId) {
+    const state = getState();
+    const entry = state.npcs.find(value => value.id === npcId);
+    const modal = document.getElementById('tensei-portrait-editor');
+    if (!entry || !modal) return;
+    if (!entry.hasPortrait) {
+        const inputElement = document.getElementById('tensei-npc-avatar-input');
+        if (inputElement) inputElement.dataset.npcId = entry.id;
+        inputElement?.click();
+        return;
+    }
+    const blob = await SillyTavern.libs?.localforage?.getItem(npcPortraitStorageKey(entry.id));
+    if (!(blob instanceof Blob)) {
+        notify('warning', getSettings().language === 'th' ? 'รูป NPC นี้ไม่ได้อยู่ในอุปกรณ์นี้ กรุณาเลือกไฟล์ใหม่' : 'This NPC portrait is not stored on this device. Choose it again here.');
+        const inputElement = document.getElementById('tensei-npc-avatar-input');
+        if (inputElement) inputElement.dataset.npcId = entry.id;
+        inputElement?.click();
+        return;
+    }
+    if (npcEditorObjectUrl) URL.revokeObjectURL(npcEditorObjectUrl);
+    npcEditorObjectUrl = URL.createObjectURL(blob);
+    const frame = entry.portraitView;
+    modal.hidden = false;
+    modal.innerHTML = `<button class="tensei-submodal-backdrop" type="button" data-action="close-portrait-editor" aria-label="${html(tr('Close'))}"></button>
+        <article class="tensei-portrait-editor-card"><header><div><span>NPC portrait · ${html(entry.name)}</span><h3>${html(tr('Adjust portrait'))}</h3></div>
+        <button type="button" data-action="close-portrait-editor"><i class="fa-solid fa-xmark"></i></button></header>
+        <form data-form="npc-portrait-frame"><input type="hidden" name="npcId" value="${html(entry.id)}"><div class="tensei-portrait-previews">
+        ${portraitPreview('Desktop framing', 'desktop', frame.desktop, npcEditorObjectUrl)}${portraitPreview('Phone framing', 'mobile', frame.mobile, npcEditorObjectUrl)}</div>
+        <footer><button type="button" class="tensei-secondary-button" data-action="choose-npc-portrait" data-id="${html(entry.id)}"><i class="fa-solid fa-image"></i>${html(tr('Choose profile picture'))}</button>
+        <button class="tensei-primary-button" type="submit"><i class="fa-solid fa-crop-simple"></i>${html(tr('Save framing'))}</button></footer></form></article>`;
+}
+
 function renderMailbox(panel, state) {
     if (!panel) return;
     const unread = state.letters.filter(entry => entry.direction === 'incoming' && entry.status === 'unread').length;
@@ -947,10 +1263,13 @@ function renderMailbox(panel, state) {
     const sortedLetters = [...state.letters].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
     panel.innerHTML = `${heading('Mailbox', `${unread} ${tr('Unread').toLowerCase()} · ${state.contacts.length} ${tr('Contacts').toLowerCase()}`, 'fa-solid fa-envelope-open-text')}
         <div class="tensei-mail-layout"><section class="tensei-contact-rail"><div class="tensei-section-label"><i class="fa-solid fa-address-book"></i><span>${html(tr('Contacts'))}</span></div>
-            <div class="tensei-contact-list">${state.contacts.length ? state.contacts.map(entry => `<article class="tensei-contact-card">
-                <div class="tensei-contact-sigil">${html(entry.name.charAt(0).toUpperCase())}</div><div><strong>${html(entry.name)}</strong>
-                <span>${html(entry.title || entry.affiliation || entry.relationship)}</span><small>${html(entry.relationship)}</small></div>
-                <button type="button" data-action="delete-contact" data-id="${html(entry.id)}" title="${html(tr('Remove'))}"><i class="fa-solid fa-user-xmark"></i></button></article>`).join('') : `<div class="tensei-mail-empty"><i class="fa-solid fa-feather"></i><p>${getSettings().language === 'th' ? 'NPC ที่รู้จักระหว่างโรลเพลย์จะปรากฏที่นี่' : 'NPCs discovered during role-play will appear here.'}</p></div>`}</div>
+            <div class="tensei-contact-list">${state.contacts.length ? state.contacts.map(entry => {
+                const linkedNpc = state.npcs.find(value => value.id === entry.npcId) || state.npcs.find(value => value.name.toLocaleLowerCase() === entry.name.toLocaleLowerCase());
+                return `<article class="tensei-contact-card"><button type="button" class="tensei-contact-open" data-action="open-contact-npc" data-id="${html(entry.id)}">
+                    ${linkedNpc ? npcPortraitSlot(linkedNpc, 'tensei-contact-sigil') : `<span class="tensei-contact-sigil"><span class="tensei-npc-initial">${html(entry.name.charAt(0).toUpperCase())}</span></span>`}
+                    <span><strong>${html(entry.name)}</strong><span>${html(entry.title || entry.affiliation || entry.relationship)}</span><small>${html(entry.relationship)}</small></span></button>
+                    <button type="button" data-action="delete-contact" data-id="${html(entry.id)}" title="${html(tr('Remove'))}"><i class="fa-solid fa-user-xmark"></i></button></article>`;
+            }).join('') : `<div class="tensei-mail-empty"><i class="fa-solid fa-feather"></i><p>${getSettings().language === 'th' ? 'NPC ที่รู้จักระหว่างโรลเพลย์จะปรากฏที่นี่' : 'NPCs discovered during role-play will appear here.'}</p></div>`}</div>
             <details class="tensei-editor"><summary><i class="fa-solid fa-user-plus"></i> ${html(tr('Add contact'))}</summary>
                 <form data-form="contact" class="tensei-form-grid">${input('Name', 'name', '')}${input('Title', 'title', '')}${input('Affiliation', 'affiliation', '')}
                     ${input('Relationship', 'relationship', 'Acquaintance')}${input('Notes', 'notes', '')}<button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add contact'))}</button></form></details></section>
@@ -1030,6 +1349,7 @@ async function prefillLetterReply(entry) {
         || state.contacts.find(value => value.name.toLowerCase() === entry.fromName.toLowerCase());
     if (!npc) {
         npc = contact({ name: entry.fromName, relationship: 'Correspondent', lastLetterAt: entry.createdAt });
+        ensureNpcForContact(state, npc);
         state.contacts.push(npc);
         await persistState(state, 'contact');
     }
@@ -1186,6 +1506,35 @@ function updateMusicProgress() {
     if (duration && audioPlayer?.duration) duration.textContent = formatDuration(audioPlayer.duration);
 }
 
+function ensureContactForNpc(state, npc) {
+    let linked = state.contacts.find(entry => entry.id === npc.contactId || entry.npcId === npc.id)
+        || state.contacts.find(entry => entry.name.toLocaleLowerCase() === npc.name.toLocaleLowerCase());
+    if (!linked) {
+        linked = contact({ name: npc.name, title: npc.title, affiliation: npc.faction, relationship: npc.relationship, notes: npc.notes, npcId: npc.id });
+        state.contacts.push(linked);
+    }
+    linked.npcId = npc.id;
+    linked.name = npc.name;
+    linked.title = npc.title;
+    linked.affiliation = npc.faction;
+    linked.relationship = npc.relationship;
+    npc.contactId = linked.id;
+    return linked;
+}
+
+function ensureNpcForContact(state, contactEntry) {
+    let linked = state.npcs.find(entry => entry.id === contactEntry.npcId)
+        || state.npcs.find(entry => entry.name.toLocaleLowerCase() === contactEntry.name.toLocaleLowerCase());
+    if (!linked) {
+        linked = npcProfile({ name: contactEntry.name, title: contactEntry.title, faction: contactEntry.affiliation,
+            relationship: contactEntry.relationship, notes: contactEntry.notes, contactId: contactEntry.id });
+        state.npcs.push(linked);
+    }
+    linked.contactId = contactEntry.id;
+    contactEntry.npcId = linked.id;
+    return linked;
+}
+
 async function onSubmit(event) {
     const form = event.target.closest('form[data-form]');
     if (!form) return;
@@ -1202,6 +1551,19 @@ async function onSubmit(event) {
             closePortraitEditor();
             notify('success', getSettings().language === 'th' ? 'บันทึกตำแหน่งรูปแล้ว' : 'Portrait framing saved.');
             break;
+        case 'npc-portrait-frame': {
+            const entry = state.npcs.find(value => value.id === values.npcId);
+            if (!entry) break;
+            entry.portraitView = {
+                desktop: { x: values.desktopX, y: values.desktopY, zoom: values.desktopZoom },
+                mobile: { x: values.mobileX, y: values.mobileY, zoom: values.mobileZoom },
+            };
+            entry.updatedAt = new Date().toISOString();
+            await persistState(state, 'npc-portrait');
+            closePortraitEditor();
+            notify('success', getSettings().language === 'th' ? 'บันทึกตำแหน่งรูป NPC แล้ว' : 'NPC portrait framing saved.');
+            break;
+        }
         case 'status':
             state.player = {
                 ...state.player, name: values.name, title: values.title, race: values.race,
@@ -1252,9 +1614,63 @@ async function onSubmit(event) {
             notify('success', `${nextQuest.name} added to the quest log.`);
             break;
         }
+        case 'npc-new': {
+            const nextNpc = npcProfile(values);
+            if (!nextNpc) return notify('warning', getSettings().language === 'th' ? 'กรุณาใส่ชื่อ NPC' : 'Enter the NPC name first.');
+            if (state.npcs.some(entry => entry.name.toLocaleLowerCase() === nextNpc.name.toLocaleLowerCase())) {
+                return notify('warning', getSettings().language === 'th' ? 'มี NPC ชื่อนี้อยู่แล้ว' : 'An NPC with this name already exists.');
+            }
+            state.npcs.push(nextNpc);
+            if (values.linkContact === 'yes') ensureContactForNpc(state, nextNpc);
+            selectedNpcId = nextNpc.id;
+            await persistState(state, 'npc');
+            break;
+        }
+        case 'npc-profile': {
+            const index = state.npcs.findIndex(entry => entry.id === values.id);
+            if (index < 0) break;
+            const previous = state.npcs[index];
+            const nextNpc = npcProfile({ ...previous, ...values, stats: {
+                ...previous.stats, level: values.level, rank: values.rank, hp: values.hp, mp: values.mp, stamina: values.stamina,
+                ...Object.fromEntries(NPC_CORE_STATS.map(stat => [stat.id, values[stat.id]])),
+            }, updatedAt: new Date().toISOString() }, previous);
+            state.npcs[index] = nextNpc;
+            const linked = state.contacts.find(entry => entry.id === nextNpc.contactId || entry.npcId === nextNpc.id);
+            if (linked) ensureContactForNpc(state, nextNpc);
+            await persistState(state, 'npc');
+            break;
+        }
+        case 'npc-ability': {
+            const entry = state.npcs.find(value => value.id === values.npcId);
+            const ability = npcAbility(values);
+            if (!entry || !ability) return notify('warning', getSettings().language === 'th' ? 'กรุณาใส่ชื่อความสามารถ' : 'Enter an ability name first.');
+            entry.abilities.push(ability);
+            entry.updatedAt = new Date().toISOString();
+            await persistState(state, 'npc');
+            break;
+        }
+        case 'npc-meter': {
+            const entry = state.npcs.find(value => value.id === values.npcId);
+            const meterEntry = npcMeter(values);
+            if (!entry || !meterEntry) return notify('warning', getSettings().language === 'th' ? 'กรุณาใส่ชื่อค่าสถานะ' : 'Enter a meter name first.');
+            entry.customMeters.push(meterEntry);
+            entry.updatedAt = new Date().toISOString();
+            await persistState(state, 'npc');
+            break;
+        }
+        case 'npc-diary': {
+            const entry = state.npcs.find(value => value.id === values.npcId);
+            const note = npcDiaryEntry(values);
+            if (!entry || !note) return notify('warning', getSettings().language === 'th' ? 'กรุณาใส่ข้อความไดอารี' : 'Write the diary entry first.');
+            entry.diary.push(note);
+            entry.updatedAt = new Date().toISOString();
+            await persistState(state, 'npc');
+            break;
+        }
         case 'contact': {
             const nextContact = contact(values);
             if (!nextContact) return notify('warning', getSettings().language === 'th' ? 'กรุณาใส่ชื่อ NPC' : 'Enter the NPC name first.');
+            ensureNpcForContact(state, nextContact);
             state.contacts.push(nextContact);
             await persistState(state, 'contact');
             break;
@@ -1263,6 +1679,7 @@ async function onSubmit(event) {
             let recipient = state.contacts.find(entry => entry.id === values.contactId);
             if (!recipient && values.recipientName) {
                 recipient = contact({ name: values.recipientName, relationship: 'Correspondent' });
+                ensureNpcForContact(state, recipient);
                 state.contacts.push(recipient);
             }
             if (!recipient || !text(values.body)) return notify('warning', getSettings().language === 'th' ? 'กรุณาเลือกผู้รับและเขียนเนื้อหา' : 'Choose a recipient and write the letter first.');
@@ -1333,6 +1750,30 @@ async function onPanelChange(event) {
         }
         return;
     }
+    const npcPortrait = event.target.closest('#tensei-npc-avatar-input');
+    if (npcPortrait instanceof HTMLInputElement && npcPortrait.files?.[0]) {
+        const npcId = npcPortrait.dataset.npcId;
+        try {
+            const store = SillyTavern.libs?.localforage;
+            if (!store) throw new Error('Local image storage is unavailable in this SillyTavern build.');
+            const state = clone(getState());
+            const entry = state.npcs.find(value => value.id === npcId);
+            if (!entry) throw new Error('NPC profile was not found.');
+            const blob = await resizeImageBlob(npcPortrait.files[0]);
+            await store.setItem(npcPortraitStorageKey(entry.id), blob);
+            entry.hasPortrait = true;
+            entry.portraitView = clone(defaultState().player.portraitView);
+            entry.updatedAt = new Date().toISOString();
+            await persistState(state, 'npc-portrait');
+            notify('success', getSettings().language === 'th' ? 'อัปเดตรูป NPC แล้ว' : 'NPC portrait updated.');
+            await openNpcPortraitEditor(entry.id);
+        } catch (error) {
+            notify('error', error.message || 'Could not use that image.');
+        } finally {
+            npcPortrait.value = '';
+        }
+        return;
+    }
     const audioInput = event.target.closest('#tensei-audio-input');
     if (audioInput instanceof HTMLInputElement && audioInput.files?.length) {
         await addAudioFiles([...audioInput.files]);
@@ -1367,6 +1808,26 @@ async function onPanelClick(event) {
         case 'close-portrait-editor':
             closePortraitEditor();
             break;
+        case 'choose-npc-portrait': {
+            const inputElement = document.getElementById('tensei-npc-avatar-input');
+            if (inputElement) inputElement.dataset.npcId = id;
+            inputElement?.click();
+            break;
+        }
+        case 'open-npc-portrait-editor':
+            await openNpcPortraitEditor(id);
+            break;
+        case 'remove-npc-portrait': {
+            const entry = state.npcs.find(value => value.id === id);
+            if (!entry) break;
+            await SillyTavern.libs?.localforage?.removeItem(npcPortraitStorageKey(entry.id));
+            entry.hasPortrait = false;
+            entry.portraitView = clone(defaultState().player.portraitView);
+            entry.updatedAt = new Date().toISOString();
+            closePortraitEditor();
+            await persistState(state, 'npc-portrait');
+            break;
+        }
         case 'map-zoom-in':
             setMapZoom(mapView.scale * 1.25);
             break;
@@ -1405,6 +1866,76 @@ async function onPanelClick(event) {
             state.quests = state.quests.filter(entry => entry.id !== id);
             await persistState(state);
             break;
+        case 'select-npc':
+            selectedNpcId = id;
+            renderNpcs(document.querySelector('[data-panel="npcs"]'), getState());
+            break;
+        case 'delete-npc': {
+            const entry = state.npcs.find(value => value.id === id);
+            if (!entry) break;
+            if (globalThis.confirm?.(getSettings().language === 'th' ? `ลบข้อมูล NPC “${entry.name}”? รายชื่อและจดหมายเดิมจะยังอยู่` : `Delete the NPC dossier for “${entry.name}”? Existing contacts and letters will remain.`) === false) break;
+            state.npcs = state.npcs.filter(value => value.id !== id);
+            state.contacts.forEach(value => { if (value.npcId === id) value.npcId = ''; });
+            await SillyTavern.libs?.localforage?.removeItem(npcPortraitStorageKey(id));
+            if (selectedNpcId === id) selectedNpcId = state.npcs[0]?.id || null;
+            await persistState(state, 'npc');
+            break;
+        }
+        case 'link-npc-contact': {
+            const entry = state.npcs.find(value => value.id === id);
+            if (!entry) break;
+            ensureContactForNpc(state, entry);
+            await persistState(state, 'contact');
+            break;
+        }
+        case 'open-contact-npc': {
+            const contactEntry = state.contacts.find(value => value.id === id);
+            if (!contactEntry) break;
+            const entry = ensureNpcForContact(state, contactEntry);
+            selectedNpcId = entry.id;
+            await persistState(state, 'contact');
+            activateTab('npcs');
+            break;
+        }
+        case 'open-npc-mailbox': {
+            const entry = state.npcs.find(value => value.id === id);
+            if (!entry) break;
+            const contactEntry = ensureContactForNpc(state, entry);
+            await persistState(state, 'contact');
+            activateTab('mail');
+            requestAnimationFrame(() => {
+                const form = document.querySelector('form[data-form="letter"]');
+                const details = form?.closest('details');
+                if (details) details.open = true;
+                const selectElement = form?.querySelector('[name="contactId"]');
+                if (selectElement) selectElement.value = contactEntry.id;
+            });
+            break;
+        }
+        case 'delete-npc-ability': {
+            const entry = state.npcs.find(value => value.id === button.dataset.npcId);
+            if (!entry) break;
+            entry.abilities = entry.abilities.filter(value => value.id !== id);
+            entry.updatedAt = new Date().toISOString();
+            await persistState(state, 'npc');
+            break;
+        }
+        case 'delete-npc-meter': {
+            const entry = state.npcs.find(value => value.id === button.dataset.npcId);
+            if (!entry) break;
+            entry.customMeters = entry.customMeters.filter(value => value.id !== id);
+            entry.updatedAt = new Date().toISOString();
+            await persistState(state, 'npc');
+            break;
+        }
+        case 'delete-npc-diary': {
+            const entry = state.npcs.find(value => value.id === button.dataset.npcId);
+            if (!entry) break;
+            entry.diary = entry.diary.filter(value => value.id !== id);
+            entry.updatedAt = new Date().toISOString();
+            await persistState(state, 'npc');
+            break;
+        }
         case 'delete-contact':
             state.contacts = state.contacts.filter(entry => entry.id !== id);
             await persistState(state, 'contact');
@@ -1632,7 +2163,7 @@ const SCALAR_PATCH_PATHS = new Set([
     ...MAGIC_DISCIPLINES.map(entry => `proficiencies.magic.${entry.id}`),
     ...SWORD_STYLES.map(entry => `proficiencies.sword.${entry.id}`),
 ]);
-const PATCH_COLLECTIONS = new Set(['inventory', 'skills', 'proficiencies.techniques', 'quests', 'contacts', 'letters']);
+const PATCH_COLLECTIONS = new Set(['inventory', 'skills', 'proficiencies.techniques', 'quests', 'npcs', 'contacts', 'letters']);
 
 function parseJson(response) {
     const cleaned = String(response || '').trim().replace(/^\`\`\`(?:json)?\s*/i, '').replace(/\s*\`\`\`$/, '');
@@ -1681,6 +2212,37 @@ function applyPatchOperation(state, operation) {
         state.location.discovered = [...new Set([...state.location.discovered, text(value, '', 120)])].filter(Boolean);
         return true;
     }
+    if (['npcAbilities', 'npcMeters', 'npcDiary'].includes(path) && value && typeof value === 'object') {
+        const npc = state.npcs.find(entry => entry.id === value.npcId)
+            || state.npcs.find(entry => entry.name.toLocaleLowerCase() === text(value.npcName).toLocaleLowerCase());
+        if (!npc) return false;
+        if (path === 'npcDiary' && verb === 'append') {
+            const entry = npcDiaryEntry(value);
+            if (!entry) return false;
+            npc.diary.push(entry);
+            npc.diary = npc.diary.slice(-40);
+            npc.updatedAt = new Date().toISOString();
+            return true;
+        }
+        const key = path === 'npcAbilities' ? 'abilities' : 'customMeters';
+        const sanitizer = path === 'npcAbilities' ? npcAbility : npcMeter;
+        if (verb === 'upsert') {
+            const entry = sanitizer(value);
+            if (!entry) return false;
+            const index = npc[key].findIndex(current => matchesPatchIdentity(current, entry));
+            if (index >= 0) npc[key][index] = { ...npc[key][index], ...entry, id: npc[key][index].id };
+            else npc[key].push(entry);
+            npc.updatedAt = new Date().toISOString();
+            return true;
+        }
+        if (verb === 'delete') {
+            const previousLength = npc[key].length;
+            npc[key] = npc[key].filter(entry => !matchesPatchIdentity(entry, value));
+            if (npc[key].length !== previousLength) npc.updatedAt = new Date().toISOString();
+            return npc[key].length !== previousLength;
+        }
+        return false;
+    }
     if (!PATCH_COLLECTIONS.has(path)) return false;
     const collection = collectionForPatch(state, path);
     if (!Array.isArray(collection)) return false;
@@ -1690,6 +2252,7 @@ function applyPatchOperation(state, operation) {
         const index = collection.findIndex(entry => matchesPatchIdentity(entry, value));
         const candidate = { ...(index >= 0 ? collection[index] : {}), ...value };
         if (!candidate.id) candidate.id = uid();
+        if (path === 'npcs') candidate.updatedAt = new Date().toISOString();
         if (index >= 0) collection[index] = candidate;
         else collection.push(candidate);
         return true;
@@ -1700,6 +2263,10 @@ function applyPatchOperation(state, operation) {
         const previousLength = collection.length;
         const retained = collection.filter(entry => !matchesPatchIdentity(entry, value));
         collection.splice(0, collection.length, ...retained);
+        if (path === 'npcs' && retained.length !== previousLength) {
+            const removedIds = new Set(state.contacts.filter(entry => !retained.some(npc => npc.id === entry.npcId)).map(entry => entry.npcId));
+            state.contacts.forEach(entry => { if (removedIds.has(entry.npcId)) entry.npcId = ''; });
+        }
         return retained.length !== previousLength;
     }
     return false;
@@ -1715,6 +2282,11 @@ function applyStatePatch(current, patch) {
     const next = normalize(candidate, current);
     next.player.portrait = current.player.portrait;
     next.player.portraitView = clone(current.player.portraitView);
+    next.npcs.forEach(entry => {
+        const previous = current.npcs.find(value => value.id === entry.id) || current.npcs.find(value => value.name.toLocaleLowerCase() === entry.name.toLocaleLowerCase());
+        entry.hasPortrait = Boolean(previous?.hasPortrait);
+        entry.portraitView = clone(previous?.portraitView || defaultState().player.portraitView);
+    });
     next.music = clone(current.music);
     next.location.pins = clone(current.location.pins);
     const summary = text(patch.summary, accepted ? 'Role-play state updated.' : '', 300);
@@ -1969,7 +2541,10 @@ function bindChatEvents() {
     const { eventSource, eventTypes } = SillyTavern.getContext();
     eventSource.on(eventTypes.CHAT_CHANGED, () => {
         cleanupAudio();
+        clearNpcPortraitObjectUrls();
+        closePortraitEditor();
         openedLetterId = null;
+        selectedNpcId = null;
         updatePrompt();
         renderAll();
         setSync('ready', tr('Ready'));
@@ -1996,7 +2571,7 @@ async function initialize() {
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape') closeInterface();
         });
-        console.info('[Tensei System] Role-play interface v0.6.0 loaded.');
+        console.info('[Tensei System] Role-play interface v0.7.0 loaded.');
     } catch (error) {
         initialized = false;
         console.error('[Tensei System] Failed to initialize.', error);

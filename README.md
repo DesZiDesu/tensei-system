@@ -11,12 +11,14 @@ A responsive, persistent Mushoku Tensei role-play interface for SillyTavern.
 - Formal segmented health, mana, and stamina instruments.
 - Smooth pointer and touch tab transitions.
 - Desktop side drawer and phone-specific full-screen layout.
-- Status, Inventory, Magic & Technique, Quests, Rank, World Map, Mailbox, and Music tabs.
+- Status, Inventory, Magic & Technique, Quests, Rank, World Map, NPC Codex, Mailbox, and Music tabs.
 - Per-chat state stored in SillyTavern chat metadata.
 - Current state injected into role-play prompts for continuity.
 - Zero-extra-call state tracking from the normal AI reply.
 - Elemental magic and North/Water/Sword God Style proficiency meters plus extensible techniques.
 - Per-chat NPC contacts and physical letters with unread state, animated reading, reply, and delete actions.
+- AI/manual per-chat NPC dossiers with relationship meters, location, family, stats, abilities, custom meters, and private diary entries.
+- Locally stored NPC portraits with independent desktop and phone framing, including iPhone safe-area and touch controls.
 - Per-chat music playlists with MP3/audio files stored locally on each device.
 - Manual editing and immediate actions from the interface.
 - Interactive original SVG world atlas with canonical Mushoku Tensei geography.
@@ -45,15 +47,26 @@ chat input. Use **Sync latest turn** to test the connected model manually.
 
 ## Current scope
 
-Version 0.6.0 replaces dual background synchronization with an inline, validated
-state patch taken from the normal role-play reply. A fresh chat does not inject,
-analyze, or create extension state for the character's First Message; tracking
-starts only after the user sends the first reply. Existing chats migrate without
-resetting their saved state.
-Deeper settlement maps, equipment rules, combat calculations, relationships, and
-factions can be layered on in later milestones.
+Version 0.7.0 adds a dedicated NPC Codex without changing the zero-extra-call
+tracking model introduced in 0.6.0. A fresh chat still does not inject, analyze,
+or create extension state for the character's First Message; tracking starts only
+after the user sends the first reply. Existing contacts migrate into lightweight
+NPC dossiers without resetting saved state, letters, music, or portraits.
 
 ## Changelog
+
+### 0.7.0
+
+- Added a dedicated per-chat NPC Codex populated by validated AI patches or manual forms.
+- Added relationship, affection, trust, loyalty, fear, corruption, lust, location, faction, alignment, family, partner, children, and notes fields.
+- Added core NPC stats, unlimited abilities, proficiency, custom meters, and timestamped diary entries.
+- Linked NPC dossiers bidirectionally with Mailbox Contacts while allowing NPC-only characters.
+- Migrated existing Contacts into lightweight NPC dossiers without deleting letters.
+- Added per-NPC portraits stored in local IndexedDB, never AI prompts or chat metadata.
+- Added separate desktop and mobile X/Y/zoom framing for every NPC portrait.
+- Added responsive iOS layouts, safe-area-aware navigation, 44px touch targets, and local-file recovery messaging.
+- Kept automatic NPC/state tracking inside the normal reply with zero background AI calls.
+- Limited prompt cost with a compact NPC index and only 16 recently updated detailed dossiers.
 
 ### 0.6.0
 
