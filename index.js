@@ -25,6 +25,40 @@ const SWORD_STYLES = [
     { id: 'waterGod', name: 'Water God Style', icon: 'fa-solid fa-water' },
     { id: 'swordGod', name: 'Sword God Style', icon: 'fa-solid fa-khanda' },
 ];
+const PROFICIENCY_ICON_PRESETS = [
+    { key: 'arcane', label: 'Arcane', icon: 'fa-solid fa-wand-sparkles', tone: '#a88bd4', words: 'arcane magic mana spell mystic' },
+    { key: 'gravity', label: 'Gravity', icon: 'fa-solid fa-circle-dot', tone: '#9b78cf', words: 'gravity weight attraction repel force' },
+    { key: 'fire', label: 'Fire', icon: 'fa-solid fa-fire', tone: '#d86b43', words: 'fire flame heat blaze combustion' },
+    { key: 'water', label: 'Water', icon: 'fa-solid fa-droplet', tone: '#4f9fd8', words: 'water aqua ocean river tide' },
+    { key: 'ice', label: 'Ice', icon: 'fa-solid fa-snowflake', tone: '#89c9e8', words: 'ice frost snow cold blizzard' },
+    { key: 'earth', label: 'Earth', icon: 'fa-solid fa-mountain', tone: '#a47b4e', words: 'earth stone rock sand ground' },
+    { key: 'wind', label: 'Wind', icon: 'fa-solid fa-wind', tone: '#79b6a2', words: 'wind air gale storm breeze' },
+    { key: 'lightning', label: 'Lightning', icon: 'fa-solid fa-bolt', tone: '#d9bd55', words: 'lightning thunder electric shock voltage' },
+    { key: 'light', label: 'Light', icon: 'fa-solid fa-sun', tone: '#e0c873', words: 'light holy divine radiant exorcism' },
+    { key: 'shadow', label: 'Shadow', icon: 'fa-solid fa-moon', tone: '#7774a8', words: 'shadow dark darkness night moon' },
+    { key: 'healing', label: 'Healing', icon: 'fa-solid fa-hand-holding-heart', tone: '#72bd83', words: 'heal healing recovery restoration regeneration' },
+    { key: 'poison', label: 'Poison', icon: 'fa-solid fa-flask', tone: '#829e62', words: 'poison toxin venom acid detox alchemy' },
+    { key: 'barrier', label: 'Barrier', icon: 'fa-solid fa-shield-halved', tone: '#7194c6', words: 'barrier shield ward protection defense' },
+    { key: 'summoning', label: 'Summoning', icon: 'fa-solid fa-draw-polygon', tone: '#b579b2', words: 'summon summoning familiar spirit contract' },
+    { key: 'space', label: 'Space', icon: 'fa-solid fa-expand', tone: '#668eb8', words: 'space spatial dimension portal teleport' },
+    { key: 'time', label: 'Time', icon: 'fa-solid fa-clock', tone: '#be9f68', words: 'time temporal clock age slow haste' },
+    { key: 'sound', label: 'Sound', icon: 'fa-solid fa-volume-high', tone: '#b5789c', words: 'sound sonic voice music vibration' },
+    { key: 'illusion', label: 'Illusion', icon: 'fa-solid fa-masks-theater', tone: '#bd7fb4', words: 'illusion mirage dream mind hypnosis' },
+    { key: 'death', label: 'Death', icon: 'fa-solid fa-skull', tone: '#7d8278', words: 'death necromancy undead soul curse' },
+    { key: 'nature', label: 'Nature', icon: 'fa-solid fa-seedling', tone: '#67a56b', words: 'nature plant wood flower forest' },
+    { key: 'blood', label: 'Blood', icon: 'fa-solid fa-droplet', tone: '#ad4f57', words: 'blood crimson vampire life' },
+    { key: 'beast', label: 'Beast', icon: 'fa-solid fa-paw', tone: '#a47d62', words: 'beast animal fang claw wild' },
+    { key: 'sword', label: 'Sword', icon: 'fa-solid fa-khanda', tone: '#b9a57d', words: 'sword blade fencing kenjutsu style school' },
+    { key: 'power', label: 'Power', icon: 'fa-solid fa-hand-fist', tone: '#c0785b', words: 'power strength heavy crushing force' },
+    { key: 'speed', label: 'Speed', icon: 'fa-solid fa-person-running', tone: '#68aeb0', words: 'speed swift quick flash movement' },
+    { key: 'precision', label: 'Precision', icon: 'fa-solid fa-bullseye', tone: '#c09067', words: 'precision accurate aim focus thrust' },
+    { key: 'counter', label: 'Counter', icon: 'fa-solid fa-rotate', tone: '#6e9aaa', words: 'counter parry redirect flowing reactive' },
+    { key: 'defense', label: 'Defense', icon: 'fa-solid fa-shield', tone: '#748ba6', words: 'defense defensive guard fortress stance' },
+    { key: 'dual', label: 'Dual Wield', icon: 'fa-solid fa-arrows-left-right', tone: '#a081bd', words: 'dual twin paired double two' },
+    { key: 'compass', label: 'Tactical', icon: 'fa-solid fa-compass', tone: '#a98763', words: 'north tactical adaptable trick unorthodox' },
+    { key: 'dragon', label: 'Dragon', icon: 'fa-solid fa-dragon', tone: '#b26355', words: 'dragon draconic wyrm emperor' },
+    { key: 'star', label: 'Celestial', icon: 'fa-solid fa-star', tone: '#d0b86f', words: 'star celestial cosmic heaven' },
+];
 const NPC_CORE_STATS = [
     { id: 'strength', name: 'Strength' }, { id: 'agility', name: 'Agility' },
     { id: 'intelligence', name: 'Intelligence' }, { id: 'endurance', name: 'Endurance' },
@@ -133,7 +167,11 @@ const TRANSLATIONS = {
         'Choose profile picture': 'เลือกรูปโปรไฟล์', 'Use in role-play': 'ใช้ในโรลเพลย์', Remove: 'ลบ', 'Pursue in role-play': 'ดำเนินภารกิจในโรลเพลย์',
         'Adjust portrait': 'จัดตำแหน่งรูป', 'Desktop framing': 'กรอบภาพ PC', 'Phone framing': 'กรอบภาพมือถือ',
         Horizontal: 'แนวนอน', Vertical: 'แนวตั้ง', Zoom: 'ซูม', 'Save framing': 'บันทึกกรอบภาพ',
-        'Magic disciplines': 'สาขาเวทมนตร์', 'Sword schools': 'สามสำนักดาบ', Proficiency: 'ความชำนาญ', 'Proficiency rank': 'ระดับความชำนาญ',
+        'Magic disciplines': 'สาขาเวทมนตร์', 'Sword schools': 'สำนักดาบ', Proficiency: 'ความชำนาญ', 'Proficiency rank': 'ระดับความชำนาญ',
+        'Custom proficiency': 'ความชำนาญกำหนดเอง', 'Preset discipline': 'สาขาพื้นฐาน', 'Preset style': 'สำนักพื้นฐาน', 'Mastery Archive': 'สารบบความชำนาญ',
+        'Known disciplines and styles': 'สาขาและสำนักที่รู้จัก', 'Active proficiencies': 'ความชำนาญที่ใช้งาน', entries: 'รายการ', custom: 'กำหนดเอง',
+        'Add magic proficiency': 'เพิ่มความชำนาญเวทมนตร์', 'Add sword style': 'เพิ่มสำนักดาบ', 'Magic name': 'ชื่อเวทมนตร์', 'Sword style name': 'ชื่อสำนักดาบ', 'Icon preset': 'ไอคอนสำเร็จรูป',
+        'A dash means the stat has not been revealed yet.': 'เครื่องหมายขีดหมายถึงค่าสถานะนั้นยังไม่ถูกเปิดเผย',
         'Add technique': 'เพิ่มวิชา', 'Technique name': 'ชื่อวิชา', Category: 'หมวดหมู่', 'Save proficiency': 'บันทึกความชำนาญ',
         Playlist: 'เพลย์ลิสต์', 'Add audio files': 'เพิ่มไฟล์เสียง', 'No tracks in this chat.': 'ยังไม่มีเพลงในแชทนี้',
         'Stored locally on this device': 'เก็บไว้ในอุปกรณ์นี้เท่านั้น', 'Now playing': 'กำลังเล่น',
@@ -213,7 +251,7 @@ function defaultState() {
     const magic = Object.fromEntries(MAGIC_DISCIPLINES.map(entry => [entry.id, 0]));
     const sword = Object.fromEntries(SWORD_STYLES.map(entry => [entry.id, 0]));
     return {
-        version: 10,
+        version: 11,
         player: {
             name: 'Adventurer', portrait: '', race: 'Human', age: '', title: 'Newcomer', guild: 'Unaffiliated', party: 'Solo', condition: 'Stable', level: 1,
             portraitView: { desktop: { x: 50, y: 50, zoom: 1 }, mobile: { x: 50, y: 50, zoom: 1 } },
@@ -229,7 +267,7 @@ function defaultState() {
         sceneMap: { activeMapId: '', activeFloorId: '', playerRoomId: '', maps: [] },
         inventory: [{ id: uid(), name: "Traveler's Clothes", quantity: 1, category: 'Equipment', description: '' }],
         skills: [],
-        proficiencies: { magic, sword, techniques: [] },
+        proficiencies: { magic, sword, customMagic: [], customSword: [], techniques: [] },
         quests: [],
         npcs: [],
         contacts: [],
@@ -299,6 +337,45 @@ function technique(value) {
     };
 }
 
+function proficiencyIconPreset(key, name = '', kind = 'magic') {
+    const requested = text(key, '', 40);
+    const exact = PROFICIENCY_ICON_PRESETS.find(entry => entry.key === requested);
+    if (exact) return exact;
+    const normalizedName = text(name, '', 160).toLocaleLowerCase();
+    const inferred = PROFICIENCY_ICON_PRESETS.map(entry => ({
+        entry, score: Math.max(0, ...entry.words.split(' ').filter(word => normalizedName.includes(word)).map(word => word.length)),
+    })).sort((a, b) => b.score - a.score)[0];
+    return inferred?.score ? inferred.entry : PROFICIENCY_ICON_PRESETS.find(entry => entry.key === (kind === 'sword' ? 'sword' : 'arcane'));
+}
+
+function customProficiency(value, fallback = {}, kind = 'magic') {
+    if (!value || typeof value !== 'object' || !text(value.name, text(fallback.name))) return null;
+    const name = text(value.name, text(fallback.name, kind === 'sword' ? 'Unnamed Sword Style' : 'Unnamed Magic', 120), 120);
+    const preset = proficiencyIconPreset(value.iconKey || fallback.iconKey, name, kind);
+    const requestedTone = text(value.tone, text(fallback.tone, '', 20), 20);
+    return {
+        id: text(value.id, text(fallback.id, uid(), 100), 100), name,
+        iconKey: preset.key, icon: preset.icon,
+        tone: /^#[0-9a-f]{6}$/i.test(requestedTone) ? requestedTone : preset.tone,
+        proficiency: number(value.proficiency, number(fallback.proficiency, 0, 0, 100), 0, 100),
+        description: text(value.description, text(fallback.description, '', 300), 300),
+    };
+}
+
+function normalizeCustomProficiencies(values, fallbacks, kind) {
+    if (!Array.isArray(values)) return Array.isArray(fallbacks) ? fallbacks : [];
+    const base = Array.isArray(fallbacks) ? fallbacks : [];
+    const byId = new Map(base.map(entry => [entry.id, entry]));
+    const byName = new Map(base.map(entry => [entry.name.toLocaleLowerCase(), entry]));
+    const unique = new Map();
+    values.forEach(value => {
+        const fallback = byId.get(value?.id) || byName.get(text(value?.name).toLocaleLowerCase()) || {};
+        const entry = customProficiency(value, fallback, kind);
+        if (entry) unique.set(entry.name.toLocaleLowerCase(), entry);
+    });
+    return [...unique.values()].slice(0, 100);
+}
+
 function contact(value) {
     if (!value || typeof value !== 'object' || !text(value.name)) return null;
     return {
@@ -354,7 +431,7 @@ function npcProfile(value, fallback = {}) {
         maritalStatus: text(value.maritalStatus, text(fallback.maritalStatus, 'Unknown', 100), 100), partner: text(value.partner, text(fallback.partner, '', 160), 160),
         children: text(value.children, text(fallback.children, '', 400), 400), notes: text(value.notes, text(fallback.notes, '', 1000), 1000),
         stats: {
-            level: number(stats.level, number(baseStats.level, 1, 1, 9999), 1, 9999), rank: text(stats.rank, text(baseStats.rank, 'Unknown', 80), 80),
+            level: number(stats.level, number(baseStats.level, 0, 0, 9999), 0, 9999), rank: text(stats.rank, text(baseStats.rank, 'Unknown', 80), 80),
             hp: number(stats.hp, number(baseStats.hp, 0, 0, 999999), 0, 999999), mp: number(stats.mp, number(baseStats.mp, 0, 0, 999999), 0, 999999),
             stamina: number(stats.stamina, number(baseStats.stamina, 0, 0, 999999), 0, 999999),
             ...Object.fromEntries(NPC_CORE_STATS.map(entry => [entry.id, number(stats[entry.id], number(baseStats[entry.id], 0, 0, 9999), 0, 9999)])),
@@ -496,7 +573,7 @@ function normalize(candidate, base = defaultState()) {
     const currency = progress.currency && typeof progress.currency === 'object' ? progress.currency : {};
     const location = source.location && typeof source.location === 'object' ? source.location : {};
 
-    result.version = 10;
+    result.version = 11;
     const portraitView = player.portraitView && typeof player.portraitView === 'object' ? player.portraitView : {};
     result.player = {
         name: text(player.name, result.player.name, 100), portrait: text(player.portrait, result.player.portrait, 1500000),
@@ -563,6 +640,8 @@ function normalize(candidate, base = defaultState()) {
     result.proficiencies.sword = Object.fromEntries(SWORD_STYLES.map(entry => [
         entry.id, number(proficiencies.sword?.[entry.id], result.proficiencies.sword[entry.id], 0, 100),
     ]));
+    result.proficiencies.customMagic = normalizeCustomProficiencies(proficiencies.customMagic, result.proficiencies.customMagic, 'magic');
+    result.proficiencies.customSword = normalizeCustomProficiencies(proficiencies.customSword, result.proficiencies.customSword, 'sword');
     if (Array.isArray(proficiencies.techniques)) result.proficiencies.techniques = proficiencies.techniques.map(technique).filter(Boolean).slice(0, 150);
     if (Array.isArray(source.quests)) result.quests = source.quests.map(quest).filter(Boolean).slice(0, 100);
     if (Array.isArray(source.npcs)) {
@@ -691,7 +770,12 @@ function aiState(state) {
     const safePlayer = { ...state.player };
     delete safePlayer.portrait;
     delete safePlayer.portraitView;
-    const recentNpcs = [...state.npcs].sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt))).slice(0, 16);
+    const recentTranscript = SillyTavern.getContext().chat.slice(-6).map(message => text(message?.mes, '', 4000)).join(' ').toLocaleLowerCase();
+    const recentNpcs = [...state.npcs].sort((a, b) => {
+        const aActive = recentTranscript.includes(a.name.toLocaleLowerCase()) ? 1 : 0;
+        const bActive = recentTranscript.includes(b.name.toLocaleLowerCase()) ? 1 : 0;
+        return bActive - aActive || String(b.updatedAt).localeCompare(String(a.updatedAt));
+    }).slice(0, 16);
     return {
         player: safePlayer,
         progression: state.progression,
@@ -708,9 +792,10 @@ function aiState(state) {
             id: entry.id, name: entry.name, title: entry.title, race: entry.race, age: entry.age, faction: entry.faction,
             relationship: entry.relationship, relationshipState: entry.relationshipState, affection: entry.affection,
             trust: entry.trust, loyalty: entry.loyalty, fear: entry.fear, corruption: entry.corruption, lust: entry.lust,
-            location: entry.location, maritalStatus: entry.maritalStatus, partner: entry.partner, children: entry.children,
-            stats: { level: entry.stats.level, rank: entry.stats.rank },
+            location: entry.location, lastSeen: entry.lastSeen, maritalStatus: entry.maritalStatus, partner: entry.partner, children: entry.children,
+            stats: entry.stats,
             abilities: entry.abilities.slice(0, 8).map(({ id, name, category, level, proficiency }) => ({ id, name, category, level, proficiency })),
+            customMeters: entry.customMeters,
             diaryLatest: entry.diary.at(-1) ? { mood: entry.diary.at(-1).mood, text: entry.diary.at(-1).text.slice(0, 240) } : undefined,
         })),
         contacts: state.contacts.map(({ id, name, title, affiliation, relationship }) => ({ id, name, title, affiliation, relationship })),
@@ -725,13 +810,20 @@ function hasUserReply(context = SillyTavern.getContext()) {
 }
 
 function patchInstructions() {
+    const iconKeys = PROFICIENCY_ICON_PRESETS.map(entry => entry.key).join(', ');
     return [
         'After the role-play reply, append one invisible HTML comment only when confirmed state changed:',
-        '<!--tensei_patch:{"ops":[["upsert","sceneMaps",{"id":"boreas-manor","name":"Boreas Manor","place":"Roa"}],["upsert","sceneFloors",{"mapId":"boreas-manor","id":"floor-1","name":"1F","level":1}],["upsert","sceneRooms",{"mapId":"boreas-manor","floorId":"floor-1","id":"foyer","name":"Foyer","type":"Entrance","x":38,"y":48,"width":24,"height":16,"discovered":true}],["set","sceneMap.activeMapId","boreas-manor"],["set","sceneMap.activeFloorId","floor-1"],["set","sceneMap.playerRoomId","foyer"]],"summary":"Entered the manor foyer."}-->',
-        'Allowed verbs: set or inc for scalar paths; upsert or delete for inventory, skills, proficiencies.techniques, quests, npcs, contacts, letters; upsert or delete for npcAbilities and npcMeters; append for npcDiary; add for location.discovered. Local maps additionally allow upsert or delete on sceneMaps, sceneFloors, sceneRooms, and sceneConnections.',
+        '<!--tensei_patch:{"ops":[["inc","progression.experience",5],["inc","proficiencies.magic.water",2],["upsert","proficiencies.customMagic",{"id":"gravity","name":"Gravity Magic","proficiency":1,"iconKey":"gravity"}],["inc","npcValues",{"npcId":"sylphie","field":"trust","amount":2}],["set","worldClock.time","14:30"]],"summary":"Training and relationship progress recorded."}-->',
+        'Allowed verbs: set or inc for scalar paths; upsert or delete for inventory, skills, proficiencies.customMagic, proficiencies.customSword, proficiencies.techniques, quests, npcs, contacts, letters; set or inc npcValues; upsert or delete npcAbilities and npcMeters; append npcDiary; add location.discovered. Local maps additionally allow upsert or delete on sceneMaps, sceneFloors, sceneRooms, and sceneConnections.',
         'Use canonical paths shown in the state JSON. For a new incoming physical letter include contactId/fromName/toName/subject/body/direction:"incoming"/status:"unread". Ordinary dialogue is not a letter.',
         'Create or update a named NPC dossier with an upsert on npcs only when that NPC becomes relevant or a confirmed fact changes. Use partial NPC objects and preserve the canonical id from npcIndex. When a relationship becomes a correspondence, also upsert contacts with npcId; do not make every incidental NPC a contact.',
         'For a meaningful private thought or relationship turning point, append npcDiary with {npcId,text,mood}, or npcName when the NPC was created in the same patch; do not write a diary entry every turn. Update abilities granularly through npcAbilities with npcId or npcName. NPC portraits and portrait framing are local-only and forbidden in patches.',
+        'Evaluate every relevant subsystem after every reply, not only scene/location. Update every materially affected value in the same patch; leave a value unchanged only when this reply provides no reasonable story basis for changing it.',
+        'Full checklist: player HP/MP/stamina/condition and identity; EXP/ranks/reputation/currency; inventory and learned skills; magic/sword/technique proficiency; quests; time/location/weather/local map; every participating NPC dossier, relationship meter, location, lastSeen, abilities, diary, and revealed stats; contacts and actual physical letters. Emit only the fields affected by this completed reply.',
+        'Progression rules: award player EXP with inc progression.experience for completed meaningful action, successful practice, discovery, combat, quest progress, or milestone. Typical gain: 1-3 routine practice, 4-8 meaningful success, 9-20 major challenge, 21-40 exceptional milestone. Do not award EXP for idle narration, mere plans, or ordinary small talk. The extension handles level rollover automatically.',
+        'Proficiency rules: increment a used or trained discipline by 1-3 when the reply confirms genuine practice or successful use; use 4-8 only for a breakthrough. Do not increase unused proficiencies. When confirmed magic or a sword style is not in the preset lists, upsert proficiencies.customMagic or proficiencies.customSword with {id,name,proficiency,description,iconKey}; later upserts may contain only id/name and changed fields.',
+        `Allowed custom proficiency iconKey values: ${iconKeys}. Choose the closest semantic icon; omit iconKey to let the extension infer it from the name.`,
+        'NPC update rules: for every named NPC who directly participates, consider relationship, location, lastSeen, abilities, custom meters, diary, and revealed stats. A substantive friendly/helpful exchange may change affection or trust by 1-3; hostility, deception, fear, romance, loyalty, or corruption should adjust only the relevant meters in proportion to what actually occurred. Use ["inc","npcValues",{"npcId":"...","field":"trust","amount":2}] for deltas or ["set","npcValues",{"npcId":"...","field":"stats.level","value":12}] for revealed absolute values. Valid relationship fields are affection, trust, loyalty, fear, corruption, lust. Valid stat fields are stats.level, stats.rank, stats.hp, stats.mp, stats.stamina, stats.strength, stats.agility, stats.intelligence, stats.endurance. Zero numeric NPC core stats mean unknown, not literal zero. Conversation alone does not increase NPC level or combat stats.',
         'Track the active scene when confirmed: time, phase, day/dayName, continent, region, place, location detail, scene position, weather, and temperature. Do not invent weather or temperature when the reply provides no evidence.',
         'Maintain a sparse overhead local map only from confirmed or strongly implied spatial facts. Create a sceneMaps record, then its sceneFloors, sceneRooms, and sceneConnections. Room coordinates use x 0-100, y 0-70, width 8-70, height 7-50. Reveal or add rooms gradually; never invent a complete unseen building. Use canonical mapId/floorId/room ids, set the active ids and playerRoomId as the player moves, and preserve all locked maps, rooms, and connections.',
         'Handle all story genres and mature or NSFW scenes neutrally. Do not censor, rewrite, omit, or classify confirmed state merely because the scene is adult; follow the active SillyTavern, model, and provider settings.',
@@ -853,7 +945,7 @@ function appearanceMenu() {
     return `<details class="tensei-appearance-menu">
         <summary aria-label="${html(tr('Appearance'))}" title="${html(tr('Appearance'))}"><i class="fa-solid fa-sliders"></i></summary>
         <div class="tensei-appearance-popover">
-            <div class="tensei-popover-heading"><span>${html(tr('Appearance'))}</span><small>UI 1.0</small></div>
+            <div class="tensei-popover-heading"><span>${html(tr('Appearance'))}</span><small>UI 1.1</small></div>
             <label class="tensei-setting-row"><span>${html(tr('Accent'))}</span><input type="color" data-ui-setting="accentColor" value="${settings.accentColor}"></label>
             <label class="tensei-setting-row"><span>${html(tr('Glass'))}</span><input type="range" data-ui-setting="glassOpacity" min="55" max="98" value="${settings.glassOpacity}"></label>
             <label class="tensei-setting-row"><span>${html(tr('Glow'))}</span><input type="range" data-ui-setting="glowStrength" min="0" max="100" value="${settings.glowStrength}"></label>
@@ -972,16 +1064,17 @@ function onInterfaceSettingChange(event) {
         if (output) output.textContent = property === 'zoom' ? `${Number(portraitControl.value).toFixed(2)}×` : `${Math.round(Number(portraitControl.value))}%`;
         return;
     }
-    const proficiency = event.target.closest('.tensei-proficiency-row input[type="range"]');
+    const proficiency = event.target.closest('.tensei-proficiency-card input[type="range"]');
     if (proficiency instanceof HTMLInputElement) {
-        const row = proficiency.closest('.tensei-proficiency-row');
-        const fill = row?.querySelector('.tensei-proficiency-track i');
-        const output = row?.querySelector('output');
-        const rankCopy = row?.querySelector('.tensei-discipline-copy small');
+        const card = proficiency.closest('.tensei-proficiency-card');
+        const fill = card?.querySelector('.tensei-proficiency-track i');
+        const score = card?.querySelector('.tensei-proficiency-orbit b');
+        const rankCopy = card?.querySelector('.tensei-proficiency-rank strong');
         const rank = tr(proficiencyRank(proficiency.value));
         if (fill) fill.style.width = `${proficiency.value}%`;
-        if (output) output.textContent = rank;
-        if (rankCopy) rankCopy.textContent = `${rank} Rank · ${proficiency.value}%`;
+        if (score) score.innerHTML = `${proficiency.value}<small>%</small>`;
+        if (rankCopy) rankCopy.textContent = rank;
+        if (card) card.style.setProperty('--proficiency', proficiency.value);
         return;
     }
     const seek = event.target.closest('#tensei-music-seek');
@@ -1375,24 +1468,59 @@ function renderSkillStorage(panel, state) {
                     <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add skill'))}</button></form></details></section>`;
 }
 
+function proficiencyCard(entry, group, value, custom = false) {
+    const score = number(value, 0, 0, 100);
+    const rank = proficiencyRank(score);
+    return `<article class="tensei-proficiency-card${custom ? ' is-custom' : ''}" style="--discipline-tone:${entry.tone || 'var(--tensei-accent)'};--proficiency:${score}">
+        <div class="tensei-proficiency-orbit"><span><i class="${entry.icon}"></i></span><b>${score}<small>%</small></b></div>
+        <div class="tensei-proficiency-card-copy"><span>${html(custom ? tr('Custom proficiency') : tr(group === 'magic' ? 'Preset discipline' : 'Preset style'))}</span>
+            <h4>${html(entry.name)}</h4><p>${html(entry.description || `${tr(rank)} Rank`)}</p></div>
+        <div class="tensei-proficiency-rank"><small>${html(tr('Proficiency rank'))}</small><strong>${html(tr(rank))}</strong></div>
+        ${custom ? `<button type="button" class="tensei-proficiency-delete" data-action="delete-custom-proficiency" data-kind="${group}" data-id="${html(entry.id)}" title="${html(tr('Remove'))}"><i class="fa-solid fa-trash"></i></button>` : ''}
+        <label class="tensei-proficiency-control"><span class="tensei-proficiency-track"><i style="width:${score}%"></i></span>
+            <input type="range" name="${custom ? `custom-${group}` : group}-${entry.id}" data-proficiency-kind="${group}" data-proficiency-id="${html(entry.id)}" data-custom="${custom}" min="0" max="100" value="${score}" aria-label="${html(entry.name)} proficiency"></label>
+    </article>`;
+}
+
+function proficiencyIconPicker(selected = 'arcane') {
+    return `<div class="tensei-icon-picker"><input type="hidden" name="iconKey" value="${html(selected)}"><span>${html(tr('Icon preset'))}</span>
+        <div>${PROFICIENCY_ICON_PRESETS.map(entry => `<button type="button" data-action="select-proficiency-icon" data-icon-key="${html(entry.key)}" class="${entry.key === selected ? 'is-selected' : ''}" style="--icon-tone:${entry.tone}" title="${html(entry.label)}"><i class="${entry.icon}"></i><small>${html(entry.label)}</small></button>`).join('')}</div></div>`;
+}
+
+function customProficiencyEditor(kind) {
+    const magic = kind === 'magic';
+    return `<details class="tensei-editor tensei-add-proficiency"><summary><i class="fa-solid fa-plus"></i> ${html(tr(magic ? 'Add magic proficiency' : 'Add sword style'))}</summary>
+        <form data-form="custom-proficiency" class="tensei-form-grid"><input type="hidden" name="kind" value="${kind}">
+            ${input(magic ? 'Magic name' : 'Sword style name', 'name', '')}${input('Proficiency', 'proficiency', 0, 'number', 'min="0" max="100"')}
+            ${input('Description', 'description', '')}${proficiencyIconPicker(magic ? 'arcane' : 'sword')}
+            <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr(magic ? 'Add magic proficiency' : 'Add sword style'))}</button></form></details>`;
+}
+
 function renderTechniques(panel, state) {
     if (!panel) return;
-    const proficiencyRow = (entry, group, value) => {
-        const rank = proficiencyRank(value);
-        return `<label class="tensei-proficiency-row" style="--discipline-tone:${entry.tone || 'var(--tensei-accent)'}">
-        <span class="tensei-discipline-icon"><i class="${entry.icon}"></i></span><span class="tensei-discipline-copy"><strong>${html(entry.name)}</strong>
-        <small>${html(tr(rank))} Rank · ${value}%</small><span class="tensei-proficiency-track"><i style="width:${value}%"></i></span></span><output>${html(tr(rank))}</output>
-        <input type="range" name="${group}-${entry.id}" min="0" max="100" value="${value}" aria-label="${html(entry.name)} proficiency"></label>`;
-    };
-    panel.innerHTML = `${heading('Techniques', `${state.proficiencies.techniques.length} ${tr('Techniques').toLowerCase()}`, 'fa-solid fa-wand-magic-sparkles')}
-        <form data-form="proficiencies" class="tensei-mastery-layout">
-            <section class="tensei-mastery-section"><div class="tensei-section-label"><i class="fa-solid fa-circle-nodes"></i><span>${html(tr('Magic disciplines'))}</span></div>
-                <div class="tensei-proficiency-grid">${MAGIC_DISCIPLINES.map(entry => proficiencyRow(entry, 'magic', state.proficiencies.magic[entry.id])).join('')}</div></section>
-            <section class="tensei-mastery-section"><div class="tensei-section-label"><i class="fa-solid fa-khanda"></i><span>${html(tr('Sword schools'))}</span></div>
-                <div class="tensei-sword-grid">${SWORD_STYLES.map(entry => proficiencyRow(entry, 'sword', state.proficiencies.sword[entry.id])).join('')}</div></section>
-            <button class="tensei-primary-button tensei-mastery-save" type="submit"><i class="fa-solid fa-floppy-disk"></i>${html(tr('Save proficiency'))}</button>
-        </form>
-        <section class="tensei-technique-section"><div class="tensei-section-label"><i class="fa-solid fa-list-check"></i><span>${html(tr('Techniques'))}</span></div>
+    const magicEntries = [
+        ...MAGIC_DISCIPLINES.map(entry => ({ ...entry, value: state.proficiencies.magic[entry.id], custom: false })),
+        ...state.proficiencies.customMagic.map(entry => ({ ...entry, value: entry.proficiency, custom: true })),
+    ];
+    const swordEntries = [
+        ...SWORD_STYLES.map(entry => ({ ...entry, tone: entry.tone || '#b9a57d', value: state.proficiencies.sword[entry.id], custom: false })),
+        ...state.proficiencies.customSword.map(entry => ({ ...entry, value: entry.proficiency, custom: true })),
+    ];
+    const mastered = [...magicEntries, ...swordEntries].filter(entry => entry.value > 0).length;
+    panel.innerHTML = `${heading('Techniques', `${mastered} ${tr('Active proficiencies').toLowerCase()} · ${state.proficiencies.techniques.length} ${tr('Techniques').toLowerCase()}`, 'fa-solid fa-wand-magic-sparkles')}
+        <section class="tensei-proficiency-overview"><div><span>${html(tr('Mastery Archive'))}</span><strong>${mastered}</strong><small>${html(tr('Known disciplines and styles'))}</small></div>
+            ${MASTERY.slice(1).map(rank => `<span><i></i>${html(tr(rank))}</span>`).join('')}</section>
+        <div class="tensei-mastery-atlas">
+            <section class="tensei-proficiency-section"><header><div><i class="fa-solid fa-hat-wizard"></i><span><strong>${html(tr('Magic disciplines'))}</strong><small>${magicEntries.length} ${html(tr('entries'))}</small></span></div>
+                <em>${state.proficiencies.customMagic.length} ${html(tr('custom'))}</em></header>
+                <form data-form="proficiencies" data-kind="magic"><div class="tensei-proficiency-card-grid">${magicEntries.map(entry => proficiencyCard(entry, 'magic', entry.value, entry.custom)).join('')}</div>
+                    <button class="tensei-primary-button tensei-mastery-save" type="submit"><i class="fa-solid fa-floppy-disk"></i>${html(tr('Save proficiency'))}</button></form>${customProficiencyEditor('magic')}</section>
+            <section class="tensei-proficiency-section"><header><div><i class="fa-solid fa-khanda"></i><span><strong>${html(tr('Sword schools'))}</strong><small>${swordEntries.length} ${html(tr('entries'))}</small></span></div>
+                <em>${state.proficiencies.customSword.length} ${html(tr('custom'))}</em></header>
+                <form data-form="proficiencies" data-kind="sword"><div class="tensei-proficiency-card-grid tensei-sword-card-grid">${swordEntries.map(entry => proficiencyCard(entry, 'sword', entry.value, entry.custom)).join('')}</div>
+                    <button class="tensei-primary-button tensei-mastery-save" type="submit"><i class="fa-solid fa-floppy-disk"></i>${html(tr('Save proficiency'))}</button></form>${customProficiencyEditor('sword')}</section>
+        </div>
+        <section class="tensei-technique-section tensei-technique-revamp"><div class="tensei-section-label"><i class="fa-solid fa-list-check"></i><span>${html(tr('Techniques'))}</span></div>
             <div class="tensei-technique-grid">${state.proficiencies.techniques.length ? state.proficiencies.techniques.map(entry => `<article class="tensei-technique-card">
                 <div><span>${html(entry.category)}</span><strong>${html(entry.name)}</strong><p>${html(entry.description || tr('No description'))}</p></div>
                 <div class="tensei-technique-meter"><em>${html(tr(proficiencyRank(entry.proficiency)))} Rank</em><span><i style="width:${entry.proficiency}%"></i></span><b>${entry.proficiency}%</b></div>
@@ -1545,6 +1673,7 @@ function renderNpcs(panel, state) {
 }
 
 function renderNpcDossier(entry, linkedContact) {
+    const knownStat = value => number(value, 0, 0, 999999) > 0 ? number(value, 0, 0, 999999) : '—';
     const relationshipMeters = [
         ['Affection', entry.affection, 'rose'], ['Trust', entry.trust, 'blue'], ['Loyalty', entry.loyalty, 'gold'],
         ['Fear', entry.fear, 'violet'], ['Corruption', entry.corruption, 'dark'], ['Lust', entry.lust, 'crimson'],
@@ -1574,9 +1703,10 @@ function renderNpcDossier(entry, linkedContact) {
             <div><dt>${html(tr('Marital status'))}</dt><dd>${html(entry.maritalStatus)}</dd></div><div><dt>${html(tr('Partner'))}</dt><dd>${html(entry.partner || 'None')}</dd></div>
             <div class="tensei-fact-wide"><dt>${html(tr('Children'))}</dt><dd>${html(entry.children || 'None')}</dd></div></dl></article></div>
         <section class="tensei-npc-stats"><div class="tensei-section-label"><i class="fa-solid fa-chart-simple"></i><span>${html(tr('Core stats'))}</span></div><div>
-            <article><span>LV</span><strong>${entry.stats.level}</strong><small>${html(entry.stats.rank)}</small></article>
-            <article><span>HP</span><strong>${entry.stats.hp}</strong></article><article><span>MP</span><strong>${entry.stats.mp}</strong></article><article><span>STA</span><strong>${entry.stats.stamina}</strong></article>
-            ${NPC_CORE_STATS.map(stat => `<article><span>${html(tr(stat.name))}</span><strong>${entry.stats[stat.id]}</strong></article>`).join('')}</div></section>
+            <article><span>LV</span><strong>${knownStat(entry.stats.level)}</strong><small>${html(entry.stats.rank)}</small></article>
+            <article><span>HP</span><strong>${knownStat(entry.stats.hp)}</strong></article><article><span>MP</span><strong>${knownStat(entry.stats.mp)}</strong></article><article><span>STA</span><strong>${knownStat(entry.stats.stamina)}</strong></article>
+            ${NPC_CORE_STATS.map(stat => `<article><span>${html(tr(stat.name))}</span><strong>${knownStat(entry.stats[stat.id])}</strong></article>`).join('')}</div>
+            <small class="tensei-npc-stat-note"><i class="fa-solid fa-eye-slash"></i>${html(tr('A dash means the stat has not been revealed yet.'))}</small></section>
         <section class="tensei-npc-abilities"><div class="tensei-section-label"><i class="fa-solid fa-sparkles"></i><span>${html(tr('Abilities'))}</span></div><div class="tensei-npc-ability-list">${abilities}</div>
             <details class="tensei-editor"><summary><i class="fa-solid fa-plus"></i> ${html(tr('Add ability'))}</summary><form data-form="npc-ability" class="tensei-form-grid"><input type="hidden" name="npcId" value="${html(entry.id)}">
                 ${input('Ability name', 'name', '')}${input('Category', 'category', 'General')}${input('Ability level', 'level', 'Beginner')}${input('Proficiency', 'proficiency', 0, 'number', 'min="0" max="100"')}
@@ -1591,7 +1721,7 @@ function renderNpcDossier(entry, linkedContact) {
             ${input('Faction', 'faction', entry.faction)}${input('Alignment', 'alignment', entry.alignment)}${input('Relationship', 'relationship', entry.relationship)}${input('Current location', 'location', entry.location)}
             ${input('Last seen', 'lastSeen', entry.lastSeen)}${input('Marital status', 'maritalStatus', entry.maritalStatus)}${input('Partner', 'partner', entry.partner)}${input('Children', 'children', entry.children)}
             ${input('Affection', 'affection', entry.affection, 'number', 'min="0" max="100"')}${input('Trust', 'trust', entry.trust, 'number', 'min="0" max="100"')}${input('Loyalty', 'loyalty', entry.loyalty, 'number', 'min="0" max="100"')}${input('Fear', 'fear', entry.fear, 'number', 'min="0" max="100"')}
-            ${input('Corruption', 'corruption', entry.corruption, 'number', 'min="0" max="100"')}${input('Lust', 'lust', entry.lust, 'number', 'min="0" max="100"')}${input('Level', 'level', entry.stats.level, 'number', 'min="1"')}${input('Rank', 'rank', entry.stats.rank)}
+            ${input('Corruption', 'corruption', entry.corruption, 'number', 'min="0" max="100"')}${input('Lust', 'lust', entry.lust, 'number', 'min="0" max="100"')}${input('Level', 'level', entry.stats.level, 'number', 'min="0"')}${input('Rank', 'rank', entry.stats.rank)}
             ${input('HP', 'hp', entry.stats.hp, 'number', 'min="0"')}${input('MP', 'mp', entry.stats.mp, 'number', 'min="0"')}${input('Stamina', 'stamina', entry.stats.stamina, 'number', 'min="0"')}
             ${NPC_CORE_STATS.map(stat => input(stat.name, stat.id, entry.stats[stat.id], 'number', 'min="0"')).join('')}${textareaField('Relationship state', 'relationshipState', entry.relationshipState, 3)}${textareaField('Notes', 'notes', entry.notes, 4)}
             <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Save NPC'))}</button></form></details>`;
@@ -2100,12 +2230,39 @@ async function onSubmit(event) {
             notify('success', `${nextSkill.name} added to skills.`);
             break;
         }
-        case 'proficiencies':
-            MAGIC_DISCIPLINES.forEach(entry => { state.proficiencies.magic[entry.id] = values[`magic-${entry.id}`]; });
-            SWORD_STYLES.forEach(entry => { state.proficiencies.sword[entry.id] = values[`sword-${entry.id}`]; });
+        case 'proficiencies': {
+            const kind = form.dataset.kind;
+            if (kind === 'magic') {
+                MAGIC_DISCIPLINES.forEach(entry => {
+                    if (values[`magic-${entry.id}`] !== undefined) state.proficiencies.magic[entry.id] = values[`magic-${entry.id}`];
+                });
+                state.proficiencies.customMagic.forEach(entry => {
+                    if (values[`custom-magic-${entry.id}`] !== undefined) entry.proficiency = values[`custom-magic-${entry.id}`];
+                });
+            } else if (kind === 'sword') {
+                SWORD_STYLES.forEach(entry => {
+                    if (values[`sword-${entry.id}`] !== undefined) state.proficiencies.sword[entry.id] = values[`sword-${entry.id}`];
+                });
+                state.proficiencies.customSword.forEach(entry => {
+                    if (values[`custom-sword-${entry.id}`] !== undefined) entry.proficiency = values[`custom-sword-${entry.id}`];
+                });
+            }
             await persistState(state, 'proficiency');
             notify('success', getSettings().language === 'th' ? 'บันทึกความชำนาญแล้ว' : 'Proficiency record saved.');
             break;
+        }
+        case 'custom-proficiency': {
+            const kind = values.kind === 'sword' ? 'sword' : 'magic';
+            const entry = customProficiency(values, {}, kind);
+            if (!entry) return notify('warning', kind === 'magic' ? 'Enter a magic name first.' : 'Enter a sword style name first.');
+            const collection = kind === 'magic' ? state.proficiencies.customMagic : state.proficiencies.customSword;
+            const existing = collection.find(value => value.name.toLocaleLowerCase() === entry.name.toLocaleLowerCase());
+            if (existing) Object.assign(existing, entry, { id: existing.id });
+            else collection.push(entry);
+            await persistState(state, 'proficiency');
+            notify('success', `${entry.name} added to proficiencies.`);
+            break;
+        }
         case 'technique': {
             const nextTechnique = technique(values);
             if (!nextTechnique) return notify('warning', getSettings().language === 'th' ? 'กรุณาใส่ชื่อวิชา' : 'Enter a technique name first.');
@@ -2318,6 +2475,13 @@ async function onPanelClick(event) {
     const state = clone(getState());
     const id = button.dataset.id;
     switch (button.dataset.action) {
+        case 'select-proficiency-icon': {
+            const picker = button.closest('.tensei-icon-picker');
+            const field = picker?.querySelector('input[name="iconKey"]');
+            if (field) field.value = button.dataset.iconKey;
+            picker?.querySelectorAll('[data-icon-key]').forEach(entry => entry.classList.toggle('is-selected', entry === button));
+            break;
+        }
         case 'choose-portrait':
             document.getElementById('tensei-avatar-input')?.click();
             break;
@@ -2438,6 +2602,12 @@ async function onPanelClick(event) {
             state.proficiencies.techniques = state.proficiencies.techniques.filter(entry => entry.id !== id);
             await persistState(state, 'technique');
             break;
+        case 'delete-custom-proficiency': {
+            const collection = button.dataset.kind === 'sword' ? 'customSword' : 'customMagic';
+            state.proficiencies[collection] = state.proficiencies[collection].filter(entry => entry.id !== id);
+            await persistState(state, 'proficiency');
+            break;
+        }
         case 'delete-quest':
             state.quests = state.quests.filter(entry => entry.id !== id);
             await persistState(state);
@@ -2761,8 +2931,10 @@ const SCALAR_PATCH_PATHS = new Set([
     ...MAGIC_DISCIPLINES.map(entry => `proficiencies.magic.${entry.id}`),
     ...SWORD_STYLES.map(entry => `proficiencies.sword.${entry.id}`),
 ]);
-const PATCH_COLLECTIONS = new Set(['inventory', 'skills', 'proficiencies.techniques', 'quests', 'npcs', 'contacts', 'letters']);
+const PATCH_COLLECTIONS = new Set(['inventory', 'skills', 'proficiencies.customMagic', 'proficiencies.customSword', 'proficiencies.techniques', 'quests', 'npcs', 'contacts', 'letters']);
 const SCENE_MAP_PATCH_COLLECTIONS = new Set(['sceneMaps', 'sceneFloors', 'sceneRooms', 'sceneConnections']);
+const NPC_RELATIONSHIP_FIELDS = new Set(['affection', 'trust', 'loyalty', 'fear', 'corruption', 'lust']);
+const NPC_STAT_FIELDS = new Set(['level', 'hp', 'mp', 'stamina', 'strength', 'agility', 'intelligence', 'endurance']);
 
 function parseJson(response) {
     const cleaned = String(response || '').trim().replace(/^\`\`\`(?:json)?\s*/i, '').replace(/\s*\`\`\`$/, '');
@@ -2778,6 +2950,8 @@ function parseJson(response) {
 
 function collectionForPatch(state, path) {
     if (path === 'proficiencies.techniques') return state.proficiencies.techniques;
+    if (path === 'proficiencies.customMagic') return state.proficiencies.customMagic;
+    if (path === 'proficiencies.customSword') return state.proficiencies.customSword;
     return state[path];
 }
 
@@ -2920,6 +3094,24 @@ function applyPatchOperation(state, operation) {
         return true;
     }
     if (SCENE_MAP_PATCH_COLLECTIONS.has(path)) return applySceneMapPatchOperation(state, verb, path, value);
+    if (path === 'npcValues' && ['set', 'inc'].includes(verb) && value && typeof value === 'object') {
+        const npc = state.npcs.find(entry => entry.id === value.npcId)
+            || state.npcs.find(entry => entry.name.toLocaleLowerCase() === text(value.npcName).toLocaleLowerCase());
+        const field = text(value.field, '', 80);
+        if (!npc) return false;
+        if (NPC_RELATIONSHIP_FIELDS.has(field)) {
+            const nextValue = verb === 'inc' ? number(npc[field], 0, 0, 100) + number(value.amount, 0, -100, 100) : value.value;
+            npc[field] = number(nextValue, npc[field], 0, 100);
+        } else if (field === 'stats.rank' && verb === 'set') {
+            npc.stats.rank = text(value.value, npc.stats.rank, 80);
+        } else if (field.startsWith('stats.') && NPC_STAT_FIELDS.has(field.slice(6))) {
+            const key = field.slice(6);
+            const nextValue = verb === 'inc' ? number(npc.stats[key], 0, 0, 999999) + number(value.amount, 0, -999999, 999999) : value.value;
+            npc.stats[key] = number(nextValue, npc.stats[key], 0, 999999);
+        } else return false;
+        npc.updatedAt = new Date().toISOString();
+        return true;
+    }
     if (['npcAbilities', 'npcMeters', 'npcDiary'].includes(path) && value && typeof value === 'object') {
         const npc = state.npcs.find(entry => entry.id === value.npcId)
             || state.npcs.find(entry => entry.name.toLocaleLowerCase() === text(value.npcName).toLocaleLowerCase());
@@ -2988,6 +3180,15 @@ function applyStatePatch(current, patch) {
         if (applyPatchOperation(candidate, operation)) accepted += 1;
     }
     const next = normalize(candidate, current);
+    if (next.progression.experience > current.progression.experience) {
+        let levelUps = 0;
+        while (next.progression.experience >= next.progression.experienceMax && levelUps < 100) {
+            next.progression.experience -= next.progression.experienceMax;
+            next.player.level += 1;
+            next.progression.experienceMax = Math.max(next.progression.experienceMax + 25, Math.round(next.progression.experienceMax * 1.2));
+            levelUps += 1;
+        }
+    }
     next.player.portrait = current.player.portrait;
     next.player.portraitView = clone(current.player.portraitView);
     next.npcs.forEach(entry => {
@@ -3307,7 +3508,7 @@ async function initialize() {
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape') closeInterface();
         });
-        console.info('[Tensei System] Role-play interface v1.0.0 loaded.');
+        console.info('[Tensei System] Role-play interface v1.1.0 loaded.');
     } catch (error) {
         initialized = false;
         console.error('[Tensei System] Failed to initialize.', error);

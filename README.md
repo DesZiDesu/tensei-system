@@ -28,6 +28,8 @@ A responsive, persistent Mushoku Tensei role-play interface for SillyTavern.
 - Scene tracking for day name/counter, time/phase, place, exact location, position, weather, and temperature.
 - Hybrid SVG floor maps with AI-assisted room discovery, multiple floors, connections, current-room markers, drag positioning, manual correction, and layout locks.
 - Named proficiency ranks alongside percentage progress for every magic discipline, sword school, and technique.
+- AI-created and manually managed custom Magic/Sword proficiencies with a semantic icon preset library.
+- Evidence-based full-system updates with EXP awards, automatic level rollover, and granular NPC relationship/stat changes.
 - Optional floating Full/Compact activity capsule for waiting, patch checks, updates, no-change replies, disabled tracking, and errors.
 - User-configurable accent color, glass opacity, glow strength, and information density.
 
@@ -51,13 +53,22 @@ chat input. Use **Sync latest turn** to test the connected model manually.
 
 ## Current scope
 
-Version 1.0.0 adds hybrid local structure maps inside Scene while preserving zero-extra-call
+Version 1.1.0 evaluates every relevant subsystem on each normal reply while preserving zero-extra-call
 automatic tracking. A fresh chat still does not inject, analyze,
 or create extension state for the character's First Message; tracking starts only
 after the user sends the first reply. NPC Codex and Mailbox remain separate tabs,
 connected only through optional NPC/Contact links and physical letters.
 
 ## Changelog
+
+### 1.1.0
+
+- Added a comprehensive per-reply update checklist for progression, proficiency, NPCs, Scene, maps, inventory, quests, and Mailbox.
+- Added defined EXP award guidance and automatic player level rollover with a growing next-level requirement.
+- Added granular NPC relationship and stat patch operations; substantive interactions can now adjust the relevant meters without changing unrelated values.
+- Exposed complete NPC stats and custom meters to tracking; unrevealed combat stats now display as a dash instead of a misleading zero.
+- Added AI/manual custom Magic and Sword proficiencies with semantic automatic icon selection and a 32-icon preset library.
+- Rebuilt the proficiency interface with mastery overview, responsive cards, radial progress, clearer rank hierarchy, and integrated custom entries.
 
 ### 1.0.0
 
