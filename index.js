@@ -31,6 +31,8 @@ const NPC_CORE_STATS = [
 ];
 const DAY_PHASES = ['Morning', 'Afternoon', 'Evening', 'Night'];
 const ZONE_TYPES = ['Safe Zone', 'Neutral Zone', 'Danger Zone', 'Unknown Zone'];
+const ROOM_TYPES = ['Room', 'Hall', 'Corridor', 'Stairs', 'Entrance', 'Garden', 'Utility', 'Unknown'];
+const CONNECTION_TYPES = ['Door', 'Passage', 'Stairs', 'Archway', 'Window'];
 const WORLD_LOCATIONS = [
     { id: 'asura', continent: 'Central Continent', name: 'Asura Kingdom', x: 254, y: 286, zone: 'Safe Zone' },
     { id: 'ars', continent: 'Central Continent', name: 'Capital Ars', x: 164, y: 307, zone: 'Safe Zone' },
@@ -95,6 +97,16 @@ const TRANSLATIONS = {
         Condition: 'สภาพร่างกาย', Level: 'เลเวล', 'Day phase': 'ช่วงเวลา', 'World time': 'เวลาโลก', 'World day': 'วันที่', 'Zone type': 'ประเภทเขต',
         'Scene Tracker': 'ระบบติดตามฉาก', 'Live environment and position': 'สภาพแวดล้อมและตำแหน่งปัจจุบัน', 'Day name': 'ชื่อวัน', 'Day counter': 'จำนวนวันที่ผ่านไป',
         'Current place': 'สถานที่ปัจจุบัน', 'Current location detail': 'จุดที่อยู่โดยละเอียด', 'Scene position': 'ตำแหน่งในฉาก', Weather: 'สภาพอากาศ', Temperature: 'อุณหภูมิ', 'Save scene': 'บันทึกฉาก',
+        'Local Structure Map': 'แผนผังสถานที่', 'AI-assisted SVG floor plan': 'แผนผัง SVG ที่ AI ช่วยอัปเดต', 'No structure map yet.': 'ยังไม่มีแผนผังสถานที่',
+        'Create structure map': 'สร้างแผนผัง', 'Map name': 'ชื่อแผนผัง', 'Associated place': 'สถานที่ที่เชื่อมโยง', 'First floor': 'ชั้นแรก',
+        Floor: 'ชั้น', 'Floor name': 'ชื่อชั้น', 'Add floor': 'เพิ่มชั้น', Rooms: 'ห้อง', Connections: 'ทางเชื่อม', 'Add room': 'เพิ่มห้อง', 'Room name': 'ชื่อห้อง',
+        'Room type': 'ประเภทห้อง', 'X position': 'ตำแหน่ง X', 'Y position': 'ตำแหน่ง Y', Width: 'ความกว้าง', Height: 'ความสูง', 'Save room': 'บันทึกห้อง',
+        'Current room': 'ห้องปัจจุบัน', 'Set current room': 'ตั้งห้องปัจจุบัน', 'Add connection': 'เพิ่มทางเชื่อม', 'From room': 'จากห้อง', 'To room': 'ไปยังห้อง',
+        'Connection type': 'ประเภททางเชื่อม', 'Edit floor plan': 'แก้ไขแผนผัง', 'Lock map': 'ล็อกแผนผัง', 'Unlock map': 'ปลดล็อกแผนผัง',
+        'Map locked': 'แผนผังถูกล็อก', 'AI updates enabled': 'เปิดการอัปเดตโดย AI', 'Drag unlocked rooms to reposition them.': 'ลากห้องที่ไม่ได้ล็อกเพื่อย้ายตำแหน่ง',
+        'Delete map': 'ลบแผนผัง', 'Delete floor': 'ลบชั้น', 'Delete room': 'ลบห้อง', Discovered: 'ค้นพบแล้ว', Locked: 'ล็อก',
+        Room: 'ห้อง', Hall: 'โถง', Corridor: 'ทางเดิน', Stairs: 'บันได', Entrance: 'ทางเข้า', Garden: 'สวน', Utility: 'พื้นที่ใช้งาน', Unknown: 'ไม่ทราบ',
+        Door: 'ประตู', Passage: 'ทางผ่าน', Archway: 'ซุ้มทางผ่าน', Window: 'หน้าต่าง',
         'HP max': 'HP สูงสุด', 'MP max': 'MP สูงสุด', 'Stamina max': 'พละกำลังสูงสุด', 'Save status': 'บันทึกสถานะ',
         'Add inventory item': 'เพิ่มสิ่งของ', 'Item name': 'ชื่อสิ่งของ', Quantity: 'จำนวน', Category: 'หมวดหมู่', Description: 'รายละเอียด', 'Add item': 'เพิ่มสิ่งของ',
         'Skill Storage': 'คลังทักษะ', 'All acquired user skills': 'ทักษะทั้งหมดของผู้เล่น', 'Add skill': 'เพิ่มทักษะ', 'Skill name': 'ชื่อทักษะ', Type: 'ประเภท',
@@ -201,7 +213,7 @@ function defaultState() {
     const magic = Object.fromEntries(MAGIC_DISCIPLINES.map(entry => [entry.id, 0]));
     const sword = Object.fromEntries(SWORD_STYLES.map(entry => [entry.id, 0]));
     return {
-        version: 9,
+        version: 10,
         player: {
             name: 'Adventurer', portrait: '', race: 'Human', age: '', title: 'Newcomer', guild: 'Unaffiliated', party: 'Solo', condition: 'Stable', level: 1,
             portraitView: { desktop: { x: 50, y: 50, zoom: 1 }, mobile: { x: 50, y: 50, zoom: 1 } },
@@ -214,6 +226,7 @@ function defaultState() {
         worldClock: { day: 1, dayName: 'Day 1', time: '08:00', phase: 'Morning' },
         location: { continent: 'Central Continent', region: 'Asura Kingdom', place: 'Unknown', detail: '', zoneType: 'Safe Zone', discovered: ['Asura Kingdom'], pins: [] },
         scene: { position: 'Unknown', weather: 'Unknown', temperature: null },
+        sceneMap: { activeMapId: '', activeFloorId: '', playerRoomId: '', maps: [] },
         inventory: [{ id: uid(), name: "Traveler's Clothes", quantity: 1, category: 'Equipment', description: '' }],
         skills: [],
         proficiencies: { magic, sword, techniques: [] },
@@ -386,6 +399,94 @@ function quest(value) {
     };
 }
 
+function sceneRoom(value, fallback = {}) {
+    if (!value || typeof value !== 'object' || !text(value.name, text(fallback.name))) return null;
+    const width = number(value.width, number(fallback.width, 24, 8, 70), 8, 70);
+    const height = number(value.height, number(fallback.height, 18, 7, 50), 7, 50);
+    const type = ROOM_TYPES.includes(value.type) ? value.type : ROOM_TYPES.includes(fallback.type) ? fallback.type : 'Room';
+    return {
+        id: text(value.id, text(fallback.id, uid(), 100), 100),
+        name: text(value.name, text(fallback.name, 'Unknown room', 120), 120),
+        type,
+        x: number(value.x, number(fallback.x, 4, 0, 100 - width), 0, 100 - width),
+        y: number(value.y, number(fallback.y, 4, 0, 70 - height), 0, 70 - height),
+        width,
+        height,
+        discovered: value.discovered === undefined ? fallback.discovered !== false : Boolean(value.discovered),
+        locked: value.locked === undefined ? Boolean(fallback.locked) : Boolean(value.locked),
+    };
+}
+
+function sceneConnection(value, fallback = {}) {
+    if (!value || typeof value !== 'object') return null;
+    const from = text(value.from, text(fallback.from, '', 100), 100);
+    const to = text(value.to, text(fallback.to, '', 100), 100);
+    if (!from || !to || from === to) return null;
+    return {
+        id: text(value.id, text(fallback.id, uid(), 100), 100), from, to,
+        type: CONNECTION_TYPES.includes(value.type) ? value.type : CONNECTION_TYPES.includes(fallback.type) ? fallback.type : 'Door',
+        locked: value.locked === undefined ? Boolean(fallback.locked) : Boolean(value.locked),
+    };
+}
+
+function sceneFloor(value, fallback = {}) {
+    if (!value || typeof value !== 'object' || !text(value.name, text(fallback.name))) return null;
+    const fallbackRooms = Array.isArray(fallback.rooms) ? fallback.rooms : [];
+    const roomsById = new Map(fallbackRooms.map(entry => [entry.id, entry]));
+    const roomsByName = new Map(fallbackRooms.map(entry => [entry.name.toLocaleLowerCase(), entry]));
+    const sourceRooms = Array.isArray(value.rooms) ? value.rooms : fallbackRooms;
+    const rooms = sourceRooms.map(entry => sceneRoom(entry, roomsById.get(entry?.id) || roomsByName.get(text(entry?.name).toLocaleLowerCase()) || {}))
+        .filter(Boolean).slice(0, 80);
+    const roomIds = new Set(rooms.map(entry => entry.id));
+    const fallbackConnections = Array.isArray(fallback.connections) ? fallback.connections : [];
+    const sourceConnections = Array.isArray(value.connections) ? value.connections : fallbackConnections;
+    const connections = sourceConnections.map(entry => sceneConnection(entry, fallbackConnections.find(current => current.id === entry?.id) || {}))
+        .filter(entry => entry && roomIds.has(entry.from) && roomIds.has(entry.to)).slice(0, 120);
+    return {
+        id: text(value.id, text(fallback.id, uid(), 100), 100),
+        name: text(value.name, text(fallback.name, '1F', 80), 80),
+        level: number(value.level, number(fallback.level, 1, -20, 200), -20, 200),
+        rooms,
+        connections,
+    };
+}
+
+function sceneStructure(value, fallback = {}) {
+    if (!value || typeof value !== 'object' || !text(value.name, text(fallback.name))) return null;
+    const fallbackFloors = Array.isArray(fallback.floors) ? fallback.floors : [];
+    const floorsById = new Map(fallbackFloors.map(entry => [entry.id, entry]));
+    const floorsByName = new Map(fallbackFloors.map(entry => [entry.name.toLocaleLowerCase(), entry]));
+    const sourceFloors = Array.isArray(value.floors) ? value.floors : fallbackFloors;
+    return {
+        id: text(value.id, text(fallback.id, uid(), 100), 100),
+        name: text(value.name, text(fallback.name, 'Local structure', 140), 140),
+        place: text(value.place, text(fallback.place, '', 180), 180),
+        locked: value.locked === undefined ? Boolean(fallback.locked) : Boolean(value.locked),
+        floors: sourceFloors.map(entry => sceneFloor(entry, floorsById.get(entry?.id) || floorsByName.get(text(entry?.name).toLocaleLowerCase()) || {}))
+            .filter(Boolean).sort((a, b) => a.level - b.level).slice(0, 20),
+    };
+}
+
+function normalizeSceneMap(value, fallback) {
+    const source = value && typeof value === 'object' ? value : {};
+    const base = fallback && typeof fallback === 'object' ? fallback : { activeMapId: '', activeFloorId: '', playerRoomId: '', maps: [] };
+    const fallbackMaps = Array.isArray(base.maps) ? base.maps : [];
+    const mapsById = new Map(fallbackMaps.map(entry => [entry.id, entry]));
+    const mapsByName = new Map(fallbackMaps.map(entry => [entry.name.toLocaleLowerCase(), entry]));
+    const sourceMaps = Array.isArray(source.maps) ? source.maps : fallbackMaps;
+    const maps = sourceMaps.map(entry => sceneStructure(entry, mapsById.get(entry?.id) || mapsByName.get(text(entry?.name).toLocaleLowerCase()) || {}))
+        .filter(Boolean).slice(0, 30);
+    let activeMapId = text(source.activeMapId, text(base.activeMapId, '', 100), 100);
+    if (!maps.some(entry => entry.id === activeMapId)) activeMapId = maps[0]?.id || '';
+    const activeMap = maps.find(entry => entry.id === activeMapId);
+    let activeFloorId = text(source.activeFloorId, text(base.activeFloorId, '', 100), 100);
+    if (!activeMap?.floors.some(entry => entry.id === activeFloorId)) activeFloorId = activeMap?.floors[0]?.id || '';
+    const activeFloor = activeMap?.floors.find(entry => entry.id === activeFloorId);
+    let playerRoomId = text(source.playerRoomId, text(base.playerRoomId, '', 100), 100);
+    if (!activeFloor?.rooms.some(entry => entry.id === playerRoomId)) playerRoomId = '';
+    return { activeMapId, activeFloorId, playerRoomId, maps };
+}
+
 function normalize(candidate, base = defaultState()) {
     const source = candidate && typeof candidate === 'object' ? candidate : {};
     const migratingLegacyNpcs = !Array.isArray(source.npcs);
@@ -395,7 +496,7 @@ function normalize(candidate, base = defaultState()) {
     const currency = progress.currency && typeof progress.currency === 'object' ? progress.currency : {};
     const location = source.location && typeof source.location === 'object' ? source.location : {};
 
-    result.version = 9;
+    result.version = 10;
     const portraitView = player.portraitView && typeof player.portraitView === 'object' ? player.portraitView : {};
     result.player = {
         name: text(player.name, result.player.name, 100), portrait: text(player.portrait, result.player.portrait, 1500000),
@@ -452,6 +553,7 @@ function normalize(candidate, base = defaultState()) {
         weather: text(scene.weather, result.scene.weather, 120),
         temperature: optionalNumber(scene.temperature, result.scene.temperature, -100, 100),
     };
+    result.sceneMap = normalizeSceneMap(source.sceneMap, result.sceneMap);
     if (Array.isArray(source.inventory)) result.inventory = source.inventory.map(item).filter(Boolean).slice(0, 200);
     if (Array.isArray(source.skills)) result.skills = source.skills.map(skill).filter(Boolean).slice(0, 100);
     const proficiencies = source.proficiencies && typeof source.proficiencies === 'object' ? source.proficiencies : {};
@@ -562,6 +664,29 @@ async function persistState(candidate, source = 'manual') {
     return true;
 }
 
+function aiSceneMap(state) {
+    const activeMap = state.sceneMap.maps.find(entry => entry.id === state.sceneMap.activeMapId);
+    const activeFloor = activeMap?.floors.find(entry => entry.id === state.sceneMap.activeFloorId);
+    return {
+        activeMapId: state.sceneMap.activeMapId,
+        activeFloorId: state.sceneMap.activeFloorId,
+        playerRoomId: state.sceneMap.playerRoomId,
+        maps: state.sceneMap.maps.map(map => ({
+            id: map.id, name: map.name, place: map.place, locked: map.locked,
+            floors: map.floors.map(floor => floor === activeFloor ? {
+                id: floor.id, name: floor.name, level: floor.level,
+                rooms: floor.rooms.map(({ id, name, type, x, y, width, height, discovered, locked }) => (
+                    { id, name, type, x, y, width, height, discovered, locked }
+                )),
+                connections: floor.connections.map(({ id, from, to, type, locked }) => ({ id, from, to, type, locked })),
+            } : {
+                id: floor.id, name: floor.name, level: floor.level,
+                rooms: floor.rooms.map(({ id, name, type, discovered, locked }) => ({ id, name, type, discovered, locked })),
+            }),
+        })),
+    };
+}
+
 function aiState(state) {
     const safePlayer = { ...state.player };
     delete safePlayer.portrait;
@@ -573,6 +698,7 @@ function aiState(state) {
         worldClock: state.worldClock,
         location: { ...state.location, pins: undefined },
         scene: state.scene,
+        sceneMap: aiSceneMap(state),
         inventory: state.inventory.map(({ id, name, quantity, category }) => ({ id, name, quantity, category })),
         skills: state.skills.map(({ id, name, rank, type }) => ({ id, name, rank, type })),
         proficiencies: state.proficiencies,
@@ -601,12 +727,13 @@ function hasUserReply(context = SillyTavern.getContext()) {
 function patchInstructions() {
     return [
         'After the role-play reply, append one invisible HTML comment only when confirmed state changed:',
-        '<!--tensei_patch:{"ops":[["set","worldClock.time","14:30"],["set","scene.weather","Rain"],["set","player.hp.current",90],["upsert","inventory",{"name":"Potion","quantity":1,"category":"Consumable"}]],"summary":"brief change"}-->',
-        'Allowed verbs: set or inc for scalar paths; upsert or delete for inventory, skills, proficiencies.techniques, quests, npcs, contacts, letters; upsert or delete for npcAbilities and npcMeters; append for npcDiary; add for location.discovered.',
+        '<!--tensei_patch:{"ops":[["upsert","sceneMaps",{"id":"boreas-manor","name":"Boreas Manor","place":"Roa"}],["upsert","sceneFloors",{"mapId":"boreas-manor","id":"floor-1","name":"1F","level":1}],["upsert","sceneRooms",{"mapId":"boreas-manor","floorId":"floor-1","id":"foyer","name":"Foyer","type":"Entrance","x":38,"y":48,"width":24,"height":16,"discovered":true}],["set","sceneMap.activeMapId","boreas-manor"],["set","sceneMap.activeFloorId","floor-1"],["set","sceneMap.playerRoomId","foyer"]],"summary":"Entered the manor foyer."}-->',
+        'Allowed verbs: set or inc for scalar paths; upsert or delete for inventory, skills, proficiencies.techniques, quests, npcs, contacts, letters; upsert or delete for npcAbilities and npcMeters; append for npcDiary; add for location.discovered. Local maps additionally allow upsert or delete on sceneMaps, sceneFloors, sceneRooms, and sceneConnections.',
         'Use canonical paths shown in the state JSON. For a new incoming physical letter include contactId/fromName/toName/subject/body/direction:"incoming"/status:"unread". Ordinary dialogue is not a letter.',
         'Create or update a named NPC dossier with an upsert on npcs only when that NPC becomes relevant or a confirmed fact changes. Use partial NPC objects and preserve the canonical id from npcIndex. When a relationship becomes a correspondence, also upsert contacts with npcId; do not make every incidental NPC a contact.',
         'For a meaningful private thought or relationship turning point, append npcDiary with {npcId,text,mood}, or npcName when the NPC was created in the same patch; do not write a diary entry every turn. Update abilities granularly through npcAbilities with npcId or npcName. NPC portraits and portrait framing are local-only and forbidden in patches.',
         'Track the active scene when confirmed: time, phase, day/dayName, continent, region, place, location detail, scene position, weather, and temperature. Do not invent weather or temperature when the reply provides no evidence.',
+        'Maintain a sparse overhead local map only from confirmed or strongly implied spatial facts. Create a sceneMaps record, then its sceneFloors, sceneRooms, and sceneConnections. Room coordinates use x 0-100, y 0-70, width 8-70, height 7-50. Reveal or add rooms gradually; never invent a complete unseen building. Use canonical mapId/floorId/room ids, set the active ids and playerRoomId as the player moves, and preserve all locked maps, rooms, and connections.',
         'Handle all story genres and mature or NSFW scenes neutrally. Do not censor, rewrite, omit, or classify confirmed state merely because the scene is adult; follow the active SillyTavern, model, and provider settings.',
         'Record only outcomes confirmed by this reply. Never record plans, attempts, questions, hypotheticals, rejected actions, or out-of-character discussion. Keep proficiency changes conservative.',
         'Omit the comment when nothing changed. Never print a full state, Markdown fence, explanation, or visible system text.',
@@ -726,7 +853,7 @@ function appearanceMenu() {
     return `<details class="tensei-appearance-menu">
         <summary aria-label="${html(tr('Appearance'))}" title="${html(tr('Appearance'))}"><i class="fa-solid fa-sliders"></i></summary>
         <div class="tensei-appearance-popover">
-            <div class="tensei-popover-heading"><span>${html(tr('Appearance'))}</span><small>UI 0.9</small></div>
+            <div class="tensei-popover-heading"><span>${html(tr('Appearance'))}</span><small>UI 1.0</small></div>
             <label class="tensei-setting-row"><span>${html(tr('Accent'))}</span><input type="color" data-ui-setting="accentColor" value="${settings.accentColor}"></label>
             <label class="tensei-setting-row"><span>${html(tr('Glass'))}</span><input type="range" data-ui-setting="glassOpacity" min="55" max="98" value="${settings.glassOpacity}"></label>
             <label class="tensei-setting-row"><span>${html(tr('Glow'))}</span><input type="range" data-ui-setting="glowStrength" min="0" max="100" value="${settings.glowStrength}"></label>
@@ -1005,6 +1132,139 @@ function weatherIcon(condition) {
     return 'fa-solid fa-sun';
 }
 
+function activeSceneStructure(state) {
+    const map = state.sceneMap.maps.find(entry => entry.id === state.sceneMap.activeMapId);
+    const floor = map?.floors.find(entry => entry.id === state.sceneMap.activeFloorId);
+    return { map, floor };
+}
+
+function sceneMapHiddenFields(mapId = '', floorId = '', roomId = '') {
+    return `<input type="hidden" name="mapId" value="${html(mapId)}"><input type="hidden" name="floorId" value="${html(floorId)}">
+        ${roomId ? `<input type="hidden" name="roomId" value="${html(roomId)}">` : ''}`;
+}
+
+function sceneRoomFields(room = {}, { editing = false } = {}) {
+    const source = { name: '', type: 'Room', x: 4, y: 4, width: 24, height: 18, discovered: true, locked: false, ...room };
+    return `${input('Room name', 'name', source.name)}${select('Room type', 'type', ROOM_TYPES, source.type)}
+        ${input('X position', 'x', source.x, 'number', 'min="0" max="92" step="0.5"')}${input('Y position', 'y', source.y, 'number', 'min="0" max="63" step="0.5"')}
+        ${input('Width', 'width', source.width, 'number', 'min="8" max="70" step="0.5"')}${input('Height', 'height', source.height, 'number', 'min="7" max="50" step="0.5"')}
+        <label class="tensei-check-field"><input type="checkbox" name="discovered"${source.discovered ? ' checked' : ''}><span>${html(tr('Discovered'))}</span></label>
+        <label class="tensei-check-field"><input type="checkbox" name="locked"${source.locked ? ' checked' : ''}><span>${html(tr('Locked'))}</span></label>
+        <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr(editing ? 'Save room' : 'Add room'))}</button>`;
+}
+
+function renderLocalStructure(state) {
+    const { map, floor } = activeSceneStructure(state);
+    const createForm = `<details class="tensei-editor${map ? '' : ' tensei-map-first-editor'}"${map ? '' : ' open'}><summary><i class="fa-solid fa-plus"></i> ${html(tr('Create structure map'))}</summary>
+        <form data-form="scene-map" class="tensei-form-grid">${input('Map name', 'name', state.location.place === 'Unknown' ? '' : state.location.place)}
+            ${input('Associated place', 'place', state.location.place)}${input('First floor', 'floorName', '1F')}${input('Floor', 'level', 1, 'number', 'min="-20" max="200"')}
+            <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Create structure map'))}</button></form></details>`;
+    if (!map || !floor) {
+        return `<section class="tensei-local-map"><header><div><span>${html(tr('Local Structure Map'))}</span><small>${html(tr('AI-assisted SVG floor plan'))}</small></div></header>
+            ${empty('No structure map yet.')}${createForm}</section>`;
+    }
+
+    const roomById = new Map(floor.rooms.map(entry => [entry.id, entry]));
+    const connections = floor.connections.map(entry => {
+        const from = roomById.get(entry.from);
+        const to = roomById.get(entry.to);
+        if (!from || !to) return '';
+        const x1 = from.x + from.width / 2;
+        const y1 = from.y + from.height / 2;
+        const x2 = to.x + to.width / 2;
+        const y2 = to.y + to.height / 2;
+        return `<g class="tensei-floor-connection${entry.locked ? ' is-locked' : ''}"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"></line>
+            <circle cx="${(x1 + x2) / 2}" cy="${(y1 + y2) / 2}" r="1.25"></circle><title>${html(entry.type)}</title></g>`;
+    }).join('');
+    const rooms = floor.rooms.map(entry => {
+        const current = entry.id === state.sceneMap.playerRoomId;
+        const label = entry.discovered ? entry.name : tr('Unexplored');
+        return `<g class="tensei-floor-room${current ? ' is-current' : ''}${entry.discovered ? '' : ' is-hidden'}${entry.locked ? ' is-locked' : ''}" data-scene-room="${html(entry.id)}">
+            <rect x="${entry.x}" y="${entry.y}" width="${entry.width}" height="${entry.height}" rx="1.4"></rect>
+            <text x="${entry.x + entry.width / 2}" y="${entry.y + entry.height / 2 - .8}" text-anchor="middle">${html(label.slice(0, 22))}</text>
+            <text class="tensei-room-type" x="${entry.x + entry.width / 2}" y="${entry.y + entry.height / 2 + 3.2}" text-anchor="middle">${html(entry.discovered ? tr(entry.type) : '?')}</text>
+            ${current ? `<circle class="tensei-player-pulse" cx="${entry.x + entry.width / 2}" cy="${entry.y + 3.2}" r="1.8"></circle>` : ''}</g>`;
+    }).join('');
+    const roomOptions = floor.rooms.filter(entry => entry.discovered).map(entry => `<option value="${html(entry.id)}"${entry.id === state.sceneMap.playerRoomId ? ' selected' : ''}>${html(entry.name)}</option>`).join('');
+    const connectionOptions = floor.rooms.map(entry => `<option value="${html(entry.id)}">${html(entry.name)}</option>`).join('');
+
+    return `<section class="tensei-local-map${map.locked ? ' is-locked' : ''}">
+        <header><div><span>${html(tr('Local Structure Map'))}</span><strong>${html(map.name)}</strong><small>${html(map.place || state.location.place)} · ${floor.rooms.length} ${html(tr('Rooms').toLowerCase())}</small></div>
+            <label class="tensei-map-picker"><span>${html(tr('Map name'))}</span><select id="tensei-scene-map-picker">${state.sceneMap.maps.map(entry => `<option value="${html(entry.id)}"${entry.id === map.id ? ' selected' : ''}>${html(entry.name)}</option>`).join('')}</select></label>
+            <button type="button" class="tensei-map-lock" data-action="toggle-scene-map-lock" data-id="${html(map.id)}"><i class="fa-solid fa-${map.locked ? 'lock' : 'lock-open'}"></i><span>${html(tr(map.locked ? 'Map locked' : 'AI updates enabled'))}</span></button></header>
+        <nav class="tensei-floor-tabs" aria-label="${html(tr('Floor'))}">${map.floors.map(entry => `<button type="button" data-action="select-scene-floor" data-id="${html(entry.id)}" data-map-id="${html(map.id)}" class="${entry.id === floor.id ? 'is-active' : ''}">${html(entry.name)}</button>`).join('')}</nav>
+        <div class="tensei-floor-canvas"><svg class="tensei-floor-svg" viewBox="0 0 100 70" preserveAspectRatio="none" role="img" aria-label="${html(`${map.name} ${floor.name}`)}">
+            <defs><pattern id="tensei-floor-grid" width="5" height="5" patternUnits="userSpaceOnUse"><path d="M 5 0 L 0 0 0 5"></path></pattern></defs>
+            <rect class="tensei-floor-grid" width="100" height="70"></rect>${connections}${rooms}</svg>
+            <div class="tensei-floor-caption"><span><i class="fa-solid fa-location-crosshairs"></i>${html(roomById.get(state.sceneMap.playerRoomId)?.name || tr('Current room'))}</span>
+                <small>${html(tr(map.locked ? 'Map locked' : 'Drag unlocked rooms to reposition them.'))}</small></div></div>
+        <details class="tensei-editor tensei-floor-editor"><summary><i class="fa-solid fa-pen-ruler"></i> ${html(tr('Edit floor plan'))}</summary>
+            <div class="tensei-map-editor-actions"><button type="button" data-action="toggle-scene-map-lock" data-id="${html(map.id)}"><i class="fa-solid fa-${map.locked ? 'lock-open' : 'lock'}"></i>${html(tr(map.locked ? 'Unlock map' : 'Lock map'))}</button>
+                <button type="button" data-action="delete-scene-floor" data-id="${html(floor.id)}" data-map-id="${html(map.id)}"><i class="fa-solid fa-layer-group"></i>${html(tr('Delete floor'))}</button>
+                <button type="button" data-action="delete-scene-map" data-id="${html(map.id)}"><i class="fa-solid fa-trash"></i>${html(tr('Delete map'))}</button></div>
+            ${roomOptions ? `<form data-form="scene-position" class="tensei-form-grid tensei-map-compact-form">${sceneMapHiddenFields(map.id, floor.id)}
+                <label class="tensei-field"><span>${html(tr('Current room'))}</span><select name="roomId">${roomOptions}</select></label>
+                <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Set current room'))}</button></form>` : ''}
+            <div class="tensei-map-editor-grid">
+                <details><summary><i class="fa-solid fa-layer-group"></i>${html(tr('Add floor'))}</summary><form data-form="scene-floor" class="tensei-form-grid">${sceneMapHiddenFields(map.id)}
+                    ${input('Floor name', 'name', `${map.floors.length + 1}F`)}${input('Floor', 'level', map.floors.length + 1, 'number', 'min="-20" max="200"')}
+                    <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add floor'))}</button></form></details>
+                <details><summary><i class="fa-solid fa-vector-square"></i>${html(tr('Add room'))}</summary><form data-form="scene-room" class="tensei-form-grid">${sceneMapHiddenFields(map.id, floor.id)}${sceneRoomFields()}</form></details>
+                ${floor.rooms.length >= 2 ? `<details><summary><i class="fa-solid fa-door-open"></i>${html(tr('Add connection'))}</summary><form data-form="scene-connection" class="tensei-form-grid">${sceneMapHiddenFields(map.id, floor.id)}
+                    <label class="tensei-field"><span>${html(tr('From room'))}</span><select name="from">${connectionOptions}</select></label>
+                    <label class="tensei-field"><span>${html(tr('To room'))}</span><select name="to">${connectionOptions}</select></label>${select('Connection type', 'type', CONNECTION_TYPES, 'Door')}
+                    <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Add connection'))}</button></form></details>` : ''}
+                ${createForm}
+            </div>
+            <div class="tensei-room-editor-list">${floor.rooms.map(entry => `<details><summary><span><i class="fa-solid fa-${entry.locked ? 'lock' : 'vector-square'}"></i>${html(entry.name)}</span><small>${html(tr(entry.type))}</small></summary>
+                <form data-form="scene-room" class="tensei-form-grid">${sceneMapHiddenFields(map.id, floor.id, entry.id)}${sceneRoomFields(entry, { editing: true })}</form>
+                <button type="button" class="tensei-map-delete-row" data-action="delete-scene-room" data-id="${html(entry.id)}" data-map-id="${html(map.id)}" data-floor-id="${html(floor.id)}"><i class="fa-solid fa-trash"></i>${html(tr('Delete room'))}</button></details>`).join('')}</div>
+            <div class="tensei-connection-list">${floor.connections.map(entry => `<span><i class="fa-solid fa-door-open"></i>${html(roomById.get(entry.from)?.name || '?')} → ${html(roomById.get(entry.to)?.name || '?')}<small>${html(tr(entry.type))}</small>
+                <button type="button" data-action="delete-scene-connection" data-id="${html(entry.id)}" data-map-id="${html(map.id)}" data-floor-id="${html(floor.id)}"><i class="fa-solid fa-xmark"></i></button></span>`).join('')}</div>
+        </details></section>`;
+}
+
+function setupSceneMapInteractions(panel, state) {
+    const svg = panel.querySelector('.tensei-floor-svg');
+    const { map, floor } = activeSceneStructure(state);
+    if (!(svg instanceof SVGElement) || !map || !floor || map.locked) return;
+    svg.querySelectorAll('[data-scene-room]').forEach(group => {
+        const room = floor.rooms.find(entry => entry.id === group.dataset.sceneRoom);
+        if (!room || room.locked) return;
+        group.classList.add('is-draggable');
+        group.addEventListener('pointerdown', event => {
+            event.preventDefault();
+            group.setPointerCapture?.(event.pointerId);
+            const bounds = svg.getBoundingClientRect();
+            const start = { x: event.clientX, y: event.clientY };
+            let nextX = room.x;
+            let nextY = room.y;
+            const move = moveEvent => {
+                nextX = Math.min(100 - room.width, Math.max(0, room.x + (moveEvent.clientX - start.x) / Math.max(1, bounds.width) * 100));
+                nextY = Math.min(70 - room.height, Math.max(0, room.y + (moveEvent.clientY - start.y) / Math.max(1, bounds.height) * 70));
+                group.setAttribute('transform', `translate(${nextX - room.x} ${nextY - room.y})`);
+            };
+            const end = async endEvent => {
+                group.removeEventListener('pointermove', move);
+                group.removeEventListener('pointerup', end);
+                group.removeEventListener('pointercancel', end);
+                group.releasePointerCapture?.(endEvent.pointerId);
+                const nextState = clone(getState());
+                const nextMap = nextState.sceneMap.maps.find(entry => entry.id === map.id);
+                const nextFloor = nextMap?.floors.find(entry => entry.id === floor.id);
+                const nextRoom = nextFloor?.rooms.find(entry => entry.id === room.id);
+                if (!nextRoom || nextMap.locked || nextRoom.locked) return renderAll(nextState);
+                nextRoom.x = Math.round(nextX * 10) / 10;
+                nextRoom.y = Math.round(nextY * 10) / 10;
+                await persistState(nextState, 'scene-map-drag');
+            };
+            group.addEventListener('pointermove', move);
+            group.addEventListener('pointerup', end);
+            group.addEventListener('pointercancel', end);
+        });
+    });
+}
+
 function renderScene(panel, state) {
     if (!panel) return;
     const phaseIndex = Math.max(0, DAY_PHASES.indexOf(state.worldClock.phase));
@@ -1023,6 +1283,7 @@ function renderScene(panel, state) {
             <article><i class="fa-solid fa-location-dot"></i><span>${html(tr('Current place'))}</span><strong>${html(state.location.place)}</strong><small>${html(exactLocation)}</small></article>
             <article><i class="fa-solid fa-street-view"></i><span>${html(tr('Scene position'))}</span><strong>${html(state.scene.position)}</strong><small>${html(tr(state.location.zoneType))}</small></article>
         </section>
+        ${renderLocalStructure(state)}
         <details class="tensei-editor"><summary><i class="fa-solid fa-pen"></i> ${html(tr('Save scene'))}</summary>
             <form data-form="scene" class="tensei-form-grid">
                 ${input('Day name', 'dayName', state.worldClock.dayName)}${input('Day counter', 'day', state.worldClock.day, 'number', 'min="1"')}
@@ -1033,6 +1294,7 @@ function renderScene(panel, state) {
                 ${input('Weather', 'weather', state.scene.weather)}${input('Temperature', 'temperature', state.scene.temperature, 'number', 'min="-100" max="100" step="0.1"')}
                 <button class="tensei-primary-button tensei-form-submit" type="submit">${html(tr('Save scene'))}</button>
             </form></details>`;
+    setupSceneMapInteractions(panel, state);
 }
 
 function portraitPreview(label, mode, frame, portrait) {
@@ -1757,6 +2019,71 @@ async function onSubmit(event) {
             await persistState(state, 'scene');
             notify('success', getSettings().language === 'th' ? 'บันทึกข้อมูลฉากแล้ว' : 'Scene tracking saved.');
             break;
+        case 'scene-map': {
+            const firstFloor = sceneFloor({ name: values.floorName || '1F', level: values.level, rooms: [], connections: [] });
+            const nextMap = sceneStructure({ name: values.name, place: values.place, floors: firstFloor ? [firstFloor] : [] });
+            if (!nextMap || !firstFloor) return notify('warning', 'Enter a map name and first floor.');
+            state.sceneMap.maps.push(nextMap);
+            state.sceneMap.activeMapId = nextMap.id;
+            state.sceneMap.activeFloorId = firstFloor.id;
+            state.sceneMap.playerRoomId = '';
+            await persistState(state, 'scene-map');
+            notify('success', `${nextMap.name} created.`);
+            break;
+        }
+        case 'scene-floor': {
+            const map = state.sceneMap.maps.find(entry => entry.id === values.mapId);
+            const nextFloor = sceneFloor({ name: values.name, level: values.level, rooms: [], connections: [] });
+            if (!map || !nextFloor) return notify('warning', 'Enter a floor name.');
+            map.floors.push(nextFloor);
+            state.sceneMap.activeMapId = map.id;
+            state.sceneMap.activeFloorId = nextFloor.id;
+            state.sceneMap.playerRoomId = '';
+            await persistState(state, 'scene-map');
+            break;
+        }
+        case 'scene-room': {
+            const map = state.sceneMap.maps.find(entry => entry.id === values.mapId);
+            const floor = map?.floors.find(entry => entry.id === values.floorId);
+            if (!floor) return notify('warning', 'Choose a valid floor.');
+            const existing = floor.rooms.find(entry => entry.id === values.roomId);
+            const nextRoom = sceneRoom({
+                id: existing?.id, name: values.name, type: values.type, x: values.x, y: values.y,
+                width: values.width, height: values.height, discovered: values.discovered === 'on', locked: values.locked === 'on',
+            }, existing || {});
+            if (!nextRoom) return notify('warning', 'Enter a room name.');
+            if (existing) floor.rooms[floor.rooms.indexOf(existing)] = nextRoom;
+            else floor.rooms.push(nextRoom);
+            state.sceneMap.activeMapId = map.id;
+            state.sceneMap.activeFloorId = floor.id;
+            await persistState(state, 'scene-map');
+            break;
+        }
+        case 'scene-position': {
+            const map = state.sceneMap.maps.find(entry => entry.id === values.mapId);
+            const floor = map?.floors.find(entry => entry.id === values.floorId);
+            const room = floor?.rooms.find(entry => entry.id === values.roomId);
+            if (!map || !floor || !room) return notify('warning', 'Choose a valid current room.');
+            state.sceneMap.activeMapId = map.id;
+            state.sceneMap.activeFloorId = floor.id;
+            state.sceneMap.playerRoomId = room.id;
+            state.scene.position = room.name;
+            await persistState(state, 'scene-map-position');
+            break;
+        }
+        case 'scene-connection': {
+            const map = state.sceneMap.maps.find(entry => entry.id === values.mapId);
+            const floor = map?.floors.find(entry => entry.id === values.floorId);
+            if (!floor?.rooms.some(entry => entry.id === values.from) || !floor.rooms.some(entry => entry.id === values.to) || values.from === values.to) {
+                return notify('warning', 'Choose two different rooms.');
+            }
+            const duplicate = floor.connections.some(entry => (
+                (entry.from === values.from && entry.to === values.to) || (entry.from === values.to && entry.to === values.from)
+            ) && entry.type === values.type);
+            if (!duplicate) floor.connections.push(sceneConnection({ from: values.from, to: values.to, type: values.type }));
+            await persistState(state, 'scene-map');
+            break;
+        }
         case 'inventory': {
             const nextItem = item(values);
             if (!nextItem) return notify('warning', 'Enter an item name first.');
@@ -1960,6 +2287,18 @@ async function onPanelChange(event) {
         audioInput.value = '';
         return;
     }
+    const sceneMapPicker = event.target.closest('#tensei-scene-map-picker');
+    if (sceneMapPicker instanceof HTMLSelectElement) {
+        const state = clone(getState());
+        const map = state.sceneMap.maps.find(entry => entry.id === sceneMapPicker.value);
+        if (map) {
+            state.sceneMap.activeMapId = map.id;
+            state.sceneMap.activeFloorId = map.floors[0]?.id || '';
+            state.sceneMap.playerRoomId = '';
+            await persistState(state, 'scene-map-view');
+        }
+        return;
+    }
     const destination = event.target.closest('form[data-form="travel"] select[name="destination"]');
     if (destination) {
         mapSelectionId = destination.value;
@@ -2024,6 +2363,63 @@ async function onPanelClick(event) {
             mapView.x = 500 - location.x * mapView.scale;
             mapView.y = 300 - location.y * mapView.scale;
             updateMapTransform();
+            break;
+        }
+        case 'select-scene-floor': {
+            const map = state.sceneMap.maps.find(entry => entry.id === button.dataset.mapId);
+            const floor = map?.floors.find(entry => entry.id === id);
+            if (!map || !floor) break;
+            state.sceneMap.activeMapId = map.id;
+            state.sceneMap.activeFloorId = floor.id;
+            if (!floor.rooms.some(entry => entry.id === state.sceneMap.playerRoomId)) state.sceneMap.playerRoomId = '';
+            await persistState(state, 'scene-map-view');
+            break;
+        }
+        case 'toggle-scene-map-lock': {
+            const map = state.sceneMap.maps.find(entry => entry.id === id);
+            if (!map) break;
+            map.locked = !map.locked;
+            await persistState(state, 'scene-map-lock');
+            notify('success', tr(map.locked ? 'Map locked' : 'AI updates enabled'));
+            break;
+        }
+        case 'delete-scene-map': {
+            const map = state.sceneMap.maps.find(entry => entry.id === id);
+            if (!map || globalThis.confirm?.(`Delete the structure map “${map.name}”?`) === false) break;
+            state.sceneMap.maps = state.sceneMap.maps.filter(entry => entry.id !== id);
+            state.sceneMap.activeMapId = state.sceneMap.maps[0]?.id || '';
+            state.sceneMap.activeFloorId = state.sceneMap.maps[0]?.floors[0]?.id || '';
+            state.sceneMap.playerRoomId = '';
+            await persistState(state, 'scene-map');
+            break;
+        }
+        case 'delete-scene-floor': {
+            const map = state.sceneMap.maps.find(entry => entry.id === button.dataset.mapId);
+            const floor = map?.floors.find(entry => entry.id === id);
+            if (!map || !floor || globalThis.confirm?.(`Delete floor “${floor.name}”?`) === false) break;
+            map.floors = map.floors.filter(entry => entry.id !== id);
+            state.sceneMap.activeFloorId = map.floors[0]?.id || '';
+            state.sceneMap.playerRoomId = '';
+            await persistState(state, 'scene-map');
+            break;
+        }
+        case 'delete-scene-room': {
+            const map = state.sceneMap.maps.find(entry => entry.id === button.dataset.mapId);
+            const floor = map?.floors.find(entry => entry.id === button.dataset.floorId);
+            const room = floor?.rooms.find(entry => entry.id === id);
+            if (!floor || !room || globalThis.confirm?.(`Delete room “${room.name}”?`) === false) break;
+            floor.rooms = floor.rooms.filter(entry => entry.id !== id);
+            floor.connections = floor.connections.filter(entry => entry.from !== id && entry.to !== id);
+            if (state.sceneMap.playerRoomId === id) state.sceneMap.playerRoomId = '';
+            await persistState(state, 'scene-map');
+            break;
+        }
+        case 'delete-scene-connection': {
+            const map = state.sceneMap.maps.find(entry => entry.id === button.dataset.mapId);
+            const floor = map?.floors.find(entry => entry.id === button.dataset.floorId);
+            if (!floor) break;
+            floor.connections = floor.connections.filter(entry => entry.id !== id);
+            await persistState(state, 'scene-map');
             break;
         }
         case 'select-pin':
@@ -2361,10 +2757,12 @@ const SCALAR_PATCH_PATHS = new Set([
     'progression.experienceMax', 'progression.reputation', 'progression.currency.gold', 'progression.currency.silver',
     'progression.currency.copper', 'worldClock.day', 'worldClock.dayName', 'worldClock.time', 'worldClock.phase', 'location.continent',
     'location.region', 'location.place', 'location.detail', 'location.zoneType', 'scene.position', 'scene.weather', 'scene.temperature',
+    'sceneMap.activeMapId', 'sceneMap.activeFloorId', 'sceneMap.playerRoomId',
     ...MAGIC_DISCIPLINES.map(entry => `proficiencies.magic.${entry.id}`),
     ...SWORD_STYLES.map(entry => `proficiencies.sword.${entry.id}`),
 ]);
 const PATCH_COLLECTIONS = new Set(['inventory', 'skills', 'proficiencies.techniques', 'quests', 'npcs', 'contacts', 'letters']);
+const SCENE_MAP_PATCH_COLLECTIONS = new Set(['sceneMaps', 'sceneFloors', 'sceneRooms', 'sceneConnections']);
 
 function parseJson(response) {
     const cleaned = String(response || '').trim().replace(/^\`\`\`(?:json)?\s*/i, '').replace(/\s*\`\`\`$/, '');
@@ -2395,6 +2793,114 @@ function matchesPatchIdentity(entry, value) {
         || (requestedName && text(entry?.name, '', 160).toLocaleLowerCase() === requestedName));
 }
 
+function sceneMapForPatch(state, value) {
+    const id = text(value?.mapId, text(value?.id, typeof value === 'string' ? value : '', 100), 100);
+    const name = text(value?.mapName, text(value?.name, '', 140), 140).toLocaleLowerCase();
+    return state.sceneMap.maps.find(entry => entry.id === id)
+        || state.sceneMap.maps.find(entry => name && entry.name.toLocaleLowerCase() === name);
+}
+
+function sceneFloorForPatch(map, value) {
+    const id = text(value?.floorId, text(value?.id, '', 100), 100);
+    const name = text(value?.floorName, text(value?.name, '', 80), 80).toLocaleLowerCase();
+    return map?.floors.find(entry => entry.id === id)
+        || map?.floors.find(entry => name && entry.name.toLocaleLowerCase() === name);
+}
+
+function applySceneMapPatchOperation(state, verb, path, value) {
+    if (!value || (typeof value !== 'object' && path !== 'sceneMaps')) return false;
+    if (path === 'sceneMaps') {
+        const existing = sceneMapForPatch(state, value);
+        if (verb === 'delete') {
+            if (!existing || existing.locked) return false;
+            state.sceneMap.maps = state.sceneMap.maps.filter(entry => entry.id !== existing.id);
+            if (state.sceneMap.activeMapId === existing.id) {
+                state.sceneMap.activeMapId = state.sceneMap.maps[0]?.id || '';
+                state.sceneMap.activeFloorId = state.sceneMap.maps[0]?.floors[0]?.id || '';
+                state.sceneMap.playerRoomId = '';
+            }
+            return true;
+        }
+        if (verb !== 'upsert' || existing?.locked) return false;
+        const next = sceneStructure({
+            id: existing?.id || value.id, name: value.name, place: value.place,
+            locked: existing?.locked || false, floors: existing?.floors || [],
+        }, existing || {});
+        if (!next) return false;
+        if (existing) state.sceneMap.maps[state.sceneMap.maps.indexOf(existing)] = next;
+        else state.sceneMap.maps.push(next);
+        return true;
+    }
+
+    const map = sceneMapForPatch(state, value);
+    if (!map || map.locked) return false;
+    if (path === 'sceneFloors') {
+        const existing = sceneFloorForPatch(map, value);
+        if (verb === 'delete') {
+            if (!existing) return false;
+            map.floors = map.floors.filter(entry => entry.id !== existing.id);
+            if (state.sceneMap.activeFloorId === existing.id) {
+                state.sceneMap.activeFloorId = map.floors[0]?.id || '';
+                state.sceneMap.playerRoomId = '';
+            }
+            return true;
+        }
+        if (verb !== 'upsert') return false;
+        const next = sceneFloor({
+            id: existing?.id || value.id, name: value.name, level: value.level,
+            rooms: existing?.rooms || [], connections: existing?.connections || [],
+        }, existing || {});
+        if (!next) return false;
+        if (existing) map.floors[map.floors.indexOf(existing)] = next;
+        else map.floors.push(next);
+        return true;
+    }
+
+    const floor = sceneFloorForPatch(map, value);
+    if (!floor) return false;
+    if (path === 'sceneRooms') {
+        const requestedId = text(value.roomId, text(value.id, '', 100), 100);
+        const requestedName = text(value.name, '', 120).toLocaleLowerCase();
+        const existing = floor.rooms.find(entry => entry.id === requestedId)
+            || floor.rooms.find(entry => requestedName && entry.name.toLocaleLowerCase() === requestedName);
+        if (verb === 'delete') {
+            if (!existing || existing.locked) return false;
+            floor.rooms = floor.rooms.filter(entry => entry.id !== existing.id);
+            floor.connections = floor.connections.filter(entry => entry.from !== existing.id && entry.to !== existing.id);
+            if (state.sceneMap.playerRoomId === existing.id) state.sceneMap.playerRoomId = '';
+            return true;
+        }
+        if (verb !== 'upsert' || existing?.locked) return false;
+        const next = sceneRoom({
+            id: existing?.id || value.id, name: value.name, type: value.type, x: value.x, y: value.y,
+            width: value.width, height: value.height, discovered: value.discovered,
+            locked: existing?.locked || false,
+        }, existing || {});
+        if (!next) return false;
+        if (existing) floor.rooms[floor.rooms.indexOf(existing)] = next;
+        else floor.rooms.push(next);
+        return true;
+    }
+
+    const requestedId = text(value.connectionId, text(value.id, '', 100), 100);
+    const existing = floor.connections.find(entry => entry.id === requestedId)
+        || floor.connections.find(entry => (
+            (entry.from === value.from && entry.to === value.to) || (entry.from === value.to && entry.to === value.from)
+        ) && entry.type === value.type);
+    if (verb === 'delete') {
+        if (!existing || existing.locked) return false;
+        floor.connections = floor.connections.filter(entry => entry.id !== existing.id);
+        return true;
+    }
+    if (verb !== 'upsert' || existing?.locked) return false;
+    if (!floor.rooms.some(entry => entry.id === value.from) || !floor.rooms.some(entry => entry.id === value.to)) return false;
+    const next = sceneConnection({ id: existing?.id || value.id, from: value.from, to: value.to, type: value.type, locked: existing?.locked || false }, existing || {});
+    if (!next) return false;
+    if (existing) floor.connections[floor.connections.indexOf(existing)] = next;
+    else floor.connections.push(next);
+    return true;
+}
+
 function applyPatchOperation(state, operation) {
     if (!Array.isArray(operation) || operation.length < 3) return false;
     const [verb, path, value] = operation;
@@ -2413,6 +2919,7 @@ function applyPatchOperation(state, operation) {
         state.location.discovered = [...new Set([...state.location.discovered, text(value, '', 120)])].filter(Boolean);
         return true;
     }
+    if (SCENE_MAP_PATCH_COLLECTIONS.has(path)) return applySceneMapPatchOperation(state, verb, path, value);
     if (['npcAbilities', 'npcMeters', 'npcDiary'].includes(path) && value && typeof value === 'object') {
         const npc = state.npcs.find(entry => entry.id === value.npcId)
             || state.npcs.find(entry => entry.name.toLocaleLowerCase() === text(value.npcName).toLocaleLowerCase());
@@ -2800,7 +3307,7 @@ async function initialize() {
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape') closeInterface();
         });
-        console.info('[Tensei System] Role-play interface v0.9.0 loaded.');
+        console.info('[Tensei System] Role-play interface v1.0.0 loaded.');
     } catch (error) {
         initialized = false;
         console.error('[Tensei System] Failed to initialize.', error);

@@ -26,6 +26,7 @@ A responsive, persistent Mushoku Tensei role-play interface for SillyTavern.
 - English/Thai interface and generated role-play actions.
 - Hidden, visible, and draft-only action delivery modes.
 - Scene tracking for day name/counter, time/phase, place, exact location, position, weather, and temperature.
+- Hybrid SVG floor maps with AI-assisted room discovery, multiple floors, connections, current-room markers, drag positioning, manual correction, and layout locks.
 - Named proficiency ranks alongside percentage progress for every magic discipline, sword school, and technique.
 - Optional floating Full/Compact activity capsule for waiting, patch checks, updates, no-change replies, disabled tracking, and errors.
 - User-configurable accent color, glass opacity, glow strength, and information density.
@@ -50,13 +51,22 @@ chat input. Use **Sync latest turn** to test the connected model manually.
 
 ## Current scope
 
-Version 0.9.0 separates Skill Storage from Techniques and adds zero-extra-call Scene
-tracking. A fresh chat still does not inject, analyze,
+Version 1.0.0 adds hybrid local structure maps inside Scene while preserving zero-extra-call
+automatic tracking. A fresh chat still does not inject, analyze,
 or create extension state for the character's First Message; tracking starts only
 after the user sends the first reply. NPC Codex and Mailbox remain separate tabs,
 connected only through optional NPC/Contact links and physical letters.
 
 ## Changelog
+
+### 1.0.0
+
+- Added responsive SVG overhead maps for mansions, dungeons, ships, towns, and other local structures.
+- Added multiple floor views, rooms, doors/passages, discovered-area visibility, and a current-room marker.
+- Added zero-extra-call AI patch operations for maps, floors, rooms, connections, and player movement.
+- Added manual creation and correction tools, including draggable room positioning and precise geometry fields.
+- Added per-room and whole-map locks that reject automatic layout edits while keeping manual correction available.
+- Kept prompt size controlled by sending full geometry only for the active floor and compact summaries for other floors.
 
 ### 0.9.0
 
