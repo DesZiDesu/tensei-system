@@ -29,9 +29,18 @@
                 <label class="tensei-settings-field" for="tensei-system-interaction-mode">
                     <span>Action delivery / รูปแบบข้อความ</span>
                     <select id="tensei-system-interaction-mode">
-                        <option value="hidden">Hidden — no user bubble</option>
-                        <option value="visible">Visible — send immediately</option>
-                        <option value="draft">Draft only — review first</option>
+                        <option value="hidden">Hidden action — no user bubble</option>
+                        <option value="visible">Visible message — send now</option>
+                        <option value="draft">Draft only — review, do not send</option>
+                    </select>
+                    <small class="tensei-settings-help" data-action-mode-help></small>
+                </label>
+                <label class="tensei-settings-field" for="tensei-system-activity-indicator">
+                    <span>Floating activity status / สถานะการทำงาน</span>
+                    <select id="tensei-system-activity-indicator">
+                        <option value="full">Full capsule</option>
+                        <option value="compact">Compact capsule</option>
+                        <option value="off">Off</option>
                     </select>
                 </label>
                 <label class="tensei-settings-field" for="tensei-system-accent">
@@ -56,8 +65,17 @@
             </div>
             <div class="tensei-system-settings-note">
                 <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-                <span>Automatic tracking, including NPC updates, adds no background AI request. It starts only after the user replies to the First Message. NPC portraits and music stay on this device. Manual Sync uses one separate request. The extension never reads, copies, or stores API keys.</span>
+                <span>Automatic tracking, including NPC and Mailbox updates, adds no background AI request. The floating status reports whether a reply changed state or not. Tracking starts only after the user replies to the First Message. NPC portraits and music stay on this device. Manual Sync uses one separate request. The extension never reads, copies, or stores API keys.</span>
             </div>
+            <details class="tensei-tracking-explainer">
+                <summary><i class="fa-solid fa-diagram-project" aria-hidden="true"></i> How automatic UI updates work</summary>
+                <ol>
+                    <li>After your first reply, the extension adds the current structured state and short patch rules to the normal role-play prompt.</li>
+                    <li>The character produces its normal reply once. If a confirmed fact changed, it appends an invisible state patch to that same reply.</li>
+                    <li>The extension removes the patch from view, validates every operation against a strict allowlist, saves it to this chat, and redraws the relevant tabs.</li>
+                    <li>If no patch is returned, the activity capsule says “No state changes.” This means tracking ran successfully but had nothing confirmed to save.</li>
+                </ol>
+            </details>
             <div class="tensei-system-settings-actions">
                 <button id="tensei-system-open-from-settings" class="menu_button">
                     <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
@@ -69,7 +87,7 @@
                 </button>
                 <span class="tensei-system-ready-state">
                     <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-                    Role-play engine ready
+                    Role-play engine 0.8 ready
                 </span>
             </div>
         </div>

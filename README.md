@@ -25,6 +25,7 @@ A responsive, persistent Mushoku Tensei role-play interface for SillyTavern.
 - Map zoom, pan, pinch gestures, current-position pulse, discoveries, and custom pins.
 - English/Thai interface and generated role-play actions.
 - Hidden, visible, and draft-only action delivery modes.
+- Optional floating Full/Compact activity capsule for waiting, patch checks, updates, no-change replies, disabled tracking, and errors.
 - User-configurable accent color, glass opacity, glow strength, and information density.
 
 ## API and privacy
@@ -47,13 +48,24 @@ chat input. Use **Sync latest turn** to test the connected model manually.
 
 ## Current scope
 
-Version 0.7.0 adds a dedicated NPC Codex without changing the zero-extra-call
-tracking model introduced in 0.6.0. A fresh chat still does not inject, analyze,
+Version 0.8.0 makes zero-call tracking visible through an optional floating status
+capsule and clarifies action delivery. A fresh chat still does not inject, analyze,
 or create extension state for the character's First Message; tracking starts only
-after the user sends the first reply. Existing contacts migrate into lightweight
-NPC dossiers without resetting saved state, letters, music, or portraits.
+after the user sends the first reply. NPC Codex and Mailbox remain separate tabs,
+connected only through optional NPC/Contact links and physical letters.
 
 ## Changelog
+
+### 0.8.0
+
+- Added a smooth floating activity capsule with Full, Compact, and Off preferences.
+- Reports Waiting for AI, Checking reply, State updated, No state changes, Tracking off, and failure states.
+- Keeps the current composer draft visible and untouched during Hidden actions.
+- Makes Visible mode send its own user bubble immediately while preserving any existing unsent draft.
+- Keeps Draft mode local until the user explicitly presses Send, so it uses no quota before then.
+- Clarified Action delivery descriptions in both Extension Settings and the in-panel appearance menu.
+- Kept NPC Codex and Mailbox as independent tabs connected only through optional NPC/Contact links and letters.
+- Preserved First Message gating and one-call normal-turn tracking.
 
 ### 0.7.0
 

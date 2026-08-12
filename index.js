@@ -73,6 +73,7 @@ const DEFAULT_SETTINGS = Object.freeze({
     injectState: true,
     language: 'en',
     interactionMode: 'hidden',
+    activityIndicator: 'full',
     accentColor: '#b78648',
     glassOpacity: 86,
     glowStrength: 38,
@@ -111,6 +112,10 @@ const TRANSLATIONS = {
         'Open a chat to activate this system': 'เปิดแชตเพื่อใช้งานระบบ', 'Reading latest turn': 'กำลังอ่านเหตุการณ์ล่าสุด', 'AI synchronized': 'ซิงก์กับ AI แล้ว', 'State updated': 'อัปเดตข้อมูลแล้ว', 'Sync unavailable': 'ไม่สามารถซิงก์ได้',
         Appearance: 'รูปแบบหน้าจอ', Accent: 'สีหลัก', Glass: 'ความโปร่งใส', Glow: 'แสงเรือง', Density: 'ความหนาแน่น', Language: 'ภาษา', 'Action delivery': 'รูปแบบการส่งคำสั่ง',
         Compact: 'กระชับ', Comfortable: 'สบายตา', Hidden: 'ซ่อนข้อความ', Visible: 'แสดงข้อความ', 'Draft only': 'ร่างเท่านั้น',
+        'Activity indicator': 'ตัวแจ้งสถานะการทำงาน', Full: 'แสดงเต็ม', Off: 'ปิด',
+        'Waiting for AI': 'กำลังรอ AI', 'Checking reply': 'กำลังตรวจคำตอบ', 'No state changes': 'ไม่มีข้อมูลเปลี่ยนแปลง',
+        'Reply received': 'ได้รับคำตอบแล้ว', 'Tracking is off': 'ปิดการติดตามอยู่', 'Waiting for first reply': 'รอคำตอบแรกของผู้เล่น',
+        'Hidden action sent': 'ส่งคำสั่งแบบซ่อนแล้ว', 'Visible message sent': 'ส่งข้อความแบบแสดงแล้ว', 'Draft prepared': 'เตรียมข้อความร่างแล้ว',
         'Choose profile picture': 'เลือกรูปโปรไฟล์', 'Use in role-play': 'ใช้ในโรลเพลย์', Remove: 'ลบ', 'Pursue in role-play': 'ดำเนินภารกิจในโรลเพลย์',
         'Adjust portrait': 'จัดตำแหน่งรูป', 'Desktop framing': 'กรอบภาพ PC', 'Phone framing': 'กรอบภาพมือถือ',
         Horizontal: 'แนวนอน', Vertical: 'แนวตั้ง', Zoom: 'ซูม', 'Save framing': 'บันทึกกรอบภาพ',
@@ -144,6 +149,9 @@ let selectedNpcId = null;
 let npcPortraitRenderToken = 0;
 let npcEditorObjectUrl = '';
 const npcPortraitObjectUrls = new Map();
+let activityHideTimer = null;
+let activityState = { mode: 'ready', label: 'Ready', detail: '', visible: false };
+let pendingComposerDraft = null;
 let audioPlayer = null;
 let audioObjectUrl = '';
 const mapView = { scale: 1, x: 0, y: 0 };
@@ -222,6 +230,7 @@ function getSettings() {
     const settings = extensionSettings[SETTINGS_KEY];
     if (!['en', 'th'].includes(settings.language)) settings.language = DEFAULT_SETTINGS.language;
     if (!['hidden', 'visible', 'draft'].includes(settings.interactionMode)) settings.interactionMode = DEFAULT_SETTINGS.interactionMode;
+    if (!['full', 'compact', 'off'].includes(settings.activityIndicator)) settings.activityIndicator = DEFAULT_SETTINGS.activityIndicator;
     if (!['compact', 'comfortable'].includes(settings.density)) settings.density = DEFAULT_SETTINGS.density;
     if (!/^#[0-9a-f]{6}$/i.test(settings.accentColor)) settings.accentColor = DEFAULT_SETTINGS.accentColor;
     settings.glassOpacity = number(settings.glassOpacity, DEFAULT_SETTINGS.glassOpacity, 55, 98);
@@ -612,6 +621,68 @@ function notify(type, message) {
     else console[type === 'error' ? 'error' : 'info'](`[Tensei System] ${message}`);
 }
 
+function activityCopy(mode = getSettings().interactionMode) {
+    const thai = getSettings().language === 'th';
+    const descriptions = {
+        hidden: thai
+            ? 'ส่งการกระทำให้ AI โดยตรงโดยไม่มีข้อความผู้เล่น และไม่แตะข้อความร่างที่พิมพ์ค้างไว้'
+            : 'Send the action directly to the AI with no user bubble. Any text already in the composer stays untouched.',
+        visible: thai
+            ? 'ส่งการกระทำเป็นข้อความผู้เล่นที่มองเห็นทันที โดยเก็บข้อความร่างเดิมไว้ให้'
+            : 'Send the action immediately as a visible user message. An existing unsent draft is preserved.',
+        draft: thai
+            ? 'ใส่การกระทำในช่องพิมพ์เพื่อให้ตรวจสอบก่อน ยังไม่เรียก AI จนกว่าจะกดส่งเอง'
+            : 'Place the action in the composer for review. No AI call happens until you send it yourself.',
+    };
+    return descriptions[mode] || descriptions.hidden;
+}
+
+function buildActivityIndicator() {
+    if (document.getElementById('tensei-activity-island')) return;
+    const indicator = document.createElement('button');
+    indicator.id = 'tensei-activity-island';
+    indicator.className = 'tensei-activity-island';
+    indicator.type = 'button';
+    indicator.setAttribute('aria-live', 'polite');
+    indicator.setAttribute('aria-label', 'Open Tensei System');
+    indicator.innerHTML = `<span class="tensei-activity-orb"><i class="fa-solid fa-wand-sparkles"></i></span>
+        <span class="tensei-activity-copy"><strong></strong><small></small></span><span class="tensei-activity-progress"></span>`;
+    indicator.addEventListener('click', openInterface);
+    document.body.appendChild(indicator);
+    syncActivityIndicator();
+}
+
+function syncActivityIndicator() {
+    const indicator = document.getElementById('tensei-activity-island');
+    if (!indicator) return;
+    const preference = getSettings().activityIndicator;
+    indicator.dataset.mode = activityState.mode;
+    indicator.dataset.display = preference;
+    indicator.classList.toggle('is-visible', activityState.visible && preference !== 'off');
+    const label = indicator.querySelector('strong');
+    const detail = indicator.querySelector('small');
+    const icon = indicator.querySelector('.tensei-activity-orb i');
+    if (label) label.textContent = activityState.label;
+    if (detail) detail.textContent = activityState.detail;
+    if (icon) {
+        icon.className = activityState.mode === 'working' ? 'fa-solid fa-wand-sparkles'
+            : activityState.mode === 'error' ? 'fa-solid fa-triangle-exclamation'
+                : activityState.mode === 'unchanged' ? 'fa-solid fa-minus'
+                    : activityState.mode === 'disabled' ? 'fa-solid fa-pause'
+                        : 'fa-solid fa-check';
+    }
+    const panelStatus = document.getElementById('tensei-system-sync-state');
+    if (panelStatus) {
+        panelStatus.dataset.mode = activityState.mode;
+        const copy = panelStatus.querySelector('span');
+        if (copy) copy.textContent = activityState.label;
+    }
+}
+
+function updateActionModeHelp() {
+    document.querySelectorAll('[data-action-mode-help]').forEach(node => { node.textContent = activityCopy(); });
+}
+
 function currentPersonaName(state = getState()) {
     return text(SillyTavern.getContext().name1, state.player.name, 100) || state.player.name;
 }
@@ -636,7 +707,7 @@ function appearanceMenu() {
     return `<details class="tensei-appearance-menu">
         <summary aria-label="${html(tr('Appearance'))}" title="${html(tr('Appearance'))}"><i class="fa-solid fa-sliders"></i></summary>
         <div class="tensei-appearance-popover">
-            <div class="tensei-popover-heading"><span>${html(tr('Appearance'))}</span><small>UI 0.7</small></div>
+            <div class="tensei-popover-heading"><span>${html(tr('Appearance'))}</span><small>UI 0.8</small></div>
             <label class="tensei-setting-row"><span>${html(tr('Accent'))}</span><input type="color" data-ui-setting="accentColor" value="${settings.accentColor}"></label>
             <label class="tensei-setting-row"><span>${html(tr('Glass'))}</span><input type="range" data-ui-setting="glassOpacity" min="55" max="98" value="${settings.glassOpacity}"></label>
             <label class="tensei-setting-row"><span>${html(tr('Glow'))}</span><input type="range" data-ui-setting="glowStrength" min="0" max="100" value="${settings.glowStrength}"></label>
@@ -647,13 +718,19 @@ function appearanceMenu() {
                 <option value="en"${settings.language === 'en' ? ' selected' : ''}>English</option>
                 <option value="th"${settings.language === 'th' ? ' selected' : ''}>ไทย</option></select></label>
             <label class="tensei-setting-row"><span>${html(tr('Action delivery'))}</span><select data-ui-setting="interactionMode">
-                <option value="hidden"${settings.interactionMode === 'hidden' ? ' selected' : ''}>${html(tr('Hidden'))}</option>
-                <option value="visible"${settings.interactionMode === 'visible' ? ' selected' : ''}>${html(tr('Visible'))}</option>
-                <option value="draft"${settings.interactionMode === 'draft' ? ' selected' : ''}>${html(tr('Draft only'))}</option></select></label>
+                <option value="hidden"${settings.interactionMode === 'hidden' ? ' selected' : ''}>${html(tr('Hidden'))} · no bubble</option>
+                <option value="visible"${settings.interactionMode === 'visible' ? ' selected' : ''}>${html(tr('Visible'))} · send now</option>
+                <option value="draft"${settings.interactionMode === 'draft' ? ' selected' : ''}>${html(tr('Draft only'))} · review</option></select></label>
+            <small class="tensei-action-mode-help" data-action-mode-help>${html(activityCopy())}</small>
+            <label class="tensei-setting-row"><span>${html(tr('Activity indicator'))}</span><select data-ui-setting="activityIndicator">
+                <option value="full"${settings.activityIndicator === 'full' ? ' selected' : ''}>${html(tr('Full'))}</option>
+                <option value="compact"${settings.activityIndicator === 'compact' ? ' selected' : ''}>${html(tr('Compact'))}</option>
+                <option value="off"${settings.activityIndicator === 'off' ? ' selected' : ''}>${html(tr('Off'))}</option></select></label>
         </div></details>`;
 }
 
 function buildInterface() {
+    buildActivityIndicator();
     if (document.getElementById('tensei-system-overlay')) return;
     const overlay = document.createElement('div');
     overlay.id = 'tensei-system-overlay';
@@ -720,6 +797,7 @@ function buildInterface() {
     overlay.addEventListener('input', onInterfaceSettingChange);
     overlay.addEventListener('change', onInterfaceSettingChange);
     applyAppearance();
+    syncActivityIndicator();
 }
 
 function rebuildInterface() {
@@ -768,7 +846,11 @@ function onInterfaceSettingChange(event) {
     settings[key] = control.type === 'range' ? Number(control.value) : control.value;
     SillyTavern.getContext().saveSettingsDebounced();
     if (key === 'language' && event.type === 'change') rebuildInterface();
-    else applyAppearance();
+    else {
+        applyAppearance();
+        if (key === 'interactionMode') updateActionModeHelp();
+        if (key === 'activityIndicator') syncActivityIndicator();
+    }
 }
 
 function activateTab(id) {
@@ -2099,6 +2181,21 @@ function setupMapInteractions(panel) {
     svg.addEventListener('pointercancel', end);
 }
 
+function restoreComposerDraft() {
+    const pending = pendingComposerDraft;
+    pendingComposerDraft = null;
+    if (!pending?.value) return;
+    requestAnimationFrame(() => setTimeout(() => {
+        const composer = document.querySelector('#send_textarea');
+        if (!(composer instanceof HTMLTextAreaElement)) return;
+        const current = composer.value.trim();
+        const sent = pending.sent.trim();
+        if (!current || current === sent) composer.value = pending.value;
+        else if (current !== pending.value.trim()) composer.value = `${pending.value}\n${composer.value}`;
+        composer.dispatchEvent(new Event('input', { bubbles: true }));
+    }, 0));
+}
+
 async function sendChatAction(message) {
     const settings = getSettings();
     const context = SillyTavern.getContext();
@@ -2107,31 +2204,20 @@ async function sendChatAction(message) {
         return;
     }
     if (settings.interactionMode === 'hidden') {
-        const composer = document.querySelector('#send_textarea');
-        const preservedDraft = composer instanceof HTMLTextAreaElement ? composer.value : '';
         const instruction = settings.language === 'th'
             ? `<tensei_system_action>การกระทำของผู้เล่น: ${message}\nให้ตอบสนองต่อการกระทำนี้ต่อเนื่องอย่างเป็นธรรมชาติในโรลเพลย์ ห้ามกล่าวถึงระบบ อินเทอร์เฟซ หรือคำสั่งที่ซ่อนอยู่</tensei_system_action>`
             : `<tensei_system_action>Player action: ${message}\nContinue the role-play naturally from this action. Never mention the system, interface, or hidden instruction.</tensei_system_action>`;
         context.setExtensionPrompt(ACTION_PROMPT_KEY, instruction, 1, 0, false, 0);
         closeInterface();
-        setSync('working', settings.language === 'th' ? 'กำลังดำเนินการ' : 'Resolving action');
+        setSync('working', tr('Hidden action sent'), settings.language === 'th' ? 'กำลังรอคำตอบของ AI โดยไม่สร้างข้อความผู้เล่น' : 'Waiting for the AI without creating a user bubble.');
         try {
-            if (composer instanceof HTMLTextAreaElement) {
-                composer.value = '';
-                composer.dispatchEvent(new Event('input', { bubbles: true }));
-            }
             await context.generate('normal');
         } catch (error) {
             console.error('[Tensei System] Hidden action failed.', error);
+            setSync('error', tr('Sync unavailable'), settings.language === 'th' ? 'AI ไม่สามารถตอบคำสั่งที่ซ่อนได้' : 'The AI could not resolve the hidden action.');
             notify('error', settings.language === 'th' ? 'ไม่สามารถดำเนินการที่ซ่อนไว้ได้' : 'The hidden action could not be generated.');
         } finally {
             context.setExtensionPrompt(ACTION_PROMPT_KEY, '', 1, 0, false, 0);
-            if (composer instanceof HTMLTextAreaElement && preservedDraft) {
-                const currentDraft = composer.value.trim();
-                composer.value = currentDraft ? `${preservedDraft}\n${currentDraft}` : preservedDraft;
-                composer.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-            setSync('ready', tr('Ready'));
         }
         return;
     }
@@ -2141,16 +2227,32 @@ async function sendChatAction(message) {
         notify('error', 'The SillyTavern chat composer is not available.');
         return;
     }
-    const hadDraft = Boolean(composer.value.trim());
-    composer.value = hadDraft ? `${composer.value.trim()}\n${message}` : message;
+    const preservedDraft = composer.value;
+    const hadDraft = Boolean(preservedDraft.trim());
+    if (settings.interactionMode === 'draft') {
+        composer.value = hadDraft ? `${preservedDraft.trim()}\n${message}` : message;
+        composer.dispatchEvent(new Event('input', { bubbles: true }));
+        composer.focus();
+        closeInterface();
+        setSync('ready', tr('Draft prepared'), settings.language === 'th' ? 'ยังไม่ได้เรียก AI ตรวจสอบแล้วกดส่งเองเมื่อพร้อม' : 'No AI call yet. Review it and press Send when ready.');
+        return;
+    }
+    if (send.matches(':disabled, .disabled')) {
+        composer.value = hadDraft ? `${preservedDraft.trim()}\n${message}` : message;
+        composer.dispatchEvent(new Event('input', { bubbles: true }));
+        composer.focus();
+        closeInterface();
+        setSync('error', settings.language === 'th' ? 'ยังส่งข้อความไม่ได้' : 'Message not sent', settings.language === 'th' ? 'คำสั่งถูกเก็บไว้ในช่องพิมพ์' : 'The action remains in the composer for review.');
+        return;
+    }
+    if (hadDraft) pendingComposerDraft = { value: preservedDraft, sent: message };
+    composer.value = message;
     composer.dispatchEvent(new Event('input', { bubbles: true }));
     composer.focus();
     closeInterface();
-    if (settings.interactionMode === 'draft' || hadDraft || send.matches(':disabled, .disabled')) {
-        notify('info', settings.language === 'th' ? 'เพิ่มคำสั่งไว้ในช่องข้อความแล้ว ตรวจสอบก่อนกดส่ง' : 'The action was added to the composer for review.');
-    } else {
-        send.click();
-    }
+    setSync('working', tr('Visible message sent'), settings.language === 'th' ? 'กำลังรอคำตอบและตรวจการเปลี่ยนแปลงของระบบ' : 'Waiting for the reply and its confirmed state changes.');
+    send.click();
+    if (hadDraft) setTimeout(() => { if (pendingComposerDraft) restoreComposerDraft(); }, 1200);
 }
 
 const SCALAR_PATCH_PATHS = new Set([
@@ -2326,13 +2428,22 @@ function extractStatePatch(message) {
 }
 
 async function processAssistantPatch(messageId, generationType = '') {
-    if (!getSettings().autoTrack || ['first_message', 'quiet', 'impersonate'].includes(generationType)) return;
+    const settings = getSettings();
+    if (['first_message', 'quiet', 'impersonate'].includes(generationType)) return;
     const context = SillyTavern.getContext();
     if (!hasUserReply(context) || !Number.isInteger(messageId)) return;
     const message = context.chat[messageId];
     if (!message || message.is_user || message.is_system || typeof message.mes !== 'string') return;
+    if (!settings.autoTrack) {
+        setSync('disabled', tr('Reply received'), tr('Tracking is off'));
+        return;
+    }
+    setSync('working', tr('Checking reply'), settings.language === 'th' ? 'กำลังอ่านเฉพาะข้อมูลที่เปลี่ยนแปลงจากคำตอบนี้' : 'Reading this reply for confirmed state changes.');
     const extracted = extractStatePatch(message.mes);
-    if (!extracted.found) return;
+    if (!extracted.found) {
+        setSync('unchanged', tr('No state changes'), settings.language === 'th' ? 'ระบบทำงานแล้ว แต่ไม่มีเหตุการณ์ที่ยืนยันให้บันทึก' : 'The extension checked this reply; there was nothing confirmed to record.');
+        return;
+    }
     message.mes = extracted.visible;
     if (Array.isArray(message.swipes) && Number.isInteger(message.swipe_id) && message.swipes[message.swipe_id] !== undefined) {
         message.swipes[message.swipe_id] = extracted.visible;
@@ -2345,10 +2456,10 @@ async function processAssistantPatch(messageId, generationType = '') {
         const { next, accepted } = applyStatePatch(getState(), extracted.patch);
         if (accepted) {
             await persistState(next, 'inline-patch');
-            setSync('ready', tr('State updated'));
+            setSync('success', tr('State updated'), settings.language === 'th' ? `บันทึกการเปลี่ยนแปลง ${accepted} รายการแล้ว` : `${accepted} confirmed change${accepted === 1 ? '' : 's'} saved.`);
             console.info(`[Tensei System] Applied ${accepted} inline state operation(s).`);
         } else {
-            setSync('ready', tr('Ready'));
+            setSync('unchanged', tr('No state changes'), settings.language === 'th' ? 'พบข้อมูล Patch แต่ไม่มีคำสั่งที่อนุญาตให้บันทึก' : 'A patch was present, but it contained no permitted changes.');
         }
     } catch (error) {
         console.error('[Tensei System] Inline state patch failed.', error);
@@ -2405,7 +2516,9 @@ async function analyzeChat({ manual = false } = {}) {
         const parsed = parseJson(response);
         const { next, accepted, summary } = applyStatePatch(current, parsed);
         if (accepted) await persistState(next, 'manual-ai-patch');
-        setSync('ready', tr('AI synchronized'));
+        setSync('success', tr('AI synchronized'), accepted
+            ? (getSettings().language === 'th' ? `Manual Sync บันทึก ${accepted} รายการ` : `Manual Sync saved ${accepted} confirmed change${accepted === 1 ? '' : 's'}.`)
+            : (getSettings().language === 'th' ? 'Manual Sync ตรวจแล้ว ไม่มีข้อมูลเปลี่ยนแปลง' : 'Manual Sync found no confirmed changes.'));
         notify('success', summary || 'No confirmed changes.');
         console.info(`[Tensei System] Manual sync applied ${accepted} operation(s).`);
     } catch (error) {
@@ -2417,12 +2530,17 @@ async function analyzeChat({ manual = false } = {}) {
     }
 }
 
-function setSync(mode, label) {
-    const status = document.getElementById('tensei-system-sync-state');
-    if (!status) return;
-    status.dataset.mode = mode;
-    const copy = status.querySelector('span');
-    if (copy) copy.textContent = label;
+function setSync(mode, label, detail = '', options = {}) {
+    clearTimeout(activityHideTimer);
+    const show = options.show ?? !(mode === 'ready' && label === tr('Ready'));
+    activityState = { mode, label, detail, visible: show };
+    syncActivityIndicator();
+    if (!show || mode === 'working') return;
+    const duration = options.duration ?? (mode === 'error' ? 8000 : 4400);
+    activityHideTimer = setTimeout(() => {
+        activityState.visible = false;
+        syncActivityIndicator();
+    }, duration);
 }
 
 function openInterface() {
@@ -2525,16 +2643,22 @@ async function addSettingsDrawer() {
     container.insertAdjacentHTML('beforeend', await context.renderExtensionTemplateAsync(EXTENSION_FOLDER, 'settings'));
     const settings = getSettings();
     bindCheckbox('tensei-system-show-launcher', 'showWandLauncher', settings, syncLauncherVisibility);
-    bindCheckbox('tensei-system-auto-track', 'autoTrack', settings, updatePrompt);
+    bindCheckbox('tensei-system-auto-track', 'autoTrack', settings, () => {
+        updatePrompt();
+        setSync(settings.autoTrack ? 'ready' : 'disabled', settings.autoTrack ? tr('Ready') : tr('Tracking is off'), '', { show: !settings.autoTrack });
+    });
     bindCheckbox('tensei-system-inject-state', 'injectState', settings, updatePrompt);
     bindSettingControl('tensei-system-language', 'language', settings, rebuildInterface);
-    bindSettingControl('tensei-system-interaction-mode', 'interactionMode', settings);
+    bindSettingControl('tensei-system-interaction-mode', 'interactionMode', settings, updateActionModeHelp);
+    bindSettingControl('tensei-system-activity-indicator', 'activityIndicator', settings, syncActivityIndicator);
     bindSettingControl('tensei-system-accent', 'accentColor', settings, applyAppearance);
     bindSettingControl('tensei-system-density', 'density', settings, applyAppearance);
     bindSettingControl('tensei-system-glass', 'glassOpacity', settings, applyAppearance);
     bindSettingControl('tensei-system-glow', 'glowStrength', settings, applyAppearance);
     document.getElementById('tensei-system-open-from-settings')?.addEventListener('click', openInterface);
     document.getElementById('tensei-system-sync-from-settings')?.addEventListener('click', () => queueAnalyze({ manual: true }));
+    updateActionModeHelp();
+    syncActivityIndicator();
 }
 
 function bindChatEvents() {
@@ -2547,12 +2671,17 @@ function bindChatEvents() {
         selectedNpcId = null;
         updatePrompt();
         renderAll();
-        setSync('ready', tr('Ready'));
+        if (SillyTavern.getContext().getCurrentChatId?.() && !hasUserReply()) {
+            setSync('ready', tr('Waiting for first reply'), getSettings().language === 'th' ? 'First Message จะยังไม่ถูกอ่านหรือบันทึก' : 'The First Message is not read or stored by the extension.');
+        } else setSync('ready', tr('Ready'), '', { show: false });
     });
     if (eventTypes.PERSONA_CHANGED) eventSource.on(eventTypes.PERSONA_CHANGED, () => renderAll());
     if (eventTypes.MESSAGE_SENT) eventSource.on(eventTypes.MESSAGE_SENT, () => {
+        restoreComposerDraft();
         updatePrompt();
-        setSync('ready', tr('Ready'));
+        const settings = getSettings();
+        if (settings.autoTrack) setSync('working', tr('Waiting for AI'), settings.language === 'th' ? 'จะตรวจและอัปเดตจากคำตอบหลักโดยไม่เรียก AI เพิ่ม' : 'The normal reply will be checked with no extra AI request.');
+        else setSync('disabled', tr('Tracking is off'), settings.language === 'th' ? 'คำตอบนี้จะไม่อัปเดต Tensei System อัตโนมัติ' : 'This reply will not update Tensei System automatically.');
     });
     eventSource.on(eventTypes.MESSAGE_RECEIVED, (messageId, generationType) => processAssistantPatch(messageId, generationType));
 }
@@ -2563,6 +2692,7 @@ async function initialize() {
     try {
         getSettings();
         applyAppearance();
+        buildActivityIndicator();
         buildInterface();
         await addSettingsDrawer();
         observeWandMenu();
@@ -2571,7 +2701,7 @@ async function initialize() {
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape') closeInterface();
         });
-        console.info('[Tensei System] Role-play interface v0.7.0 loaded.');
+        console.info('[Tensei System] Role-play interface v0.8.0 loaded.');
     } catch (error) {
         initialized = false;
         console.error('[Tensei System] Failed to initialize.', error);
