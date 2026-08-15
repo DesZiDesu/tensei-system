@@ -1,0 +1,161 @@
+@import url("./style.css");
+
+/* Tensei System UI polish layer.
+   Kept separate from the core stylesheet so these targeted visual fixes stay
+   isolated from the extension's existing layout and behavior. */
+
+/* Appearance menu: keep the accent picker a true circular swatch instead of
+   stretching it to the full width of the settings column. */
+.tensei-setting-row input[type="color"] {
+    width: 2.15rem;
+    min-width: 2.15rem;
+    max-width: 2.15rem;
+    height: 2.15rem;
+    min-height: 2.15rem;
+    padding: 2px;
+    justify-self: start;
+    overflow: hidden;
+    border: 1px solid var(--tensei-line);
+    border-radius: 50%;
+    background: #0b0907;
+    cursor: pointer;
+}
+
+.tensei-setting-row input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 1px;
+}
+
+.tensei-setting-row input[type="color"]::-webkit-color-swatch {
+    border: 0;
+    border-radius: 50%;
+}
+
+.tensei-setting-row input[type="color"]::-moz-color-swatch {
+    border: 0;
+    border-radius: 50%;
+}
+
+/* Scene time cycle: turn the old boxed phase row into a cleaner timeline.
+   The active phase remains driven by the existing --phase value. */
+.tensei-scene-cycle.tensei-day-cycle {
+    min-height: 86px;
+    margin-bottom: .65rem;
+    padding: .9rem .65rem .72rem;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at calc(12.5% + (var(--phase) * 25%)) 28px, rgba(var(--tensei-accent-rgb), .10), transparent 18%),
+        linear-gradient(180deg, rgba(var(--tensei-accent-rgb), .035), rgba(0, 0, 0, .18));
+    border: 1px solid var(--tensei-line-soft);
+    border-radius: 3px;
+    box-shadow: inset 0 1px rgba(255, 255, 255, .018);
+}
+
+.tensei-scene-cycle .tensei-cycle-line {
+    left: 12.5%;
+    right: 12.5%;
+    top: 28px;
+    height: 2px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, .075);
+    border-radius: 999px;
+}
+
+.tensei-scene-cycle .tensei-cycle-line span {
+    height: 100%;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--tensei-accent) 62%, #6f624d), var(--tensei-accent));
+    box-shadow: 0 0 calc(10px * var(--tensei-glow-strength)) rgba(var(--tensei-accent-rgb), .62);
+}
+
+.tensei-scene-cycle .tensei-cycle-stop {
+    gap: .38rem;
+    color: var(--tensei-muted);
+    font-size: .58rem;
+    letter-spacing: .015em;
+}
+
+.tensei-scene-cycle .tensei-cycle-stop i {
+    width: 29px;
+    height: 29px;
+    color: #746f67;
+    background: linear-gradient(180deg, #151310, #090806);
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .26);
+    font-size: .68rem;
+    transition: transform 180ms ease, color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.tensei-scene-cycle .tensei-cycle-stop span {
+    white-space: nowrap;
+}
+
+.tensei-scene-cycle .tensei-cycle-stop.is-current {
+    color: color-mix(in srgb, var(--tensei-accent) 76%, white);
+    font-weight: 650;
+}
+
+.tensei-scene-cycle .tensei-cycle-stop.is-current i {
+    color: #0c0804;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--tensei-accent) 76%, white), var(--tensei-accent));
+    border-color: color-mix(in srgb, var(--tensei-accent) 72%, white);
+    box-shadow:
+        0 0 0 3px rgba(var(--tensei-accent-rgb), .10),
+        0 0 calc(20px * var(--tensei-glow-strength)) rgba(var(--tensei-accent-rgb), .72);
+    transform: scale(1.08);
+}
+
+@media (max-width: 800px) {
+    /* Fill the middle shell correctly, then dock navigation immediately above
+       the location/sync footer. This also caps iOS safe-area padding so Safari
+       cannot create the large blank bands seen on some mobile viewports. */
+    .tensei-app-layout {
+        height: 100%;
+        min-height: 0;
+    }
+
+    .tensei-tab-list {
+        align-self: end;
+        padding: .32rem .22rem max(.32rem, min(env(safe-area-inset-bottom, 0px), 12px));
+    }
+
+    .tensei-system-panel-footer {
+        min-height: 44px;
+        padding: .5rem .68rem max(.5rem, min(env(safe-area-inset-bottom, 0px), 14px));
+    }
+
+    .tensei-scene-cycle.tensei-day-cycle {
+        min-height: 82px;
+        padding: .82rem .38rem .65rem;
+    }
+
+    .tensei-scene-cycle .tensei-cycle-line {
+        left: 12.5%;
+        right: 12.5%;
+        top: 26px;
+    }
+
+    .tensei-scene-cycle .tensei-cycle-stop {
+        gap: .32rem;
+        font-size: .53rem;
+    }
+
+    .tensei-scene-cycle .tensei-cycle-stop i {
+        width: 27px;
+        height: 27px;
+        font-size: .62rem;
+    }
+}
+
+@media (max-width: 440px) {
+    .tensei-scene-cycle.tensei-day-cycle {
+        padding-inline: .22rem;
+    }
+
+    .tensei-scene-cycle .tensei-cycle-stop {
+        font-size: .49rem;
+    }
+
+    .tensei-system-panel-footer {
+        gap: .5rem;
+    }
+}
