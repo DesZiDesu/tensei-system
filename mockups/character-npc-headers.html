@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Tensei — Character / NPC Header Mockups</title>
+<style>
+:root{color-scheme:dark;--bg:#0e0d0c;--panel:#171410;--ink:#eee9df;--soft:#c9c0b2;--gold:#b78648;--line:#54412d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,sans-serif}
+button,input{font:inherit}button{border:1px solid var(--line);background:#211b14;color:var(--ink);padding:9px 15px;min-height:44px;cursor:pointer;border-radius:0}button:hover{background:#33291d}button:focus-visible,summary:focus-visible{outline:2px solid #efd1a9;outline-offset:4px}
+button[aria-pressed=true]{background:var(--gold);color:#130e08;border-color:var(--gold)}
+.wrap{max-width:980px;margin:0 auto;padding:30px 20px 48px}.eyebrow{font-size:11px;letter-spacing:.2em;color:#d3ad7c}h1{font:400 clamp(24px,4vw,36px)/1.3 Georgia,serif;margin:8px 0}p{margin:0 0 16px}.sub{color:var(--soft);font-size:14px}
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:22px 0 12px}.controls .view{margin-left:auto}.options{display:flex;flex-wrap:wrap;gap:20px;font-size:14px;color:var(--soft);padding:8px 0 18px}.options label{display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer}input{accent-color:var(--gold);width:18px;height:18px}
+#description{min-height:28px;font-size:14px;color:#d3ad7c}
+.stage{max-width:100%;margin:auto;transition:max-width .2s ease}.stage.mobile{max-width:390px}.window{background:#13110f;border:1px solid var(--line)}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--line)}.brand{font:400 19px Georgia,serif;letter-spacing:.05em}.top small{color:#b8aa98;font-size:12px}.top .live{margin-left:auto;font-size:11px;letter-spacing:.12em;color:#d3ad7c}
+.chat{padding:22px}.narration{font-size:15px;color:#c9c0b2;line-height:1.9;margin:0 0 20px}
+.speaker{margin:0 0 22px}.identity{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-left:3px solid var(--gold);padding:12px;background:#1b1712;text-align:left;width:100%;color:var(--ink)}
+.avatar{width:52px;height:58px;flex:none;display:grid;place-content:center;background:linear-gradient(135deg,#373242,#1a1720);border:1px solid #625574;font:400 23px Georgia,serif;color:#d5c4ed}.avatar.green{background:linear-gradient(135deg,#2a3b2c,#151c17);border-color:#536549;color:#cbdfb8}
+.identity-copy{min-width:0;flex:1}.kind{display:block;font:11px/1.4 system-ui,sans-serif;letter-spacing:.14em;color:#cfaa79}.name{display:block;font:400 22px/1.25 Georgia,serif;margin:3px 0;overflow-wrap:anywhere}.role{display:block;color:var(--soft);font-size:13px}.open{font:12px/1.4 system-ui,sans-serif;color:#d3ad7c;white-space:nowrap}
+.words{margin:15px 0 0 26px;padding:0 0 0 18px;border-left:1px solid var(--line)}.label{font-size:11px;letter-spacing:.08em;color:#c9a575;margin-bottom:6px}.speech{font-size:17px;margin:0 0 16px;line-height:1.8}
+.thought{background:#1b1815;border:1px solid #373027;padding:10px 14px;color:#bfb3a4;font-size:14px}.thought summary{cursor:pointer;min-height:26px;color:#b69d7d}.thought p{font-style:italic;margin:8px 0 2px}
+.status{display:none}.composer{border-top:1px solid var(--line);padding:13px 18px;color:#8e8274;font-size:13px;display:flex;justify-content:space-between}
+.stage.b .speaker{display:grid;grid-template-columns:160px minmax(0,1fr);background:#1b1712;border:1px solid var(--line)}.stage.b .identity{display:flex;flex-direction:column;justify-content:flex-start;gap:12px;border:0;border-right:1px solid var(--line);padding:20px 12px;text-align:center;background:#211a13}
+.stage.b .identity-copy{flex:0}.stage.b .avatar{width:82px;height:94px;font-size:32px}.stage.b .name{font-size:20px}.stage.b .words{border:0;margin:0;padding:22px}.stage.b .open{margin-top:5px}.stage.b .status{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.tag{border:1px solid var(--line);padding:3px 8px;font-size:12px;color:#d2b48c}
+.stage.hide-thoughts .thought{display:none}.stage.hide-headers .identity{display:none}.stage.hide-headers .speaker{display:block}.stage.hide-headers .words{margin-left:0}
+.stage.mobile .chat{padding:14px}.stage.mobile .identity{flex-wrap:wrap;gap:10px}.stage.mobile .open{display:none}.stage.mobile .name{font-size:19px}.stage.mobile.b .speaker{grid-template-columns:1fr}.stage.mobile.b .identity{flex-direction:row;text-align:left;border-right:0;border-bottom:1px solid var(--line);padding:14px}.stage.mobile.b .avatar{width:56px;height:64px;font-size:24px}.stage.mobile.b .words{padding:16px}.stage.mobile.b .identity-copy{flex:1}.stage.mobile .words{margin-left:8px;padding-left:12px}.stage.mobile .top{padding:12px}
+.note{color:#a89a88;font-size:12px;margin-top:18px}
+dialog{background:#18140f;color:var(--ink);border:1px solid var(--gold);padding:24px;width:min(440px,calc(100% - 32px));max-height:85dvh;overflow:auto}dialog::backdrop{background:#000b}dialog h2{font:400 28px Georgia,serif;margin:14px 0 8px}dialog dl{display:grid;grid-template-columns:95px 1fr;gap:12px;margin:24px 0}dt{color:#b8a184}dd{margin:0}.dialog-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+@media(max-width:600px){.wrap{padding:20px 12px}.controls .view{margin-left:0}.chat{padding:14px}.identity{gap:10px;flex-wrap:wrap}.name{font-size:20px}.open{display:none}.stage.b .speaker{grid-template-columns:1fr}.stage.b .identity{flex-direction:row;text-align:left;border-right:0;border-bottom:1px solid var(--line);padding:14px}.stage.b .identity-copy{flex:1}.stage.b .avatar{width:56px;height:64px;font-size:24px}.stage.b .words{padding:16px}.words{margin-left:8px;padding-left:12px}.options{gap:10px 18px}.live{display:none}.speech{font-size:16px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<div class="eyebrow">TENSEI SYSTEM / INTERACTIVE MOCKUP</div>
+<h1>Character &amp; NPC Headers</h1>
+<p class="sub">ลองสลับรูปแบบ แล้วแตะชื่อผู้พูดเพื่อเปิดโปรไฟล์ตัวอย่าง</p>
+<div class="controls" aria-label="รูปแบบตัวอย่าง">
+<button type="button" data-variant="a" aria-pressed="true">A · Compact Header</button>
+<button type="button" data-variant="b" aria-pressed="false">B · Portrait Card</button>
+<button type="button" id="mobile" class="view" aria-pressed="false">จำลองหน้าจอมือถือ</button>
+</div>
+<div id="description" aria-live="polite">A — แถบชื่อกะทัดรัด เว้นพื้นที่ให้บทสนทนา</div>
+<div class="options">
+<label><input id="headers" type="checkbox" checked>แสดง Header</label>
+<label><input id="thoughts" type="checkbox" checked>แสดงความคิด</label>
+</div>
+<section id="stage" class="stage a" aria-label="ตัวอย่าง Main Chat">
+<div class="window">
+<header class="top"><span class="brand">Tensei System</span><small>Main Chat</small><span class="live">PREVIEW</span></header>
+<div class="chat">
+<p class="narration">แสงเช้าลอดผ่านยอดไม้ ร็อกซี่วางตำราไว้ข้างตัว ก่อนหันมาหาคุณพร้อมไม้เท้าในมือ</p>
+<article class="speaker">
+<button type="button" class="identity" data-person="roxy" aria-label="เปิดโปรไฟล์ Roxy Migurdia">
+<span class="avatar" aria-hidden="true">RM</span>
+<span class="identity-copy"><span class="kind">CHARACTER</span><span class="name">Roxy Migurdia</span><span class="role">อาจารย์เวทมนตร์</span></span><span class="open">ดูโปรไฟล์ ↗</span>
+</button>
+<div class="words"><div class="label">บทสนทนา</div><p class="speech">“วันนี้เราจะเริ่มจากการควบคุมมานานะ ลองตั้งสมาธิ แล้วค่อย ๆ ปล่อยมันออกมา”</p>
+<details class="thought" open><summary>ความคิด</summary><p>เขาเรียนรู้ได้เร็วกว่าที่ฉันคาดไว้… บางทีอาจถึงเวลาสอนบทต่อไปแล้ว</p></details>
+<div class="status"><span class="tag">สงบ</span><span class="tag">กำลังสอน</span></div></div>
+</article>
+<p class="narration">เสียงฝีเท้าหยุดลงที่ชายป่า รูย์เจิร์ดกวาดตามองรอบบริเวณ ก่อนพยักหน้าให้ทั้งสองคน</p>
+<article class="speaker">
+<button type="button" class="identity" data-person="ruijerd" aria-label="เปิดโปรไฟล์ Ruijerd Superdia">
+<span class="avatar green" aria-hidden="true">RS</span>
+<span class="identity-copy"><span class="kind">NPC</span><span class="name">Ruijerd Superdia</span><span class="role">นักรบเผ่าสเปิร์ด</span></span><span class="open">ดูโปรไฟล์ ↗</span>
+</button>
+<div class="words"><div class="label">บทสนทนา</div><p class="speech">“ข้าจะคอยดูทางให้ พวกเจ้าฝึกต่อเถอะ ถ้ามีอะไรผิดปกติ ข้าจะบอกเอง”</p>
+<div class="status"><span class="tag">ระวังตัว</span><span class="tag">เฝ้ายาม</span></div></div>
+</article>
+</div>
+<div class="composer"><span>ตัวอย่างการแสดงผลบทสนทนา</span><span>AI message #12</span></div>
+</div>
+</section>
+<p class="note">ข้อมูลสมมติสำหรับเลือกดีไซน์ · RM / RS แทนตำแหน่งรูปตัวละคร · ยังไม่เชื่อมกับ AI หรือข้อมูลแชทจริง</p>
+</main>
+<dialog id="profile" aria-labelledby="profile-name">
+<div class="dialog-top"><span class="eyebrow">NPC CODEX / ตัวอย่าง</span><button type="button" id="close">ปิด ×</button></div>
+<h2 id="profile-name"></h2><p id="profile-role" class="sub"></p>
+<dl><dt>เผ่าพันธุ์</dt><dd id="profile-race"></dd><dt>ความสัมพันธ์</dt><dd id="profile-relation"></dd><dt>สถานที่</dt><dd>ลานฝึกริมป่า</dd></dl>
+<p class="note">ตัวอย่างการเปิดโปรไฟล์จาก Header — ยังไม่ใช่ข้อมูลที่บันทึกในส่วนเสริม</p>
+</dialog>
+<script>
+'use strict';
+const stage=document.getElementById('stage');
+const description=document.getElementById('description');
+document.querySelectorAll('[data-variant]').forEach(button=>{
+button.addEventListener('click',()=>{
+const variant=button.dataset.variant;
+stage.classList.toggle('a',variant==='a');
+stage.classList.toggle('b',variant==='b');
+document.querySelectorAll('[data-variant]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+description.textContent=variant==='a'?'A — แถบชื่อกะทัดรัด เว้นพื้นที่ให้บทสนทนา':'B — การ์ดตัวละคร รวมตัวตน บทสนทนา และสถานะ';
+});
+});
+const mobile=document.getElementById('mobile');
+mobile.addEventListener('click',()=>{
+const active=stage.classList.toggle('mobile');
+mobile.setAttribute('aria-pressed',String(active));
+});
+document.getElementById('headers').addEventListener('change',event=>stage.classList.toggle('hide-headers',!event.target.checked));
+document.getElementById('thoughts').addEventListener('change',event=>stage.classList.toggle('hide-thoughts',!event.target.checked));
+const profiles={
+roxy:{name:'Roxy Migurdia',role:'อาจารย์เวทมนตร์',race:'มิเกิร์ด',relation:'อาจารย์ / ผู้ร่วมทาง'},
+ruijerd:{name:'Ruijerd Superdia',role:'นักรบเผ่าสเปิร์ด',race:'สเปิร์ด',relation:'ผู้ร่วมทาง'}
+};
+const dialog=document.getElementById('profile');
+document.querySelectorAll('[data-person]').forEach(button=>button.addEventListener('click',()=>{
+const person=profiles[button.dataset.person];
+for(const field of ['name','role','race','relation'])document.getElementById('profile-'+field).textContent=person[field];
+dialog.showModal();
+}));
+document.getElementById('close').addEventListener('click',()=>dialog.close());
+</script>
+</body>
+</html>
