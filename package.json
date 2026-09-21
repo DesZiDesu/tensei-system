@@ -1,0 +1,4 @@
+{
+  "name": "tensei-system", "private": true, "type": "module", "version": "1.2.0",
+  "scripts": { "test": "node --test tests/*.test.js", "test:browser": "node tests/browser.mjs" }
+}

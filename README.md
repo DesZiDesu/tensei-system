@@ -61,6 +61,26 @@ connected only through optional NPC/Contact links and physical letters.
 
 ## Changelog
 
+### 1.2.0 — MT chat + NPC Management + cache-safe loading
+
+- Approved rectangular Header/Dialogue/Narrative design: per-character colors, light parchment dialogue, neutral narrative, no gaps between blocks, and one header per continuous speaker. Ordinary legacy prose is not guessed or converted.
+- Square 1:1 portraits with a double frame, 32–128 px size, and 70–100% dialogue width. Without an available image there is no placeholder or empty frame. Main-character card images are used when available; uploaded portraits stay on this device, not in AI prompts.
+- Open **Extensions → Tensei System → NPC Management** or its shortcut in the existing NPC Codex. Six editable sections cover identity, story, relationships, stats, skills/notes, and image/color. Search, create, edit, delete and AI completion share the existing per-chat `npcs` registry; previous Codex data is retained.
+- The normal AI response uses `<tensei_chat>` with `npcs` and `turns`, plus the existing `tensei_patch` for other state. No additional AI request is made for automatic NPC collection. The system starts after the first user reply, as before.
+- Every new AI profile must have all 22 textual fields, six relationship values, eight numeric stats plus rank, and explicit abilities/customMeters/diary arrays (empty arrays are valid when there are no entries). Placeholder strings and incomplete nested entries fail validation. Fictional details/game stats are requested consistently with the story, not represented as canonical source facts.
+- If a model omits fields or only supplies a speaker name, the NPC is still visible in Management as **pending**, with the exact missing fields. It is not falsely marked complete; the next main reply is asked to complete it. Existing filled/manual values are protected during completion. A model cannot be forced to comply: retry or use **ให้ AI เติมช่องว่าง** if needed. That explicit button uses one extra request, previews the result, and requires Save.
+- The HTML transcript keeps the chat protocol for replay/swipes; rendering uses text nodes, never executes AI-supplied markup. Per-chat isolation, duplicate prevention, and stale-context checks protect NPC saves and portrait uploads. Deleting a dossier does not delete old chat messages or letters.
+
+#### Updating on iOS Safari
+
+Press **Update** for the extension in SillyTavern, wait for the server update to finish, then refresh/reopen SillyTavern normally. No Safari cache clearing is needed for subsequent releases using this loader. `manifest.json` now selects a new stable `loader.js` entry; it loads runtime, every local module, all stylesheets, and settings with a fresh query token on every page load. Settings also use `cache: no-store`; CSS has no unversioned `@import`.
+
+Reloading alone does **not** update extension files on the server. A stale server/proxy/service worker that ignores query strings is outside the loader's control. Keep `loader.js` stable in future releases, put feature changes in runtime/modules, and preserve versioned loading for all new local assets.
+
+#### Verification
+
+`npm test` runs protocol and runtime-state regressions without dependencies or AI calls. `npm run test:browser` runs the optional Playwright mock-host suite (install Playwright and Chromium first, or provide `CHROMIUM_PATH`). This release's browser download was blocked by network timeouts in the development environment, so only the Node suite was executed there; real iOS Safari/provider testing remains necessary.
+
 ### 1.1.0
 
 - Added a comprehensive per-reply update checklist for progression, proficiency, NPCs, Scene, maps, inventory, quests, and Mailbox.

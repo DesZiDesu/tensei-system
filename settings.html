@@ -5,6 +5,13 @@
             <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down" aria-hidden="true"></div>
         </div>
         <div class="inline-drawer-content">
+            <p>Tensei System 1.2.0</p>
+            <button id="tensei-npc-manager-open" class="menu_button" type="button">NPC Management · จัดการตัวละคร</button>
+            <label class="checkbox_label"><input id="tensei-render-chat" type="checkbox"><span>แสดง Header / Dialogue / Narrative แบบ MT</span></label>
+            <label class="checkbox_label"><input id="tensei-npc-auto" type="checkbox"><span>สร้าง NPC จากคำตอบหลักอัตโนมัติ (ไม่เรียก AI เพิ่ม)</span></label>
+            <label>ขนาดภาพ Header เริ่มต้น (32–128 px)<input id="tensei-chat-avatar-size" type="range" min="32" max="128" step="8"></label>
+            <label>ความกว้างกล่องพูด (70–100%)<input id="tensei-dialogue-width" type="range" min="70" max="100" step="5"></label>
+            <p class="tensei-settings-help">โปรไฟล์ AI ต้องครบทุกช่องจึงถือว่าสมบูรณ์ รายการที่ขาดจะอยู่ใน NPC Management พร้อมสถานะรอเติม ปุ่มให้ AI เติมเองใช้คำขอเพิ่ม 1 ครั้ง</p>
             <p class="tensei-system-settings-copy">A persistent Mushoku Tensei role-play state linked to the current chat.</p>
             <label class="checkbox_label" for="tensei-system-show-launcher">
                 <input id="tensei-system-show-launcher" type="checkbox" />
